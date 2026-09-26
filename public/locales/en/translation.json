@@ -1,0 +1,462 @@
+{
+  "common": {
+    "submit": "Submit",
+    "processing": "Processing data on the server...",
+    "contact": "Contact",
+    "map": "Map",
+    "save": "Save",
+    "cancel": "Cancel",
+    "login": "Login",
+    "logout": "Logout"
+  },
+  "nav": {
+    "home": "Home",
+    "information": "Information",
+    "login": "Login",
+    "logout": "Logout",
+    "language": "Language",
+    "info": "Signed in as"
+  },
+  "hero": {
+    "title": "<0>Geographic Information System</0><1/><2>Flood-prone Area Mapping</2>",
+    "subtitle": "Analysis and visualization of geospatial data for real-time identification, monitoring, and mitigation of flood risks.",
+    "ctaButton": "Start Mapping",
+    "demoButton": "See Demo"
+  },
+  "infoCard": {
+    "title": "Best <1>Feature</1>",
+    "subtitle": "Advanced technology for accurate and comprehensive analysis and mapping of flood-prone areas",
+    "features": {
+      "interactive": {
+        "title": "Interactive Mapping",
+        "description": "Digital map visualization with customizable geospatial data layers for in-depth analysis of flood-prone areas."
+      },
+      "database": {
+        "title": "Database Integration",
+        "description": "A centralized database system that stores historical data on rainfall, topography, and flood events for predictive analysis."
+      },
+      "analysis": {
+        "title": "Data Analysis",
+        "description": "Machine learning algorithms to analyze flood patterns and provide risk predictions based on historical and real-time data."
+      },
+      "warning": {
+        "title": "Early Warning System",
+        "description": "Automatic notifications to the public and stakeholders regarding potential flooding based on weather monitoring and field conditions."
+      },
+      "monitoring": {
+        "title": "Real-time Monitoring",
+        "description": "Integration with satellites for real-time monitoring of weather and environmental conditions."
+      },
+      "collaboration": {
+        "title": "Multi-Stakeholder Collaboration",
+        "description": "A collaborative platform for government, researchers, and communities in flood mitigation and management."
+      }
+    }
+  },
+  "contact": {
+    "title": "Contact <1>Us</1>",
+    "subtitle": "Need more information? Our team is ready to assist you in implementing a GIS system for your region.",
+    "info": {
+      "emailTitle": "Email",
+      "callTitle": "Call",
+      "addressTitle": "Address",
+      "addressDetail": "KMUTT Geospatial Engineering and InnOvation Center (KGEO) located in the Science Instrument Building, 5th floor, on the KMUTT Bangmod Campus <1/> 126 Pracha Uthit Road <3/> Bang Mod, Thung Khru, Bangkok 10140, Thailand."
+    },
+    "form": {
+      "nameLabel": "Full Name",
+      "namePlaceholder": "Enter your name",
+      "emailLabel": "Email",
+      "emailPlaceholder": "name@email.com",
+      "messageLabel": "Message",
+      "messagePlaceholder": "Your message..."
+    }
+  },
+  "footer": {
+    "tagline": "Flood-prone Area Mapping System",
+    "description": "Geospatial analysis and mapping platform for flood risk identification, monitoring and mitigation using the latest technology.",
+    "quickLinks": {
+      "title": "Quick Links",
+      "home": "Home",
+      "about": "About us",
+      "feature": "Feature",
+      "docs": "Documentation",
+      "blog": "Blog"
+    },
+    "resources": {
+      "title": "Resources",
+      "userManual": "User Manual",
+      "apiDoc": "API Documentation",
+      "demonstration": "Demonstration",
+      "faq": "FAQ",
+      "contact": "Contact"
+    },
+    "legal": {
+      "privacy": "Privacy Policy",
+      "terms": "Terms & Conditions",
+      "sitemap": "Sitemap"
+    },
+    "dataResources": {
+    "title": "Data Resources",
+    "gee": "Google Earth Engine",
+    "leaflet": "Leaflet JS",
+    "openStreetMap": "OpenStreetMap",
+    "nakhonPathomDWR": "Nakhon Pathom DWR Data"
+  },
+    "copyright": "© {{year}} FlowGIS. All rights reserved."
+  },
+  "carousel": {
+    "news": {
+      "news1": {
+        "title": "News1",
+        "description": "description.....",
+        "location": "location"
+      },
+      "news2": {
+        "title": "News2",
+        "description": "description.....",
+        "location": "Bandung"
+      }
+    }
+  },
+  "sidebar": {
+    "mainTitle": "GIS Mapping & Analysis Tools",
+    "toggle": {
+      "close": "Close Sidebar",
+      "open": "Open Sidebar"
+    },
+    "sections" : {
+      "floodEvent": "Flood Event Analysis",
+      "rainfall": "Rainfall Analysis",
+      "floodRisk": "Flood Risk Analysis"
+    },
+    "aoi": {
+      "title": "Area of Interest (AOI)",
+      "description": "Select one: draw polygon, click the map, or enter coordinates manually.",
+      "coordinatesLabel": "Polygon/Point Coordinates:",
+      "placeholder": "Draw a polygon or click on map...",
+      "clearButton": "Clear AOI Selection"
+    },
+    "layers": {
+      "admin": {
+        "title": "Administrative Boundaries",
+        "provinces": "Provinces",
+        "districts": "Districts"
+      },
+      "facilities": {
+        "hospitals": "Hospitals",
+        "waterStation": "Water Station (CCTV)"
+      },
+      "thematic": {
+        "title": "Thematic Layers",
+        "globalSurfaceWater": "Global Surface Water",
+        "urbanAreas": "Urban Areas"
+      }
+    },
+    "analysis": {
+      "floodEvent": {
+        "title": "Flood Event Analysis",
+        "startDate": "Start Date:",
+        "endDate": "End Date:",
+        "button": "Show Flood Comparison",
+        "layersTitle": "Flood Comparison Layers",
+        "waterBefore": "Water Before Flood (Light Blue)",
+        "waterAfter": "Water During Flood (Dark Blue)",
+        "newFlooded": "New Flooded Area (Red)"
+      },
+      "floodRisk": {
+          "description": "Calculates a 5-factor flood hazard risk score based on historical data.",
+          "startYear": "Start Year:",
+          "endYear": "End Year:",
+          "startDate": "Start Date:",
+          "endDate": "End Date:",
+          "button": "Run Flood Risk Analysis",
+          "layersTitle": "Component Layers",
+          "defaultLayer": "Flood Susceptibility Score (Default)",
+          "rawLayersTitle": "Raw Data Layers:",
+          "raw": {
+            "rainfall": "Rainfall ",
+            "elevation": "Elevation ",
+            "distance": "Distance from Water",
+            "tpi": "Topographic Position Index (TPI)",
+            "ndvi": "Vegetation (Normalized Difference Vegetation Index)",
+            "ndwi": "Wetness (Normalized Difference Water Index)"
+          },
+          "scoreLayersTitle": "Susceptibility Score Layers (1-5):",
+          "score": {
+            "elevation": "Elevation Score",
+            "distance": "Distance from water Score",
+            "topo": "Topographic Position Index (TPI) Score",
+            "vegetation": "Vegetation (Normalized Difference Vegetation Index) Score",
+            "wetness": "Wetness (Normalized Difference Water Index) Score"
+          },
+          "mlDescription": "or complete the form and analyze the area with machine learning",
+          "mlBtn": "Try it"
+      },
+      "rainfall": {
+        "title": "Rainfall Analysis",
+        "startYear": "Start Year:",
+        "endYear": "End Year:",
+        "button": "Show Graphs & Maps",
+        "startDate": "Start Date",
+        "endDate": "End Date",
+        "mode": {                  
+          "monthly": "Monthly",
+          "daily": "Daily"
+        }
+      }
+    }
+  },
+  "mapTools": {
+    "drawPolygon": "Draw Polygon",
+    "insertPoint": "Insert Point",
+    "drawCircle": "Draw Circle",
+    "delete": "Delete",
+    "zoomIn": "Zoom In",
+    "zoomOut": "Zoom Out",
+    "homeButtonAriaLabel": "Go to Home",
+    "infoButtonAriaLabel": "Go to Information",
+    "openLayers": "Open layers",
+    "closeLayers": "Close layers"
+  },
+  "layerPopup": {
+    "title": "Layer",
+    "geosocial": "Geosocial Map Layers",
+    "thematic": "Thematic Layers",
+    "admin": "Administrative Boundaries",
+    "facilities": "Public Facilities"
+  },
+  "basemapPopup": {
+    "title": "Basemap",
+    "closeAriaLabel": "Close",
+    "scrollLeft": "Scroll left",
+    "scrollRight": "Scroll right",
+    "maps": {
+      "osm": "OpenStreetMap",
+      "satellite": "Satellite",
+      "dark": "Dark Mode",
+      "topo": "Topographic"
+    }
+  },
+  "fileUploadPopup": {
+    "mainTitle": "Upload AOI File",
+    "dragTitle": "Upload or drag your AOI file here",
+    "formats": "Format: GeoJSON, KML, Shapefile (ZIP)",
+    "selectFile": "Select File",
+    "selectedFile": "Selected file: {{fileName}}",
+    "submit": "Submit File",
+    "triggerAriaLabel": "Upload file",
+    "req": "Login Required",
+    "desc": "To upload files and perform analysis, you need to sign in to your account first.",
+    "login": "Login"
+  },
+  "chartPopup": {
+    "rainfallTitle": "Rainfall Analysis Results"
+  },
+  "markerPopup": {
+    "defaultName": "Public Facilities",
+    "defaultNA": "N/A",
+    "type": "Type:",
+    "address": "Address:",
+    "phone": "Phone:",
+    "capacity": "Capacity:"
+  },
+  "waterStation": {
+    "popup": {
+      "type": "Type:",
+      "owner": "Station Owner Name:",
+      "code": "Station Code:",
+      "coordinate": "Coordinate:",
+      "viewDetails": "View Details"
+    },
+    "modal": {
+      "contentLabel": "Water Station Details",
+      "title": "Station Details: {{stationCode}}",
+      "errorLoad": "Unable to load historical data for this station.",
+      "emptyAll": "There is no historical data to display for this station.",
+      "titleWaterLevel": "Water Level",
+      "emptyWaterLevel": "No water level data.",
+      "titleRunoff": "Runoff",
+      "emptyRunoff": "No runoff/discharge data.",
+      "titleRainfall": "Rainfall",
+      "emptyRainfall": "No rainfall data available.",
+      "charts": {
+        "axisDate": "Date / Time",
+        "axisValue": "Value",
+        "labelRainfall": "Rainfall (mm)",
+        "labelWaterLevel": "Water Level (m)",
+        "labelDischarge": "Discharge (m³/s)"
+      }
+    }
+  },
+  "search": {
+    "title": "Search for Information",
+    "placeholder": "Search for flood news, articles or information...",
+    "mapPlaceholder": "Find the name of the region/place...",
+    "toggleOpen": "Open search",
+    "toggleClose": "Close search",
+    "clear": "Clear search"
+  },
+  "signup": {
+    "logoAlt": "Company Logo",
+    "title": "Create a New Account",
+    "form": {
+      "fullNameLabel": "Full Name",
+      "fullNamePlaceholder": "Enter full name",
+      "UserNameLabel": "Username",
+      "phoneLabel": "Phone Number",
+      "phonePlaceholder": "08xxxxxxxxxx",
+      "emailLabel": "Email",
+      "emailPlaceholder": "name@email.com",
+      "passwordLabel": "New Password",
+      "passwordPlaceholder": "Minimum 8 characters",
+      "confirmPasswordLabel": "Confirm Password",
+      "confirmPasswordPlaceholder": "Confirm password",
+      "submitButton": "Submit",
+      "orSeparator": "Or sign up with",
+      "googleButton": "Google",
+      "loginPrompt": "Already have an account? <1>Login here</1>"
+    }
+  },
+  "login": {
+    "logoAlt": "Company Logo",
+    "title": "Login",
+    "subtitle": "Log in to your account",
+    "form": {
+      "usernameLabel": "Username",
+      "usernamePlaceholder": "Enter username",
+      "emailLabel": "Email",
+      "emailPlaceholder": "Enter your email",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "Enter password",
+      "forgotPassword": "Forgot password?",
+      "submitButton": "Login",
+      "orSeparator": "Or login with",
+      "googleButton": "Google",
+      "registerPrompt": "Don't have an account yet? <1>Register now</1>"
+    },
+    "desc": "Don't have an account yet? ",
+    "toRegister": "Register now"
+  },
+  "charts": {
+    "rainfall": {
+      "label": "Monthly Rainfall (mm)",
+      "dailyLabel": "Daily Rainfall (mm)",
+      "empty": "No rainfall data to display."
+    }
+  },
+  "searchBar": {
+    "title": "Search for Information",
+    "placeholder": "Search for flood news, articles or information..."
+  },
+  "infoPage": {
+    "latestNewsTitle": "Flood Latest News"
+  },
+  "geoLayers": {
+    "ad4_zone_poly": "City Plan Zones",
+    "admin_point": "Administrative Points",
+    "administrative_line": "Administrative Boundaries",
+    "agriculture_area_poly": "Agricultural Areas",
+    "barrage_line": "Barrages",
+    "bridge_point": "Bridges",
+    "chang_line": "Provincial Boundaries",
+    "comunity_area_poly": "Community & Residential Areas",
+    "evacuation_point": "Evacuation Shelters",
+    "hidrologi_point": "Hydrology Stations",
+    "landmark_point": "Landmarks & Important Places",
+    "main_canal_line": "Main Canals",
+    "main_river_poly": "Main Rivers",
+    "military_area": "Military Areas",
+    "ms1_zone_poly": "Specific Land Use Zone (MS1)",
+    "prototype_point": "Pilot Project Sites",
+    "province_label": "Province Labels",
+    "province_road_poly": "Provincial Roads",
+    "publicland_poly": "Public Lands",
+    "rail_line": "Railway Lines",
+    "sewage_point": "Wastewater Treatment Plants",
+    "tol_area_poly": "Tollway Areas",
+    "water_gate_point": "Water Gates",
+    "water_plan_point": "Water Supply Systems",
+    "weir_point": "Weirs",
+    "solid_waste_point": "Solid Waste Disposal Sites",
+    "tol_81_line": "Motorway Route 81"
+  },
+  "welcomeModal": {
+    "title": "Welcome to Flowgis",
+    "description": "Want to start mapping? Check the manual here for complete instructions.",
+    "laterBtn": "Later",
+    "manualBtn": "Let's See"
+  },
+  
+  "mlAnalysis": {
+    "instruction": "Upload 10 GeoTIFF raster files in the order below. The input order is very important!",
+    "factors": {
+      "flow_accumulation": "1. Flow Accumulation",
+      "soil_type": "2. Soil Type",
+      "ndvi": "3. NDVI (Normalized Difference Vegetation Index)",
+      "ndwi": "4. NDWI (Normalized Difference Water Index)",
+      "lulc": "5. LULC (Land Use Land Cover)",
+      "ndbi": "6. NDBI (Normalized Difference Built-up Index)",
+      "elevation": "7. Elevation (DEM)",
+      "twi": "8. TWI (Topographic Wetness Index)",
+      "precipitation": "9. Precipitation",
+      "slope": "10. Slope"
+    },
+    "buttons": {
+      "submit": "Run ML Prediction",
+      "processing": "Processing and Predicting..."
+    },
+    "errors": {
+      "failed": "Failed"
+    },
+    "modal": "ML Flood Vulnerability Analysis (10 Factors)"
+  },
+  "layerPopup": {
+    "title": "Layers",
+    "geosocial": "Geosocial Layers",
+    "thematic": "Thematic Layers",
+    "admin": "Administrative Boundaries",
+    "facilities": "Facilities",
+    "userAnalysis": "Analysis Results"
+  },
+  "userLayers": {
+    "refresh": "Refresh Data",
+    "layersTab": "Layers",
+    "groupsTab": "Groups",
+    "selectAll": "Select All Layers",
+    "loading": "Loading analysis layers...",
+    "noLayers": "No saved analysis results yet.",
+    "noLayersDesc": "Run a spatial analysis to generate a new WMS layer.",
+    "noGroups": "No Layer Groups created yet.",
+    "noGroupsDesc": "Click the + Group button above to merge multiple layers into a single WMS.",
+    "createGroup": "Create Layer Group",
+    "editGroup": "Edit Layer Group",
+    "groupName": "Group Name",
+    "saveGroup": "Save Group",
+    "updateGroup": "Update Group",
+    "saving": "Saving...",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "zoom": "Zoom to layer",
+    "zoomGroup": "Zoom to group",
+    "selectOrder": "Select Layers & Ordering:",
+    "orderHint": "#1 = Displays on top of the map"
+  },
+  "mapTools": {
+    "drawPolygon": "Draw Polygon",
+    "insertPoint": "Insert Point",
+    "drawCircle": "Draw Circle",
+    "uploadFile": "Upload File",
+    "delete": "Delete Selection",
+    "zoomIn": "Zoom In",
+    "zoomOut": "Zoom Out"
+  },
+  "maptools": {
+    "uploadFile": "Upload File",
+    "drawPolygon": "Draw Polygon",
+    "insertPoint": "Insert Point",
+    "drawCircle": "Draw Circle",
+    "delete": "Delete Selection",
+    "zoomIn": "Zoom In",
+    "zoomOut": "Zoom Out"
+  }
+}

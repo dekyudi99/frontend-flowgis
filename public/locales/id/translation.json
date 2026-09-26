@@ -1,0 +1,414 @@
+{
+  "common": {
+    "submit": "Kirim",
+    "processing": "Memproses data di server...",
+    "contact": "Kontak",
+    "map": "Peta",
+    "save": "Simpan",
+    "cancel": "Batal",
+    "login": "Masuk",
+    "logout": "Keluar"
+  },
+  "nav": {
+    "home": "Beranda",
+    "information": "Informasi",
+    "login": "Login",
+    "logout": "Keluar",
+    "language": "Bahasa",
+    "info": "Masuk sebagai"
+  },
+  "hero": {
+    "title": "<0>Sistem Informasi Geografis</0><1/><2>Pemetaan Area Rawan Banjir</2>",
+    "subtitle": "Analisis dan visualisasi data geospasial untuk identifikasi, pemantauan, dan mitigasi risiko banjir secara real-time.",
+    "ctaButton": "Mulai Memetakan",
+    "demoButton": "Lihat Demo"
+  },
+  "infoCard": {
+    "title": "Fitur <1>Terbaik</1>",
+    "subtitle": "Teknologi canggih untuk analisis dan pemetaan wilayah rawan banjir yang akurat dan komprehensif",
+    "features": {
+      "interactive": {
+        "title": "Pemetaan Interaktif",
+        "description": "Visualisasi peta digital dengan lapisan data geospasial yang dapat disesuaikan untuk analisis mendalam daerah rawan banjir."
+      },
+      "database": {
+        "title": "Integrasi Basis Data",
+        "description": "Sistem basis data terpusat yang menyimpan data historis curah hujan, topografi, dan kejadian banjir untuk analisis prediktif."
+      },
+      "analysis": {
+        "title": "Analisis Data",
+        "description": "Algoritma machine learning untuk menganalisis pola banjir dan memberikan prediksi risiko berdasarkan data historis dan real-time."
+      },
+      "warning": {
+        "title": "Sistem Peringatan Dini",
+        "description": "Notifikasi otomatis kepada publik dan pemangku kepentingan mengenai potensi banjir berdasarkan pemantauan cuaca dan kondisi lapangan."
+      },
+      "monitoring": {
+        "title": "Pemantauan Real-time",
+        "description": "Integrasi dengan satelit untuk pemantauan cuaca dan kondisi lingkungan secara real-time."
+      },
+      "collaboration": {
+        "title": "Kolaborasi Multi-Stakeholder",
+        "description": "Platform kolaboratif untuk pemerintah, peneliti, dan masyarakat dalam mitigasi dan manajemen banjir."
+      }
+    }
+  },
+  "contact": {
+    "title": "Hubungi <1>Kami</1>",
+    "subtitle": "Butuh informasi lebih lanjut? Tim kami siap membantu Anda mengimplementasikan sistem GIS untuk wilayah Anda.",
+    "info": {
+      "emailTitle": "Email",
+      "callTitle": "Telepon",
+      "addressTitle": "Alamat",
+      "addressDetail": "Pusat Rekayasa dan Inovasi Geospasial KMUTT (KGEO) berlokasi di Gedung Instrumen Sains, lantai 5, di Kampus KMUTT Bangmod <1/> 126 Pracha Uthit Road <3/> Bang Mod, Thung Khru, Bangkok 10140, Thailand."
+    },
+    "form": {
+      "nameLabel": "Nama Lengkap",
+      "namePlaceholder": "Masukkan nama Anda",
+      "emailLabel": "Email",
+      "emailPlaceholder": "nama@email.com",
+      "messageLabel": "Pesan",
+      "messagePlaceholder": "Pesan Anda..."
+    }
+  },
+  "footer": {
+    "tagline": "Sistem Pemetaan Area Rawan Banjir",
+    "description": "Platform analisis dan pemetaan geospasial untuk identifikasi, pemantauan, dan mitigasi risiko banjir menggunakan teknologi terbaru.",
+    "quickLinks": {
+      "title": "Tautan Cepat",
+      "home": "Beranda",
+      "about": "Tentang Kami",
+      "feature": "Fitur",
+      "docs": "Dokumentasi",
+      "blog": "Blog"
+    },
+    "resources": {
+      "title": "Sumber Daya",
+      "userManual": "Panduan Pengguna",
+      "apiDoc": "Dokumentasi API",
+      "demonstration": "Demonstrasi",
+      "faq": "Tanya Jawab",
+      "contact": "Kontak"
+    },
+    "legal": {
+      "privacy": "Kebijakan Privasi",
+      "terms": "Syarat & Ketentuan",
+      "sitemap": "Peta Situs"
+    },
+    "dataResources": {
+    "title": "Sumber Daya Data",
+    "gee": "Google Earth Engine",
+    "leaflet": "Leaflet JS",
+    "openStreetMap": "OpenStreetMap",
+    "nakhonPathomDWR": "Data DWR Nakhon Pathom"
+  },
+    "copyright": "© {{year}} FlowGIS. Semua hak dilindungi."
+  },
+  "carousel": {
+    "news": {
+      "news1": {
+        "title": "Berita1",
+        "description": "deskripsi.....",
+        "location": "lokasi"
+      },
+      "news2": {
+        "title": "Berita2",
+        "description": "deskripsi.....",
+        "location": "Bandung"
+      }
+    }
+  },
+  "sidebar": {
+    "mainTitle": "Alat Pemetaan dan Analisis GIS",
+    "toggle": {
+      "close": "Tutup Sidebar",
+      "open": "Tutup Sidebar"
+    },
+    "sections": {
+      "floodEvent": "Analisis Kejadian Banjir",
+      "rainfall": "Analisis Curah Hujan",
+      "floodRisk": "Analisis Risiko Banjir"
+    },
+    "aoi": {
+      "title": "Area of Interest (AOI)",
+      "description": "Pilih satu: gambar poligon, klik peta, atau masukkan koordinat secara manual.",
+      "coordinatesLabel": "Koordinat Poligon/Titik:",
+      "placeholder": "Gambar poligon atau klik di peta...",
+      "clearButton": "Hapus Pilihan AOI"
+    },
+    "layers": {
+      "admin": {
+        "title": "Batas Administrasi",
+        "provinces": "Provinsi",
+        "districts": "Kabupaten/Kota"
+      },
+      "facilities": {
+        "hospitals": "Rumah Sakit",
+        "waterStation": "Stasiun Air (CCTV)"
+      },
+      "thematic": {
+        "title": "Lapisan Tematik",
+        "globalSurfaceWater": "Air Permukaan Global",
+        "urbanAreas": "Area Perkotaan"
+      }
+    },
+    "analysis": {
+      "floodEvent": {
+        "title": "Analisis Kejadian Banjir",
+        "startDate": "Tanggal Mulai:",
+        "endDate": "Tanggal Akhir:",
+        "button": "Tampilkan Perbandingan Banjir",
+        "layersTitle": "Lapisan Perbandingan Banjir",
+        "waterBefore": "Air Sebelum Banjir (Biru Muda)",
+        "waterAfter": "Air Saat Banjir (Biru Tua)",
+        "newFlooded": "Area Banjir Baru (Merah)"
+      },
+      "floodRisk": {
+        "description": "Menghitung skor risiko bahaya banjir 5 faktor berdasarkan data historis.",
+        "startYear": "Tahun Mulai:",
+        "endYear": "Tahun Akhir:",
+        "startDate": "Tanggal Mulai:",
+        "endDate": "Tahun Akhir:",
+        "button": "Jalankan Analisis Risiko Banjir",
+        "layersTitle": "Lapisan Komponen",
+        "defaultLayer": "Skor Kerentanan Banjir (Default)",
+        "rawLayersTitle": "Lapisan Data Mentah:",
+        "raw": {
+          "rainfall": "Curah Hujan ",
+          "elevation": "Elevasi",
+          "distance": "Jarak dari Sumber Air",
+          "tpi": "Indeks Posisi Topografi (TPI)",
+          "ndvi": "Vegetasi (Normalized Difference Vegetation Index)",
+          "ndwi": "Kebasahan (Normalized Difference Water Index)"
+        },
+        "scoreLayersTitle": "Lapisan Skor Kerentanan (1-5):",
+        "score": {
+          "elevation": "Skor Elevasi",
+          "distance": "Skor Jarak dari Sumber Air",
+          "topo": "Skor Indeks Posisi Topografi (TPI)",
+          "vegetation": "Skor Vegetasi (Normalized Difference Vegetation Index)",
+          "wetness": "Skor Kebasahan (Normalized Difference Water Index)"
+        },
+        "mlDescription": "atau isi formulir dan analisis area tersebut menggunakan machine learning",
+        "mlBtn": "Coba"
+      },
+      "rainfall": {
+        "title": "Analisis Curah Hujan",
+        "startYear": "Tahun Mulai:",
+        "endYear": "Tahun Akhir:",
+        "button": "Tampilkan Grafik & Peta",
+        "startDate": "Tanggal Mulai",
+        "endDate": "Tanggal Akhir",
+        "mode": {
+          "monthly": "Bulanan",
+          "daily": "Harian"
+        }
+      }
+    }
+  },
+  "mapTools": {
+    "drawPolygon": "Gambar Poligon",
+    "insertPoint": "Sisipkan Titik",
+    "drawCircle": "Gambar Lingkaran",
+    "delete": "Hapus",
+    "zoomIn": "Perbesar",
+    "zoomOut": "Perkecil",
+    "homeButtonAriaLabel": "Ke Beranda",
+    "infoButtonAriaLabel": "Ke Informasi",
+    "openLayers": "Buka lapisan",
+    "closeLayers": "Tutup lapisan"
+  },
+  "layerPopup": {
+    "title": "Lapisan",
+    "geosocial": "Layer Peta Geososial",
+    "thematic": "Lapisan Tematik",
+    "admin": "Batas Administrasi",
+    "facilities": "Fasilitas Publik"
+  },
+  "basemapPopup": {
+    "title": "Peta Dasar",
+    "closeAriaLabel": "Tutup",
+    "scrollLeft": "Geser ke kiri",
+    "scrollRight": "Geser ke kanan",
+    "maps": {
+      "osm": "OpenStreetMap",
+      "satellite": "Satelit",
+      "dark": "Mode Gelap",
+      "topo": "Topografi"
+    }
+  },
+  "fileUploadPopup": {
+    "mainTitle": "Unggah File AOI",
+    "dragTitle": "Unggah atau seret file AOI Anda di sini",
+    "formats": "Format: GeoJSON, KML, Shapefile (ZIP)",
+    "selectFile": "Pilih File",
+    "selectedFile": "File terpilih: {{fileName}}",
+    "submit": "Kirim File",
+    "triggerAriaLabel": "Unggah file",
+    "req": "Login Diperlukan",
+    "desc": "Untuk mengunggah file dan melakukan analisis, Anda perlu masuk ke akun Anda terlebih dahulu.",
+    "login": "Masuk"
+  },
+  "chartPopup": {
+    "rainfallTitle": "Hasil Analisis Curah Hujan"
+  },
+  "markerPopup": {
+    "defaultName": "Fasilitas Publik",
+    "defaultNA": "T/A",
+    "type": "Tipe:",
+    "address": "Alamat:",
+    "phone": "Telepon:",
+    "capacity": "Kapasitas:"
+  },
+  "waterStation": {
+    "popup": {
+      "type": "Tipe:",
+      "owner": "Nama Pemilik Stasiun:",
+      "code": "Kode Stasiun:",
+      "coordinate": "Koordinat:",
+      "viewDetails": "Lihat Detail"
+    },
+    "modal": {
+      "contentLabel": "Detail Stasiun Air",
+      "title": "Detail Stasiun: {{stationCode}}",
+      "errorLoad": "Tidak dapat memuat data historis untuk stasiun ini.",
+      "emptyAll": "Tidak ada data historis untuk ditampilkan di stasiun ini.",
+      "titleWaterLevel": "Tinggi Muka Air",
+      "emptyWaterLevel": "Tidak ada data tinggi muka air.",
+      "titleRunoff": "Limpasan",
+      "emptyRunoff": "Tidak ada data limpasan/debit.",
+      "titleRainfall": "Curah Hujan",
+      "emptyRainfall": "Tidak ada data curah hujan.",
+      "charts": {
+        "axisDate": "Tanggal / Waktu",
+        "axisValue": "Nilai",
+        "labelRainfall": "Curah Hujan (mm)",
+        "labelWaterLevel": "Tinggi Muka Air (m)",
+        "labelDischarge": "Debit (m³/s)"
+      }
+    }
+  },
+  "search": {
+    "title": "Cari Informasi",
+    "placeholder": "Cari berita banjir, artikel, atau informasi...",
+    "mapPlaceholder": "Cari nama wilayah/tempat...",
+    "toggleOpen": "Buka pencarian",
+    "toggleClose": "Tutup pencarian",
+    "clear": "Bersihkan pencarian"
+  },
+  "signup": {
+    "logoAlt": "Logo Perusahaan",
+    "title": "Buat Akun Baru",
+    "form": {
+      "fullNameLabel": "Nama Lengkap",
+      "fullNamePlaceholder": "Masukkan nama lengkap",
+      "UserNameLabel": "Username",
+      "phoneLabel": "Nomor Telepon",
+      "phonePlaceholder": "08xxxxxxxxxx",
+      "emailLabel": "Email",
+      "emailPlaceholder": "nama@email.com",
+      "passwordLabel": "Kata Sandi Baru",
+      "passwordPlaceholder": "Minimal 8 karakter",
+      "confirmPasswordLabel": "Konfirmasi Kata Sandi",
+      "confirmPasswordPlaceholder": "Konfirmasi kata sandi",
+      "submitButton": "Daftar",
+      "orSeparator": "Atau daftar dengan",
+      "googleButton": "Google",
+      "loginPrompt": "Sudah punya akun? <1>Masuk di sini</1>"
+    }
+  },
+  "login": {
+    "logoAlt": "Logo Perusahaan",
+    "title": "Masuk",
+    "subtitle": "Masuk ke akun Anda",
+    "form": {
+      "usernameLabel": "Nama Pengguna",
+      "usernamePlaceholder": "Masukkan nama pengguna",
+      "emailLabel": "Email",
+      "emailPlaceholder": "Masukkan email",
+      "passwordLabel": "Kata Sandi",
+      "passwordPlaceholder": "Masukkan kata sandi",
+      "forgotPassword": "Lupa kata sandi?",
+      "submitButton": "Masuk",
+      "orSeparator": "Atau masuk dengan",
+      "googleButton": "Google",
+      "registerPrompt": "Belum punya akun? <1>Daftar sekarang</1>"
+    },
+    "desc": "Belum punya akun? ",
+    "toRegister": "Daftar sekarang"
+  },
+  "charts": {
+    "rainfall": {
+      "label": "Curah Hujan Bulanan (mm)",
+      "dailyLabel": "Curah Hujan Harian (mm)",
+      "empty": "Tidak ada data curah hujan untuk ditampilkan."
+      }
+    },
+  "searchBar": {
+    "title": "Cari Informasi",
+    "placeholder": "Cari berita, artikel, atau informasi banjir..."
+  },
+  "infoPage": {
+    "latestNewsTitle": "Berita Banjir Terbaru"
+  },
+  "geoLayers": {
+    "ad4_zone_poly": "Zona Tata Ruang (RTRW)",
+    "admin_point": "Titik Administratif",
+    "administrative_line": "Garis Batas Wilayah",
+    "agriculture_area_poly": "Area Pertanian",
+    "barrage_line": "Bendung Gerak",
+    "bridge_point": "Jembatan",
+    "chang_line": "Batas Provinsi",
+    "comunity_area_poly": "Area Pemukiman & Komunitas",
+    "evacuation_point": "Tempat Evakuasi",
+    "hidrologi_point": "Pos Hidrologi",
+    "landmark_point": "Lokasi Penting (Landmark)",
+    "main_canal_line": "Kanal & Saluran Utama",
+    "main_river_poly": "Sungai Utama",
+    "military_area": "Area Militer",
+    "ms1_zone_poly": "Zona Penggunaan Khusus (MS1)",
+    "prototype_point": "Lokasi Percontohan (Prototipe)",
+    "province_label": "Label Provinsi",
+    "province_road_poly": "Jalan Provinsi",
+    "publicland_poly": "Tanah Publik / Tanah Negara",
+    "rail_line": "Jalur Kereta Api",
+    "sewage_point": "Instalasi Pengolahan Air Limbah (IPAL)",
+    "tol_area_poly": "Area Jalan Tol",
+    "water_gate_point": "Pintu Air",
+    "water_plan_point": "Sistem Penyediaan Air Minum (SPAM)",
+    "weir_point": "Bendung (Weir)",
+    "solid_waste_point": "Tempat Pembuangan Sampah (TPS/TPA)",
+    "tol_81_line": "Jalur Tol 81 (Bang Yai - Kanchanaburi)"
+  },
+  "welcomeModal": {
+    "title": "Selamat Datang di Flowgis",
+    "description": "Ingin mulai melakukan pemetaan? Cek panduan lengkapnya di sini.",
+    "laterBtn": "Nanti Saja",
+    "manualBtn": "Lihat Panduan"
+  },
+  
+  "mlAnalysis": {
+    "instruction": "Unggah 10 file raster GeoTIFF dengan urutan di bawah ini. Urutan input sangat penting!",
+    "factors": {
+      "flow_accumulation": "1. Akumulasi Aliran (Flow Accumulation)",
+      "soil_type": "2. Jenis Tanah (Soil Type)",
+      "ndvi": "3. NDVI (Indeks Vegetasi)",
+      "ndwi": "4. NDWI (Indeks Air)",
+      "lulc": "5. LULC (Penggunaan Lahan)",
+      "ndbi": "6. NDBI (Indeks Bangunan)",
+      "elevation": "7. Ketinggian (DEM)",
+      "twi": "8. TWI (Indeks Kebasahan Topografi)",
+      "precipitation": "9. Curah Hujan",
+      "slope": "10. Kemiringan Lereng (Slope)"
+    },
+    "buttons": {
+      "submit": "Jalankan Prediksi ML",
+      "processing": "Sedang Memproses..."
+    },
+    "errors": {
+      "failed": "Gagal"
+    },
+    "modal": "Analisis Kerentanan Banjir dengan Machine Learning (10 Faktor)"
+  }
+
+}

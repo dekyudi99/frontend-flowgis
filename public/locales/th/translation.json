@@ -1,0 +1,414 @@
+{
+  "common": {
+    "submit": "ส่ง",
+    "processing": "กำลังประมวลผลข้อมูลบนเซิร์ฟเวอร์...",
+    "contact": "ติดต่อ",
+    "map": "แผนที่",
+    "save": "บันทึก",
+    "cancel": "ยกเลิก",
+    "login": "เข้าสู่ระบบ",
+    "logout": "ออกจากระบบ"
+  },
+  "Logout": "ออกจากระบบ",
+  "nav": {
+    "home": "หน้าหลัก",
+    "information": "ข้อมูล",
+    "login": "เข้าสู่ระบบ",
+    "logout": "ออกจากระบบ",
+    "language": "ภาษา",
+    "info": "เข้าสู่ระบบโดย"
+  },
+  "hero": {
+    "title": "<0>ระบบสารสนเทศภูมิศาสตร์</0><1/><2>การจัดทำแผนที่พื้นที่เสี่ยงน้ำท่วม</2>",
+    "subtitle": "การวิเคราะห์และแสดงภาพข้อมูลภูมิสารสนเทศเพื่อการระบุ ตรวจสอบ และบรรเทาความเสี่ยงน้ำท่วมแบบเรียลไทม์",
+    "ctaButton": "เริ่มทำแผนที่",
+    "demoButton": "ดูเดโม"
+  },
+  "infoCard": {
+    "title": "คุณสมบัติ<1>ที่ดีที่สุด</1>",
+    "subtitle": "เทคโนโลยีขั้นสูงเพื่อการวิเคราะห์และจัดทำแผนที่พื้นที่เสี่ยงน้ำท่วมอย่างแม่นยำและครอบคลุม",
+    "features": {
+      "interactive": {
+        "title": "การทำแผนที่เชิงโต้ตอบ",
+        "description": "การแสดงภาพแผนที่ดิจิทัลพร้อมชั้นข้อมูลภูมิสารสนเทศที่ปรับแต่งได้ เพื่อการวิเคราะห์เชิงลึกของพื้นที่เสี่ยงน้ำท่วม"
+      },
+      "database": {
+        "title": "การรวมฐานข้อมูล",
+        "description": "ระบบฐานข้อมูลส่วนกลางที่จัดเก็บข้อมูลในอดีตเกี่ยวกับปริมาณน้ำฝน, ภูมิประเทศ และเหตุการณ์น้ำท่วมสำหรับการวิเคราะห์เชิงคาดการณ์"
+      },
+      "analysis": {
+        "title": "การวิเคราะห์ข้อมูล",
+        "description": "อัลกอริทึมการเรียนรู้ของเครื่องเพื่อวิเคราะห์รูปแบบน้ำท่วมและให้การคาดการณ์ความเสี่ยงโดยอิงจากข้อมูลในอดีตและเรียลไทม์"
+      },
+      "warning": {
+        "title": "ระบบเตือนภัยล่วงหน้า",
+        "description": "การแจ้งเตือนอัตโนมัติไปยังสาธารณะและผู้มีส่วนได้ส่วนเสียเกี่ยวกับโอกาสเกิดน้ำท่วม โดยอิงจากการตรวจสอบสภาพอากาศและสภาพพื้นที่"
+      },
+      "monitoring": {
+        "title": "การตรวจสอบแบบเรียลไทม์",
+        "description": "การบูรณาการกับดาวเทียมเพื่อการตรวจสอบสภาพอากาศและสิ่งแวดล้อมแบบเรียลไทม์"
+      },
+      "collaboration": {
+        "title": "การทำงานร่วมกันหลายฝ่าย",
+        "description": "แพลตฟอร์มการทำงานร่วมกันสำหรับรัฐบาล, นักวิจัย และชุมชนในการบรรเทาและจัดการน้ำท่วม"
+      }
+    }
+  },
+  "contact": {
+    "title": "ติดต่อ<1>เรา</1>",
+    "subtitle": "ต้องการข้อมูลเพิ่มเติมหรือไม่? ทีมงานของเราพร้อมที่จะช่วยเหลือคุณในการนำระบบ GIS ไปใช้ในภูมิภาคของคุณ",
+    "info": {
+      "emailTitle": "อีเมล",
+      "callTitle": "โทร",
+      "addressTitle": "ที่อยู่",
+      "addressDetail": "ศูนย์วิศวกรรมภูมิสารสนเทศและนวัตกรรม มจธ. (KGEO) ตั้งอยู่ที่อาคารเครื่องมือวิทยาศาสตร์ ชั้น 5 มหาวิทยาลัยเทคโนโลยีพระจอมเกล้าธนบุรี วิทยาเขตบางมด <1/> 126 ถนนประชาอุทิศ <3/> บางมด ทุ่งครุ กรุงเทพฯ 10140 ประเทศไทย"
+    },
+    "form": {
+      "nameLabel": "ชื่อเต็ม",
+      "namePlaceholder": "ป้อนชื่อของคุณ",
+      "emailLabel": "อีเมล",
+      "emailPlaceholder": "name@email.com",
+      "messageLabel": "ข้อความ",
+      "messagePlaceholder": "ข้อความของคุณ..."
+    }
+  },
+  "footer": {
+    "tagline": "ระบบแผนที่พื้นที่เสี่ยงน้ำท่วม",
+    "description": "แพลตฟอร์มการวิเคราะห์และทำแผนที่ภูมิสารสนเทศเพื่อการระบุ ตรวจสอบ และบรรเทาความเสี่ยงน้ำท่วมโดยใช้เทคโนโลยีล่าสุด",
+    "quickLinks": {
+      "title": "ลิงค์ด่วน",
+      "home": "หน้าหลัก",
+      "about": "เกี่ยวกับเรา",
+      "feature": "คุณสมบัติ",
+      "docs": "เอกสารประกอบ",
+      "blog": "บล็อก"
+    },
+    "resources": {
+      "title": "แหล่งข้อมูล",
+      "userManual": "คู่มือการใช้งาน",
+      "apiDoc": "เอกสาร API",
+      "demonstration": "การสาธิต",
+      "faq": "คำถามที่พบบ่อย",
+      "contact": "ติดต่อ"
+    },
+    "legal": {
+      "privacy": "นโยบายความเป็นส่วนตัว",
+      "terms": "ข้อกำหนดและเงื่อนไข",
+      "sitemap": "แผนผังเว็บไซต์"
+    },
+    "dataResources": {
+    "title": "แหล่งข้อมูล", 
+    "gee": "Google Earth Engine",
+    "leaflet": "Leaflet JS",
+    "openStreetMap": "OpenStreetMap",
+    "nakhonPathomDWR": "ข้อมูล DWR นครปฐม" 
+  },
+    "copyright": "© {{year}} FlowGIS. สงวนลิขสิทธิ์"
+  },
+  "carousel": {
+    "news": {
+      "news1": {
+        "title": "ข่าว1",
+        "description": "รายละเอียด.....",
+        "location": "สถานที่"
+      },
+      "news2": {
+        "title": "ข่าว2",
+        "description": "รายละเอียด.....",
+        "location": "บันดุง"
+      }
+    }
+  },
+  "sidebar": {
+    "mainTitle": "เครื่องมือการทำแผนที่และการวิเคราะห์ GIS",
+    "toggle": {
+      "close": "ปิดแถบด้านข้าง",
+      "open": "เปิดแถบด้านข้าง"
+    },
+    "sections": {
+      "floodEvent": "การวิเคราะห์เหตุการณ์น้ำท่วม",
+      "rainfall": "การวิเคราะห์ปริมาณน้ำฝน",
+      "floodRisk": "การวิเคราะห์ความเสี่ยงน้ำท่วม"
+    },
+    "aoi": {
+      "title": "พื้นที่ที่สนใจ (AOI)",
+      "description": "เลือกหนึ่ง: วาดรูปหลายเหลี่ยม, คลิกแผนที่, หรือป้อนพิกัดด้วยตนเอง",
+      "coordinatesLabel": "พิกัดรูปหลายเหลี่ยม/จุด:",
+      "placeholder": "วาดรูปหลายเหลี่ยมหรือคลิกบนแผนที่...",
+      "clearButton": "ล้างการเลือก AOI"
+    },
+    "layers": {
+      "admin": {
+        "title": "ขอบเขตการปกครอง",
+        "provinces": "จังหวัด",
+        "districts": "เขต/อำเภอ"
+      },
+      "facilities": {
+        "hospitals": "โรงพยาบาล",
+        "waterStation": "สถานีวัดน้ำ (CCTV)"
+      },
+      "thematic": {
+        "title": "ชั้นข้อมูลเฉพาะเรื่อง",
+        "globalSurfaceWater": "น้ำบนดินทั่วโลก",
+        "urbanAreas": "พื้นที่เขตเมือง"
+      }
+    },
+    "analysis": {
+      "floodEvent": {
+        "title": "การวิเคราะห์เหตุการณ์น้ำท่วม",
+        "startDate": "วันที่เริ่มต้น:",
+        "endDate": "วันที่สิ้นสุด:",
+        "button": "แสดงการเปรียบเทียบน้ำท่วม",
+        "layersTitle": "ชั้นข้อมูลเปรียบเทียบน้ำท่วม",
+        "waterBefore": "น้ำก่อนน้ำท่วม (สีฟ้าอ่อน)",
+        "waterAfter": "น้ำระหว่างน้ำท่วม (สีน้ำเงินเข้ม)",
+        "newFlooded": "พื้นที่น้ำท่วมใหม่ (สีแดง)"
+      },
+      "floodRisk": {
+        "description": "คำนวณคะแนนความเสี่ยงจากอันตรายน้ำท่วม 5 ปัจจัยโดยใช้ข้อมูลในอดีต",
+        "startYear": "ปีเริ่มต้น:",
+        "endYear": "ปีสิ้นสุด:",
+        "startDate": "ปีเริ่มต้น:",
+        "endDate": "ปีสิ้นสุด:",
+        "button": "เรียกใช้การวิเคราะห์ความเสี่ยงน้ำท่วม",
+        "layersTitle": "ชั้นข้อมูลองค์ประกอบ",
+        "defaultLayer": "คะแนนความเสี่ยงน้ำท่วม (ค่าเริ่มต้น)",
+        "rawLayersTitle": "ชั้นข้อมูลดิบ:",
+        "raw": {
+          "rainfall": "ปริมาณน้ำฝน",
+          "elevation": "ระดับความสูง",
+          "distance": "ระยะห่างจากแหล่งน้ำ",
+          "tpi": "ดัชนีตำแหน่งทางภูมิประเทศ (TPI)",
+          "ndvi": "พืชพรรณ (Normalized Difference Vegetation Index)",
+          "ndwi": "ความชื้น (Normalized Difference Water Index)"
+        },
+        "scoreLayersTitle": "ชั้นข้อมูลคะแนนความเสี่ยง (1-5):",
+        "score": {
+          "elevation": "คะแนนระดับความสูง",
+          "distance": "คะแนนระยะห่างจากแหล่งน้ำ",
+          "topo": "คะแนนดัชนีตำแหน่งทางภูมิประเทศ (TPI)",
+          "vegetation": "คะแนนพืชพรรณ (Normalized Difference Vegetation Index)",
+          "wetness": "คะแนนความชื้น (Normalized Difference Water Index)"
+        },
+        "mlDescription": "หรือกรอกแบบฟอร์มและวิเคราะห์พื้นที่โดยใช้การเรียนรู้ของเครื่อง",
+        "mlBtn": "พยายาม"
+      },
+      "rainfall": {
+        "title": "การวิเคราะห์ปริมาณน้ำฝน",
+        "startYear": "ปีเริ่มต้น:",
+        "endYear": "ปีสิ้นสุด:",
+        "button": "แสดงกราฟและแผนที่",
+        "startDate": "วันที่เริ่มต้น",
+        "endDate": "วันที่สิ้นสุด",
+        "mode": {
+          "monthly": "รายเดือน",
+          "daily": "รายวัน"
+        }
+      }
+    }
+  },
+  "mapTools": {
+    "drawPolygon": "วาดรูปหลายเหลี่ยม",
+    "insertPoint": "แทรกจุด",
+    "drawCircle": "วาดวงกลม",
+    "delete": "ลบ",
+    "zoomIn": "ขยาย",
+    "zoomOut": "ย่อ",
+    "homeButtonAriaLabel": "ไปที่หน้าหลัก",
+    "infoButtonAriaLabel": "ไปที่ข้อมูล",
+    "openLayers": "เปิดชั้นข้อมูล",
+    "closeLayers": "ปิดชั้นข้อมูล"
+  },
+  "layerPopup": {
+    "title": "ชั้นข้อมูล",
+    "geosocial": "ชั้นข้อมูลแผนที่ภูมิสารสนเทศ",
+    "thematic": "ชั้นข้อมูลเฉพาะเรื่อง",
+    "admin": "ขอบเขตการปกครอง",
+    "facilities": "สิ่งอำนวยความสะดวกสาธารณะ"
+  },
+  "basemapPopup": {
+    "title": "แผนที่ฐาน",
+    "closeAriaLabel": "ปิด",
+    "scrollLeft": "เลื่อนไปทางซ้าย",
+    "scrollRight": "เลื่อนไปทางขวา",
+    "maps": {
+      "osm": "OpenStreetMap",
+      "satellite": "ดาวเทียม",
+      "dark": "โหมดมืด",
+      "topo": "ภูมิประเทศ"
+    }
+  },
+  "fileUploadPopup": {
+    "mainTitle": "อัปโหลดไฟล์ AOI",
+    "dragTitle": "อัปโหลดหรือลากไฟล์ AOI ของคุณที่นี่",
+    "formats": "รูปแบบ: GeoJSON, KML, Shapefile (ZIP)",
+    "selectFile": "เลือกไฟล์",
+    "selectedFile": "ไฟล์ที่เลือก: {{fileName}}",
+    "submit": "ส่งไฟล์",
+    "triggerAriaLabel": "อัปโหลดไฟล์",
+    "req": "กรุณาเข้าสู่ระบบ",
+    "desc": "เพื่ออัปโหลดไฟล์และทำการวิเคราะห์ คุณต้องลงชื่อเข้าใช้บัญชีของคุณก่อน",
+    "login": "เข้าสู่ระบบ"
+  },
+  "chartPopup": {
+    "rainfallTitle": "ผลการวิเคราะห์ปริมาณน้ำฝน"
+  },
+  "markerPopup": {
+    "defaultName": "สิ่งอำนวยความสะดวกสาธารณะ",
+    "defaultNA": "ไม่มีข้อมูล",
+    "type": "ประเภท:",
+    "address": "ที่อยู่:",
+    "phone": "โทรศัพท์:",
+    "capacity": "ความจุ:"
+  },
+  "waterStation": {
+    "popup": {
+      "type": "ประเภท:",
+      "owner": "ชื่อเจ้าของสถานี:",
+      "code": "รหัสสถานี:",
+      "coordinate": "พิกัด:",
+      "viewDetails": "ดูรายละเอียด"
+    },
+    "modal": {
+      "contentLabel": "รายละเอียดสถานีวัดน้ำ",
+      "title": "รายละเอียดสถานี: {{stationCode}}",
+      "errorLoad": "ไม่สามารถโหลดข้อมูลย้อนหลังสำหรับสถานีนี้ได้",
+      "emptyAll": "ไม่มีข้อมูลย้อนหลังที่จะแสดงสำหรับสถานีนี้",
+      "titleWaterLevel": "ระดับน้ำ",
+      "emptyWaterLevel": "ไม่มีข้อมูลระดับน้ำ",
+      "titleRunoff": "การไหลของน้ำ",
+      "emptyRunoff": "ไม่มีข้อมูลการไหลของน้ำ/การระบายน้ำ",
+      "titleRainfall": "ปริมาณน้ำฝน",
+      "emptyRainfall": "ไม่มีข้อมูลปริมาณน้ำฝน",
+      "charts": {
+        "axisDate": "วันที่ / เวลา",
+        "axisValue": "ค่า",
+        "labelRainfall": "ปริมาณน้ำฝน (มม.)",
+        "labelWaterLevel": "ระดับน้ำ (ม.)",
+        "labelDischarge": "อัตราการไหล (ลบ.ม./วินาที)"
+      }
+    }
+  },
+  "search": {
+    "title": "ค้นหาข้อมูล",
+    "placeholder": "ค้นหาข่าวสารน้ำท่วม, บทความ, หรือข้อมูล...",
+    "mapPlaceholder": "ค้นหาชื่อภูมิภาค/สถานที่...",
+    "toggleOpen": "เปิดการค้นหา",
+    "toggleClose": "ปิดการค้นหา",
+    "clear": "ล้างการค้นหา"
+  },
+  "signup": {
+    "logoAlt": "โลโก้บริษัท",
+    "title": "สร้างบัญชีใหม่",
+    "form": {
+      "fullNameLabel": "ชื่อเต็ม",
+      "fullNamePlaceholder": "ป้อนชื่อเต็ม",
+      "UserNameLabel": "ชื่อผู้ใช้",
+      "phoneLabel": "หมายเลขโทรศัพท์",
+      "phonePlaceholder": "08xxxxxxxxxx",
+      "emailLabel": "อีเมล",
+      "emailPlaceholder": "name@email.com",
+      "passwordLabel": "รหัสผ่านใหม่",
+      "passwordPlaceholder": "อย่างน้อย 8 ตัวอักษร",
+      "confirmPasswordLabel": "ยืนยันรหัสผ่าน",
+      "confirmPasswordPlaceholder": "ยืนยันรหัสผ่าน",
+      "submitButton": "ลงทะเบียน",
+      "orSeparator": "หรือลงทะเบียนด้วย",
+      "googleButton": "Google",
+      "loginPrompt": "มีบัญชีอยู่แล้ว? <1>เข้าสู่ระบบที่นี่</1>"
+    }
+  },
+  "login": {
+    "logoAlt": "โลโก้บริษัท",
+    "title": "เข้าสู่ระบบ",
+    "subtitle": "เข้าสู่ระบบบัญชีของคุณ",
+    "form": {
+      "usernameLabel": "ชื่อผู้ใช้",
+      "usernamePlaceholder": "ป้อนชื่อผู้ใช้",
+      "emailLabel": "ที่อยู่อีเมล",
+      "emailPlaceholder": "ป้อนอีเมล",
+      "passwordLabel": "รหัสผ่าน",
+      "passwordPlaceholder": "ป้อนรหัสผ่าน",
+      "forgotPassword": "ลืมรหัสผ่าน?",
+      "submitButton": "เข้าสู่ระบบ",
+      "orSeparator": "หรือเข้าสู่ระบบด้วย",
+      "googleButton": "Google",
+      "registerPrompt": "ยังไม่มีบัญชี? <1>ลงทะเบียนตอนนี้</1>"
+    },
+    "desc": "ยังไม่มีบัญชีใช่ไหม? ",
+    "toRegister": "ลงทะเบียนเลย"
+  },
+  "charts": {
+    "rainfall": {
+      "label": "ปริมาณน้ำฝนรายเดือน (มม.)",
+      "dailyLabel": "ปริมาณน้ำฝนรายวัน (มม.)",
+      "empty": "ไม่มีข้อมูลปริมาณน้ำฝนที่จะแสดงผล"
+    }
+  },
+  "searchBar": {
+    "title": "ค้นหาข้อมูล",
+    "placeholder": "ค้นหาข่าวสาร บทความ หรือข้อมูลเกี่ยวกับน้ำท่วม..."
+  },
+  "infoPage": {
+    "latestNewsTitle": "ข่าวสารน้ำท่วมล่าสุด"
+  },
+  "geoLayers": {
+    "ad4_zone_poly": "เขตผังเมืองรวม",
+    "admin_point": "จุดบริหารจัดการ",
+    "administrative_line": "เส้นแบ่งเขตการปกครอง",
+    "agriculture_area_poly": "พื้นที่เกษตรกรรม",
+    "barrage_line": "ฝายทดน้ำ",
+    "bridge_point": "สะพาน",
+    "chang_line": "เขตจังหวัด",
+    "comunity_area_poly": "พื้นที่ชุมชนและที่อยู่อาศัย",
+    "evacuation_point": "ศูนย์อพยพ",
+    "hidrologi_point": "สถานีอุทกวิทยา",
+    "landmark_point": "สถานที่สำคัญ",
+    "main_canal_line": "คลองสายหลัก",
+    "main_river_poly": "แม่น้ำสายหลัก",
+    "military_area": "เขตทหาร",
+    "ms1_zone_poly": "ที่ดินประเภทพิเศษ (MS1)",
+    "prototype_point": "จุดโครงการต้นแบบ",
+    "province_label": "ชื่อจังหวัด",
+    "province_road_poly": "ถนนทางหลวงจังหวัด",
+    "publicland_poly": "ที่สาธารณประโยชน์",
+    "rail_line": "ทางรถไฟ",
+    "sewage_point": "โรงบำบัดน้ำเสีย",
+    "tol_area_poly": "เขตทางหลวงพิเศษ",
+    "water_gate_point": "ประตูระบายน้ำ",
+    "water_plan_point": "ระบบประปา",
+    "weir_point": "ฝายน้ำล้น",
+    "solid_waste_point": "สถานที่กำจัดขยะมูลฝอย",
+    "tol_81_line": "แนวเส้นทางมอเตอร์เวย์ สาย 81"
+  },
+  "welcomeModal": {
+    "title": "ยินดีต้อนรับสู่ Flowgis",
+    "description": "ต้องการเริ่มทำแผนที่ใช่ไหม? ตรวจสอบคู่มือการใช้งานฉบับสมบูรณ์ได้ที่นี่",
+    "laterBtn": "ไว้ทีหลัง",
+    "manualBtn": "ดูคู่มือ"
+  },
+
+  "mlAnalysis": {
+    "instruction": "อัปโหลดไฟล์ GeoTIFF raster 10 ไฟล์ตามลำดับด้านล่าง ลำดับการนำเข้ามีความสำคัญมาก!",
+    "factors": {
+      "flow_accumulation": "1. การสะสมการไหล (Flow Accumulation)",
+      "soil_type": "2. ประเภทดิน (Soil Type)",
+      "ndvi": "3. NDVI (ดัชนีพืชพรรณ)",
+      "ndwi": "4. NDWI (ดัชนีพื้นที่น้ำ)",
+      "lulc": "5. LULC (การใช้ประโยชน์ที่ดิน)",
+      "ndbi": "6. NDBI (ดัชนีสิ่งปลูกสร้าง)",
+      "elevation": "7. ความสูง (DEM)",
+      "twi": "8. TWI (ดัชนีความชื้นทางธรณีสัณฐาน)",
+      "precipitation": "9. ปริมาณน้ำฝน",
+      "slope": "10. ความลาดชัน (Slope)"
+    },
+    "buttons": {
+      "submit": "รันการทำนายผล ML",
+      "processing": "กำลังประมวลผล..."
+    },
+    "errors": {
+      "failed": "ล้มเหลว"
+    },
+    "modal": "การวิเคราะห์ความเปราะบางต่ออุทกภัยด้วย ML (10 ปัจจัย)"
+  }
+}
