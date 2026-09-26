@@ -16,7 +16,6 @@ export default function SignupPage() {
   const [formData, setFormData] = useState({
     fullname: "",
     username: "",
-    phone: "",
     email: "",
     password: "",
     confirmPassword: ""
@@ -44,11 +43,6 @@ export default function SignupPage() {
     if (!formData.username.trim()) {
       newErrors.username = "Username is required";
     }
-    if (!formData.phone) {
-      newErrors.phone = "Phone number is required";
-    } else if (formData.phone.length < 10) {
-      newErrors.phone = "Must be at least 10 digits";
-    }
     if (!formData.email.trim()) {
       newErrors.email = "Email is required";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
@@ -72,11 +66,6 @@ export default function SignupPage() {
   const handleChange = (e) => {
     const { id, value } = e.target;
     let updatedValue = value;
-
-    if (id === "phone") {
-      updatedValue = value.replace(/[^0-9]/g, '');
-      if (updatedValue.length > 20) return;
-    }
 
     setFormData((prev) => ({ ...prev, [id]: updatedValue }));
 
@@ -198,28 +187,6 @@ export default function SignupPage() {
                 value={formData.username}
                 className={`mt-1 border-gray-300 focus:border-teal-500 focus:ring-teal-500 ${errors.username ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
                 placeholder={t('signup.form.UserNameLabel')}
-                onChange={handleChange}
-              />
-            </div>
-
-            {/* Phone */}
-            <div>
-              <Label htmlFor="phone" className="text-gray-700">
-                {t('signup.form.phoneLabel')}
-                <span className="text-red-500 ml-1">*</span>
-                {errors.phone && (
-                  <span className="text-red-500 text-xs ml-2 font-normal">
-                    {errors.phone}
-                  </span>
-                )}
-              </Label>
-              <Input
-                id="phone"
-                name="phone"
-                type="text"
-                value={formData.phone}
-                className={`mt-1 border-gray-300 focus:border-teal-500 focus:ring-teal-500 ${errors.phone ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
-                placeholder={t('signup.form.phonePlaceholder')}
                 onChange={handleChange}
               />
             </div>
