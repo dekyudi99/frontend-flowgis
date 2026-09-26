@@ -56,6 +56,8 @@ export default function SignupPage() {
     }
     if (!formData.password) {
       newErrors.password = "Password is required";
+    } else if (formData.password.length < 8) {
+      newErrors.password = "Password must be at least 8 characters";
     }
     if (!formData.confirmPassword) {
       newErrors.confirmPassword = "Confirm password is required";
@@ -73,7 +75,7 @@ export default function SignupPage() {
 
     if (id === "phone") {
       updatedValue = value.replace(/[^0-9]/g, '');
-      if (updatedValue.length > 15) return;
+      if (updatedValue.length > 20) return;
     }
 
     setFormData((prev) => ({ ...prev, [id]: updatedValue }));
@@ -106,7 +108,24 @@ export default function SignupPage() {
       
     } catch (error) {
       console.error("Registration error:", error);
-      const message = error.response?.data?.error || "Registration failed. Please try again.";
+      const resData = error.response?.data;
+      let message = "Registration failed. Please try again.";
+
+      if (resData?.errors) {
+        const fieldErrors = {};
+        for (const [key, msgs] of Object.entries(resData.errors)) {
+          fieldErrors[key] = Array.isArray(msgs) ? msgs[0] : msgs;
+        }
+        setErrors((prev) => ({ ...prev, ...fieldErrors }));
+
+        const firstKey = Object.keys(resData.errors)[0];
+        message = Array.isArray(resData.errors[firstKey]) ? resData.errors[firstKey][0] : resData.errors[firstKey];
+      } else if (resData?.message) {
+        message = resData.message;
+      } else if (resData?.error) {
+        message = resData.error;
+      }
+
       addNotification("error", message);
       setLoading(false);
     }
