@@ -54,13 +54,20 @@ export default function UserManagement() {
   });
   const [modalSaving, setModalSaving] = useState(false);
 
+  // Bersihkan cache dummy data lama dari localStorage jika pernah tersimpan
+  useEffect(() => {
+    localStorage.removeItem('flowgis_admin_users');
+  }, []);
+
   const fetchUsers = async () => {
     setLoading(true);
     try {
       const data = await userService.getUsers(search, roleFilter);
-      setUsers(data);
+      setUsers(Array.isArray(data) ? data : []);
     } catch (err) {
-      console.error('Failed to fetch users:', err);
+      console.error('Failed to fetch users from database:', err);
+      notify.error(err.response?.data?.message || err.message || 'Gagal memuat data pengguna dari database');
+      setUsers([]);
     } finally {
       setLoading(false);
     }
@@ -132,7 +139,11 @@ export default function UserManagement() {
       await fetchUsers();
     } catch (err) {
       console.error('Error saving user:', err);
-      notify.error(err.response?.data?.message || err.message || 'Gagal menyimpan data pengguna');
+      const validationErrors = err.response?.data?.errors;
+      const errMsg = validationErrors
+        ? Object.values(validationErrors).flat().join(' ')
+        : (err.response?.data?.message || err.message || 'Gagal menyimpan data pengguna ke database');
+      notify.error(errMsg);
       // Buka kembali modal jika terjadi error agar pengguna dapat memperbaiki data input
       setIsModalOpen(true);
     } finally {
