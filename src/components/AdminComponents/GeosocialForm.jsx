@@ -5,6 +5,7 @@ import { UploadCloud, AlertCircle, Loader2 } from 'lucide-react';
 import { geosocialService } from '@/services/geosocialService';
 import { useNotification } from '@/context/NotificationContext';
 import Loader from '@/components/commons/Loader';
+import { resolveWmsLayersParam, normalizeBbox } from '@/lib/wmsHelper';
 
 export default function GeosocialForm({ onAddLayer }) {
   const { notify } = useNotification();
@@ -74,21 +75,30 @@ export default function GeosocialForm({ onAddLayer }) {
       }
 
       const extension = file.name.split('.').pop().toUpperCase();
-      const bbox = newLayer?.bbox || [];
+      const resolvedLayerName = resolveWmsLayersParam(newLayer) || newLayer?.layer_name || newLayer?.layer_key || `geosocial:${layerName.toLowerCase().replace(/\s+/g, '_')}`;
+      const bounds = normalizeBbox(newLayer?.bbox);
+
       const createdItem = {
         id: newLayer?.id || Date.now(),
         name: newLayer?.display_name || layerName,
-        layer_name: newLayer?.layer_name || newLayer?.layer_key || `geosocial:${layerName.toLowerCase().replace(/\s+/g, '_')}`,
+        display_name: newLayer?.display_name || layerName,
+        layer_name: resolvedLayerName,
+        layer_key: resolvedLayerName,
+        workspace_name: newLayer?.workspace_name,
+        store_name: newLayer?.store_name,
         type: newLayer?.type?.toUpperCase() || extension,
         url: newLayer?.url || newLayer?.wms_url || 'http://localhost:8080/geoserver/wms',
-        minx: bbox[0],
-        miny: bbox[1],
-        maxx: bbox[2],
-        maxy: bbox[3],
+        bbox: newLayer?.bbox,
+        minx: bounds ? bounds[0][1] : undefined,
+        miny: bounds ? bounds[0][0] : undefined,
+        maxx: bounds ? bounds[1][1] : undefined,
+        maxy: bounds ? bounds[1][0] : undefined,
         date: new Date().toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }),
         size: `${(file.size / (1024 * 1024)).toFixed(1)} MB`,
         status: 'Active',
         is_active: true,
+        _autoZoom: true,
+        _v: new Date().toISOString(),
       };
 
       if (onAddLayer) {

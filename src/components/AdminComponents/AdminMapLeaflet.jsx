@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Layers, EyeOff, Sliders, Video, Camera, Hospital, Droplet } from 'lucide-react';
+import { buildWmsLayerConfig, normalizeBbox } from '@/lib/wmsHelper';
 
 // Fix default Leaflet icon
 delete L.Icon.Default.prototype._getIconUrl;
@@ -161,32 +162,33 @@ export default function AdminMapLeaflet({
     }
 
     if (activeWmsLayer) {
-      const rawWmsUrl = activeWmsLayer.url || 'http://localhost:8080/geoserver/wms';
-      const layerName = activeWmsLayer.layer_name || activeWmsLayer.layer_key;
+      const config = buildWmsLayerConfig(activeWmsLayer, { opacity: wmsOpacity });
 
-      if (layerName) {
-        const wmsUrl = activeWmsLayer._t 
-          ? `${rawWmsUrl}${rawWmsUrl.includes('?') ? '&' : '?'}_t=${activeWmsLayer._t}` 
-          : rawWmsUrl;
-
-        const wms = L.tileLayer.wms(wmsUrl, {
-          layers: layerName,
-          format: 'image/png',
-          transparent: true,
-          version: '1.1.1',
-          zIndex: 40,
-          opacity: wmsOpacity,
+      if (config && config.layers) {
+        const wms = L.tileLayer.wms(config.url, {
+          layers: config.layers,
+          styles: config.styles,
+          format: config.format,
+          transparent: config.transparent,
+          version: config.version,
+          zIndex: config.zIndex,
+          opacity: config.opacity,
         });
 
         wms.addTo(map);
         wmsLayerInstanceRef.current = wms;
 
-        // Auto zoom ke layer jika koordinat bounds tersedia
-        if (activeWmsLayer.minx && activeWmsLayer.miny && activeWmsLayer.maxx && activeWmsLayer.maxy) {
-          map.fitBounds([
-            [activeWmsLayer.miny, activeWmsLayer.minx],
-            [activeWmsLayer.maxy, activeWmsLayer.maxx]
-          ]);
+        // Auto zoom ke layer jika koordinat bounds valid tersedia
+        const bounds = config.bounds || normalizeBbox(
+          activeWmsLayer.minx !== undefined ? [activeWmsLayer.minx, activeWmsLayer.miny, activeWmsLayer.maxx, activeWmsLayer.maxy] : activeWmsLayer.bbox
+        );
+
+        if (bounds) {
+          try {
+            map.fitBounds(bounds, { padding: [40, 40], animate: true });
+          } catch (e) {
+            console.warn("Could not fitBounds to layer:", e);
+          }
         }
       }
     }

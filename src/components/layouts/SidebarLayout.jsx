@@ -32,11 +32,10 @@ export default function SidebarLayout({
   onLayerToggle, 
   onOpenMLModal,
   activeLayers = {},
+  selectedComponentLayers = {},
   userAnalysisLayers = [],
-  activeUserLayers = {},
   onToggleUserLayer,
   onToggleComponentLayer,
-  loadingComponentLayer = {},
   onProjectCreated,
   onSaveProject,
   onDownloadProject,
@@ -46,7 +45,6 @@ export default function SidebarLayout({
   hasAnalysisToSave = false,
   onSelectSavedAoi,
   selectedAoi = null,
-  drawnGeometryData = null,
   onParametersChange = null
 }) {
   const { t } = useTranslation();
@@ -520,13 +518,11 @@ export default function SidebarLayout({
                             onAnalyze={(payload) => onFloodRiskAnalysis(activeProject?.id, payload)}
                             onToggleLayer={onLayerToggle}
                             activeLayers={activeLayers}
+                            selectedComponentLayers={selectedComponentLayers}
                             userAnalysisLayers={userAnalysisLayers}
-                            activeUserLayers={activeUserLayers}
                             onToggleUserLayer={onToggleUserLayer}
                             onToggleComponentLayer={onToggleComponentLayer}
-                            loadingComponentLayer={loadingComponentLayer}
                             selectedAoi={selectedAoi}
-                            drawnGeometryData={drawnGeometryData}
                             onParametersChange={onParametersChange}
                             />
                         </div>

@@ -93,6 +93,26 @@ export default function AdminDashboard() {
       const data = await geosocialService.getAllLayers();
       if (Array.isArray(data) && data.length > 0) {
         setGeosocialList(data);
+        // ADM-003: Auto-select dan preview layer pertama jika belum ada layer aktif yang dipilih
+        setActiveWmsLayer((current) => {
+          if (!current && data[0]) {
+            const first = data[0];
+            return {
+              id: first.id,
+              url: first.url,
+              layer_name: first.layer_name || first.layer_key,
+              display_name: first.display_name || first.name || 'WMS Layer',
+              minx: first.minx,
+              miny: first.miny,
+              maxx: first.maxx,
+              maxy: first.maxy,
+              bbox: first.bbox,
+              styles: first.style_name || first.styles,
+              _v: first.updated_at || Date.now(),
+            };
+          }
+          return current;
+        });
       } else {
         setGeosocialList([
           { id: 1, name: 'Population Density Map of Flood-Prone Areas', layer_key: 'geosocial:population_density', type: 'VECTOR', date: '15 Jan 2026', size: '2.4 MB', is_active: true },
@@ -289,13 +309,26 @@ export default function AdminDashboard() {
     });
     try {
       const res = await geosocialService.updateStyle(layerId, styleData);
+      const styleName = res?.data?.style_name || res?.style_name || styleData.style_name;
+      const updatedAt = res?.data?.updated_at || res?.updated_at || new Date().toISOString();
+
       setGeosocialList((prev) =>
-        prev.map((item) => (item.id === layerId ? { ...item, legend_url: styleData.fill_color } : item))
+        prev.map((item) => (item.id === layerId ? { 
+          ...item, 
+          legend_url: styleData.fill_color,
+          style_name: styleName || item.style_name,
+          updated_at: updatedAt
+        } : item))
       );
       // Refresh WMS layer di Leaflet peta admin jika layer yang diedit sedang aktif ditampilkan
       setActiveWmsLayer((prev) => {
         if (prev && prev.id === layerId) {
-          return { ...prev, _t: Date.now() };
+          return { 
+            ...prev, 
+            styles: styleName || prev.styles,
+            _v: updatedAt,
+            _t: Date.now() 
+          };
         }
         return prev;
       });
@@ -323,6 +356,9 @@ export default function AdminDashboard() {
       miny: layer.miny,
       maxx: layer.maxx,
       maxy: layer.maxy,
+      bbox: layer.bbox,
+      styles: layer.style_name || layer.styles,
+      _v: layer.updated_at || Date.now(),
     });
 
     const mapElem = document.getElementById('admin-leaflet-card');

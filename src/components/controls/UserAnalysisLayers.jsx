@@ -412,9 +412,9 @@ export default function UserAnalysisLayers({
                           <Label
                             htmlFor={`user-layer-${layer.id}`}
                             className="text-[11px] font-medium text-gray-800 cursor-pointer block truncate leading-snug"
-                            title={layer.layer_name}
+                            title={layer.display_name || layer.layer_name}
                           >
-                            {layer.layer_name}
+                            {layer.display_name || layer.layer_name}
                           </Label>
 
                           <div className="flex items-center gap-1.5 mt-0.5 text-[9px] text-gray-500">

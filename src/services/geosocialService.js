@@ -1,7 +1,4 @@
 import API from './api';
-import axios from 'axios';
-
-const FASTAPI_URL = import.meta.env.VITE_ASTRAGIS_API_URL || 'http://localhost:8000';
 
 export const geosocialService = {
   // Ambil katalog layer geosocial aktif (untuk tampilan publik / map viewer)
@@ -12,14 +9,8 @@ export const geosocialService = {
 
   // Ambil seluruh layer (aktif & nonaktif) untuk Admin Dashboard
   getAllLayers: async () => {
-    try {
-      const response = await API.get('/geosocial/layers?all=true');
-      return response.data?.data || [];
-    } catch (err) {
-      console.warn('Fallback getting public layers:', err);
-      const response = await API.get('/geosocial/layers');
-      return response.data?.data || [];
-    }
+    const response = await API.get('/geosocial/layers', { params: { all: true } });
+    return response.data?.data || [];
   },
 
   // Upload layer spasial selalu melalui Laravel business process, lalu Laravel meneruskan ke AstraGIS

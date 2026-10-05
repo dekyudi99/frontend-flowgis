@@ -23,6 +23,7 @@ import WaterStationModal from '@/components/modals/WaterStationModal';
 import { geosocialService } from '@/services/geosocialService';
 import Navbar from '@/components/sections/Navbar';
 import shp from 'shpjs';
+import { normalizeBbox } from '@/lib/wmsHelper';
 
 export default function Dashboard() {
   const { activeProject, analysisResult, isNewAnalysis, executeAnalysis, cancelAnalysis, loading, error } = useAnalysis();
@@ -46,10 +47,16 @@ export default function Dashboard() {
   const [isAnalysisSaved, setIsAnalysisSaved] = useState(false);
   const [userAnalysisLayers, setUserAnalysisLayers] = useState([]);
   const [activeUserLayers, setActiveUserLayers] = useState({});
+  const [selectedComponentLayers, setSelectedComponentLayers] = useState({});
+  const [componentSavePending, setComponentSavePending] = useState(false);
   const [userLayerGroups, setUserLayerGroups] = useState([]);
   const [activeUserGroups, setActiveUserGroups] = useState({});
   const [loadingUserLayers, setLoadingUserLayers] = useState(false);
-  const [loadingComponentLayer, setLoadingComponentLayer] = useState({});
+  const userListRequestsRef = useRef({ layers: new Map(), groups: new Map() });
+  const userListCacheRef = useRef({ layers: new Map(), groups: null });
+  const authGenerationRef = useRef(0);
+  const activeProjectIdRef = useRef(activeProject?.id);
+  activeProjectIdRef.current = activeProject?.id;
   const [selectedLayerStats, setSelectedLayerStats] = useState(null);
   const [chartPos, setChartPos] = useState({ x: 0, y: 0 });
   const isDraggingChartRef = useRef(false);
@@ -245,11 +252,16 @@ export default function Dashboard() {
 
     // Kasus 1: WMS Layer dari AstraGIS (Layer yang sudah tersimpan di GeoServer)
     if (data.wms_layer) {
-      const wmsLayer = data.wms_layer;
+      const wmsLayer = {
+        ...data.wms_layer,
+        _v: data.wms_layer.updated_at || data.wms_layer._v || new Date().toISOString()
+      };
       setIsAnalysisSaved(true);
-      // Bersihkan direct tile GEE agar tidak menjadi layer hantu di bawah WMS layer
+      setSelectedComponentLayers({});
+      setComponentSavePending(false);
+      // Keep the saved WMS available in Analysis Results without activating it.
       setActiveLayers({});
-      setActiveUserLayers((prev) => ({ ...prev, [wmsLayer.id]: wmsLayer }));
+      setActiveUserLayers({});
 
       // Tambahkan ke list userAnalysisLayers
       setUserAnalysisLayers((prev) => {
@@ -259,14 +271,10 @@ export default function Dashboard() {
 
       // Otomatis arahkan map ke batas (bbox) hasil analisis WMS
       if (wmsLayer.bbox && mapRef.current) {
-        const [minx, miny, maxx, maxy] = wmsLayer.bbox;
-        mapRef.current.fitBounds([[miny, minx], [maxy, maxx]], { padding: [40, 40], animate: true });
-      }
-
-      // Pastikan legenda utama yang terpilih
-      const mainLeg = resolveLayerLegend(wmsLayer, loadedLegends);
-      if (mainLeg) {
-        setActiveLegend(mainLeg);
+        const bounds = normalizeBbox(wmsLayer.bbox);
+        if (bounds) {
+          mapRef.current.fitBounds(bounds, { padding: [40, 40], animate: true });
+        }
       }
 
       const stats = wmsLayer.metadata?.statistics || wmsLayer.statistics || data.statistics;
@@ -280,6 +288,34 @@ export default function Dashboard() {
     // Kasus 2: Hasil Cepat Langsung dari GEE (Direct XYZ Tiles & Statistics)
     else if (loadedMaps && Object.keys(loadedMaps).length > 0) {
       setIsAnalysisSaved(Boolean(data.is_saved));
+      const componentNames = ['Rainfall', 'Elevation', 'Distance', 'TPI', 'NDVI', 'NDWI'];
+      const componentPreviews = Object.fromEntries(
+        Object.entries(loadedMaps).filter(([key, url]) =>
+          componentNames.some((name) => name.toLowerCase() === key.toLowerCase())
+          && typeof url === 'string'
+          && url.startsWith('http')
+        )
+      );
+
+      const hasComponentPreviews = componentNames.some((name) =>
+        Object.keys(componentPreviews).some((key) => key.toLowerCase() === name.toLowerCase())
+      );
+
+      if (isNewAnalysis && hasComponentPreviews) {
+        // Show the main FloodRisk preview immediately; component previews remain checkbox-controlled.
+        setSelectedComponentLayers({});
+        setComponentSavePending(false);
+        const floodRiskUrl = loadedMaps.FloodRisk;
+        setActiveLayers(
+          typeof floodRiskUrl === 'string' && floodRiskUrl.startsWith('http')
+            ? { FloodRisk: floodRiskUrl }
+            : {}
+        );
+        setActiveUserLayers({});
+        if (loadedLegends.FloodRisk) setActiveLegend(loadedLegends.FloodRisk);
+        setIsChartOpen(true);
+      }
+
       let activeMapKey = null;
       let activeMapObj = null;
       let legObj = null;
@@ -304,14 +340,12 @@ export default function Dashboard() {
       }
 
       if (activeMapKey && activeMapObj) {
-        // HANYA tampilkan tile GEE langsung jika ini analisis baru (sedang berjalan / preview sementara).
-        // Jangan tampilkan saat memuat histori proyek agar tidak menjadi "layer hantu"
-        // yang muncul di peta tanpa ada checkbox yang tercentang di daftar layer.
-        if (isNewAnalysis) {
+        // Keep displaying FloodRisk after Run, even when component previews are also available.
+        if (isNewAnalysis && !hasComponentPreviews) {
           setActiveLayers({ [activeMapKey]: activeMapObj });
           if (legObj) setActiveLegend(legObj);
           setIsChartOpen(true);
-        } else {
+        } else if (!isNewAnalysis) {
           setActiveLayers({});
         }
 
@@ -339,6 +373,8 @@ export default function Dashboard() {
     setActiveLegend(null);
     setActiveTool(null);
     setIsAnalysisSaved(false);
+    setSelectedComponentLayers({});
+    setComponentSavePending(false);
     
     // 3. Bersihkan AOI dan gambar di peta
     setAoiDisplayText('');
@@ -348,14 +384,10 @@ export default function Dashboard() {
       drawnItemsRef.current.clearLayers();
     }
 
-    // 4. Muat ulang layer hasil analisis khusus untuk project yang aktif saat ini
-    if (activeProject?.id) {
-      loadUserAnalysisLayers(activeProject.id);
-      loadUserLayerGroups();
-    } else {
-      setUserAnalysisLayers([]);
-      setUserLayerGroups([]);
-    }
+    // Clear previous project lists; the dedicated loader effect fetches the active project's lists once.
+    setUserAnalysisLayers([]);
+    setUserLayerGroups([]);
+    setLoadingUserLayers(false);
   }, [activeProject?.id]); 
   
   useEffect(() => {
@@ -621,8 +653,8 @@ export default function Dashboard() {
         
         const tileUrl = availableMaps[layerName] || getStaticLayerUrl(layerName) || (typeof isChecked === 'string' ? isChecked : null);
 
-        if (isChecked && (tileUrl || isChecked === true)) {
-            newLayers[layerName] = tileUrl || true;
+        if (isChecked && typeof tileUrl === 'string' && tileUrl.startsWith('http')) {
+            newLayers[layerName] = tileUrl;
         } else {
             delete newLayers[layerName];
         }
@@ -661,61 +693,104 @@ export default function Dashboard() {
   };
 
   // Muat histori layer analisis pengguna dari AstraGIS via backend (khusus milik pengguna saat ini dan project saat ini)
-  const loadUserAnalysisLayers = async (projectId = null) => {
+  const loadUserAnalysisLayers = async (projectId = null, force = false) => {
     const targetProjectId = projectId || activeProject?.id;
     const token = localStorage.getItem('auth_token') || localStorage.getItem('token');
     if (!token || !targetProjectId) {
       setUserAnalysisLayers([]);
-      return;
+      return [];
     }
-    try {
-      setLoadingUserLayers(true);
-      const res = await projectService.getUserLayers(targetProjectId);
-      const list = res?.data || (Array.isArray(res) ? res : []);
-      if (Array.isArray(list)) {
-        // Filter ketat agar hanya menampilkan layer yang terkait dengan project ini
-        const filtered = list.filter((layer) => {
-          const meta = layer.metadata || {};
-          const pid = meta.project_id || meta.extra?.project_id;
-          return !pid || String(pid) === String(targetProjectId);
+
+    const requestKey = String(targetProjectId);
+    const cached = userListCacheRef.current.layers.get(requestKey);
+    if (cached && !force) {
+      if (String(activeProject?.id) === requestKey) setUserAnalysisLayers(cached);
+      return cached;
+    }
+    const pending = userListRequestsRef.current.layers.get(requestKey);
+    if (pending) return pending;
+    if (force) userListCacheRef.current.layers.delete(requestKey);
+
+    const authGeneration = authGenerationRef.current;
+    const request = (async () => {
+      if (String(activeProjectIdRef.current) === requestKey) setLoadingUserLayers(true);
+      try {
+        const response = await projectService.getUserLayers(targetProjectId);
+        const list = Array.isArray(response?.data) ? response.data : (Array.isArray(response) ? response : null);
+        if (!list) throw new Error('Invalid analysis-layer list response.');
+
+        const normalized = list.map((layer) => ({
+          ...layer,
+          _v: layer.updated_at || layer._v || layer.created_at || Date.now(),
+        }));
+        const filtered = normalized.filter((layer) => {
+          const projectOwner = layer.flowgis_project_id
+            || layer.metadata?.flowgis_project_id
+            || layer.project_id
+            || layer.metadata?.project_id;
+          return projectOwner !== undefined && String(projectOwner) === requestKey;
         });
-        setUserAnalysisLayers(filtered);
-      } else {
-        setUserAnalysisLayers([]);
+        userListCacheRef.current.layers.set(requestKey, filtered);
+        if (authGeneration === authGenerationRef.current && String(activeProjectIdRef.current) === requestKey) {
+          setUserAnalysisLayers(filtered);
+        }
+        return filtered;
+      } catch (error) {
+        if (error.response?.status !== 401) console.error('Gagal memuat layer analisis pengguna:', error);
+        return [];
+      } finally {
+        if (userListRequestsRef.current.layers.get(requestKey) === request) {
+          userListRequestsRef.current.layers.delete(requestKey);
+        }
+        if (authGeneration === authGenerationRef.current && String(activeProjectIdRef.current) === requestKey) {
+          setLoadingUserLayers(false);
+        }
       }
-    } catch (err) {
-      if (err.response?.status !== 401) {
-        console.error("Gagal memuat layer analisis pengguna dari AstraGIS:", err);
-      }
-      setUserAnalysisLayers([]);
-    } finally {
-      setLoadingUserLayers(false);
-    }
+    })();
+
+    userListRequestsRef.current.layers.set(requestKey, request);
+    return request;
   };
 
-  // Muat layer group pengguna dari AstraGIS (khusus milik pengguna saat ini)
-  const loadUserLayerGroups = async () => {
+  const loadUserLayerGroups = async (force = false) => {
     const token = localStorage.getItem('auth_token') || localStorage.getItem('token');
     if (!token) {
       setUserLayerGroups([]);
       return [];
     }
-    try {
-      const res = await projectService.getUserLayerGroups();
-      const list = res?.data || (Array.isArray(res) ? res : []);
-      if (Array.isArray(list)) {
-        setUserLayerGroups(list);
-        return list;
-      }
-    } catch (err) {
-      if (err.response?.status !== 401) {
-        console.error("Gagal memuat layer group pengguna:", err);
-      }
+    if (userListCacheRef.current.groups !== null && !force) {
+      setUserLayerGroups(userListCacheRef.current.groups);
+      return userListCacheRef.current.groups;
     }
-    setUserLayerGroups([]);
-    return [];
-  };
 
+    const requestKey = 'current-user';
+    const currentRequest = userListRequestsRef.current.groups.get(requestKey);
+    if (currentRequest) return currentRequest;
+    if (force) userListCacheRef.current.groups = null;
+
+    const authGeneration = authGenerationRef.current;
+    const request = (async () => {
+      try {
+        const response = await projectService.getUserLayerGroups();
+        const list = Array.isArray(response?.data) ? response.data : (Array.isArray(response) ? response : null);
+        if (!list) throw new Error('Invalid layer-group list response.');
+
+        userListCacheRef.current.groups = list;
+        if (authGeneration === authGenerationRef.current) setUserLayerGroups(list);
+        return list;
+      } catch (error) {
+        if (error.response?.status !== 401) console.error('Gagal memuat layer group pengguna:', error);
+        return [];
+      } finally {
+        if (userListRequestsRef.current.groups.get(requestKey) === request) {
+          userListRequestsRef.current.groups.delete(requestKey);
+        }
+      }
+    })();
+
+    userListRequestsRef.current.groups.set(requestKey, request);
+    return request;
+  };
   // Muat layer geosocial dari backend (WMS & Vector)
   const loadGeosocialLayers = async () => {
     try {
@@ -737,6 +812,11 @@ export default function Dashboard() {
 
     // Dengarkan sinyal auth-change (login / logout / ganti akun)
     const handleAuthChange = () => {
+      authGenerationRef.current += 1;
+      userListCacheRef.current.layers.clear();
+      userListCacheRef.current.groups = null;
+      userListRequestsRef.current.layers.clear();
+      userListRequestsRef.current.groups.clear();
       if (activeProject?.id) {
         loadUserAnalysisLayers(activeProject.id);
         loadUserLayerGroups();
@@ -748,13 +828,6 @@ export default function Dashboard() {
     window.addEventListener('auth-change', handleAuthChange);
     return () => window.removeEventListener('auth-change', handleAuthChange);
   }, [activeProject?.id]);
-
-  useEffect(() => {
-    if (analysisResult && activeProject?.id) {
-      loadUserAnalysisLayers(activeProject.id);
-      loadUserLayerGroups();
-    }
-  }, [analysisResult, activeProject?.id]);
 
   const isGeosocialWmsLayer = (layer) => {
     if (!layer) return false;
@@ -787,7 +860,7 @@ export default function Dashboard() {
           next[layer.id] = {
             id: `geosocial_${layer.id}`,
             name: layer.display_name,
-            wms_url: layer.url || 'http://localhost:8080/geoserver/wms',
+            wms_url: layer.url || import.meta.env.VITE_GEOSERVER_WMS_URL || 'http://localhost:8080/geoserver/wms',
             wms_layers_param: layer.layer_name,
             opacity: 0.85,
           };
@@ -840,7 +913,7 @@ export default function Dashboard() {
         nextWms[layer.id] = {
           id: `geosocial_${layer.id}`,
           name: layer.display_name,
-          wms_url: layer.url || 'http://localhost:8080/geoserver/wms',
+          wms_url: layer.url || import.meta.env.VITE_GEOSERVER_WMS_URL || 'http://localhost:8080/geoserver/wms',
           wms_layers_param: layer.layer_name,
           opacity: 0.85,
         };
@@ -885,9 +958,6 @@ export default function Dashboard() {
   };
 
   const handleUserLayerToggle = (layer, isChecked) => {
-    // Matikan preview tile GEE mentah agar tidak tumpang-tindih atau menjadi layer hantu
-    setActiveLayers({});
-
     setActiveUserLayers((prev) => {
       const updated = { ...prev };
       if (isChecked) {
@@ -922,9 +992,6 @@ export default function Dashboard() {
   };
 
   const handleUserLayerToggleAll = (isChecked) => {
-    // Matikan preview tile GEE mentah
-    setActiveLayers({});
-
     if (isChecked) {
       const allActive = {};
       userAnalysisLayers.forEach((layer) => {
@@ -945,11 +1012,10 @@ export default function Dashboard() {
   const handleZoomToUserLayer = (layer) => {
     if (!mapRef.current || !layer.bbox) return;
     try {
-      const [minx, miny, maxx, maxy] = layer.bbox;
-      mapRef.current.fitBounds([
-        [miny, minx],
-        [maxy, maxx],
-      ], { padding: [40, 40], animate: true });
+      const bounds = normalizeBbox(layer.bbox);
+      if (bounds) {
+        mapRef.current.fitBounds(bounds, { padding: [40, 40], animate: true });
+      }
     } catch (e) {
       console.error("Error zooming to user layer:", e);
     }
@@ -1003,21 +1069,23 @@ export default function Dashboard() {
 
   const handleCreateUserGroup = async (groupData) => {
     const res = await projectService.createUserLayerGroup(groupData);
+    userListCacheRef.current.groups = null;
     addNotification('success', `Layer Group "${groupData.title}" created successfully!`);
-    await loadUserLayerGroups();
+    await loadUserLayerGroups(true);
     return res;
   };
 
   const handleDeleteUserGroup = async (groupId) => {
     try {
       await projectService.deleteUserLayerGroup(groupId);
+      userListCacheRef.current.groups = null;
       addNotification('info', 'Layer Group deleted successfully.');
       setActiveUserGroups((prev) => {
         const updated = { ...prev };
         delete updated[groupId];
         return updated;
       });
-      await loadUserLayerGroups();
+      await loadUserLayerGroups(true);
     } catch (err) {
       console.error("Failed to delete layer group:", err);
       addNotification('error', 'Failed to delete layer group.');
@@ -1027,8 +1095,9 @@ export default function Dashboard() {
   const handleUpdateUserGroup = async (groupId, groupData) => {
     try {
       const res = await projectService.updateUserLayerGroup(groupId, groupData);
+      userListCacheRef.current.groups = null;
       addNotification('success', `Layer Group "${groupData.title}" updated successfully!`);
-      const updatedGroups = await loadUserLayerGroups();
+      const updatedGroups = await loadUserLayerGroups(true);
       const freshGroup = updatedGroups?.find((g) => g.id === groupId) || res?.data;
 
       // Auto-refresh instantly on map using cache buster _t
@@ -1066,6 +1135,8 @@ export default function Dashboard() {
   const handleDeleteUserLayer = async (layerId) => {
     try {
       await projectService.deleteUserLayer(layerId);
+      userListCacheRef.current.layers.delete(String(activeProject?.id));
+      userListCacheRef.current.groups = null;
       addNotification('info', 'Analysis result deleted successfully.');
       setActiveUserLayers((prev) => {
         const updated = { ...prev };
@@ -1073,8 +1144,8 @@ export default function Dashboard() {
         return updated;
       });
       setUserAnalysisLayers((prev) => prev.filter((l) => l.id !== layerId));
-      await loadUserAnalysisLayers();
-      await loadUserLayerGroups();
+      await loadUserAnalysisLayers(activeProject?.id, true);
+      await loadUserLayerGroups(true);
     } catch (err) {
       console.error("Failed to delete analysis layer:", err);
       addNotification('error', 'Failed to delete analysis layer.');
@@ -1185,158 +1256,58 @@ export default function Dashboard() {
     });
   };
 
-  const handleToggleComponentLayer = async (layerId, isChecked, dateParams = {}) => {
+  const handleToggleComponentLayer = (layerId, isChecked) => {
+    setIsAnalysisSaved(false);
     const compKey = layerId.toLowerCase();
-    const reqStartDate = dateParams.start_date || dateParams.startDate || '2024-01-01';
-    const reqEndDate = dateParams.end_date || dateParams.endDate || '2024-01-31';
-    const aoiLabel = selectedAoi?.name || (selectedAoi?.id ? `AOI #${selectedAoi.id}` : 'Drawn Area');
+    const previewKey = Object.keys(availableMaps).find(
+      (key) => key.toLowerCase() === compKey
+    );
+    const previewUrl = previewKey ? availableMaps[previewKey] : null;
+
+    if (isChecked && (typeof previewUrl !== 'string' || !previewUrl.startsWith('http'))) {
+      addNotification('info', `Preview layer ${layerId} belum tersedia. Jalankan analisis terlebih dahulu.`);
+      return;
+    }
 
     if (isChecked) {
-      // 1. Cek apakah layer komponen untuk AOI dan rentang waktu ini SUDAH TERSIMPAN
-      const existingSavedLayer = findMatchingSavedLayer(compKey, selectedAoi, reqStartDate, reqEndDate);
+      const nextSelectedComponents = { ...selectedComponentLayers, [compKey]: true };
+      setSelectedComponentLayers(nextSelectedComponents);
+      setComponentSavePending(true);
+    } else if (!isChecked) {
+      const nextSelectedComponents = { ...selectedComponentLayers };
+      delete nextSelectedComponents[compKey];
+      setSelectedComponentLayers(nextSelectedComponents);
+      setComponentSavePending(Object.keys(nextSelectedComponents).length > 0);
+    }
+    setActiveLayers((previous) => {
+      const next = { ...previous };
+      delete next[previewKey || layerId];
+      if (isChecked) next[previewKey || layerId] = previewUrl;
+      return next;
+    });
 
-      if (existingSavedLayer) {
-        // SUDAH TERSIMPAN: Langsung aktifkan layer WMS yang ada tanpa analisis ulang ke GEE!
-        handleUserLayerToggle(existingSavedLayer, true);
-        const leg = resolveLayerLegend(existingSavedLayer);
-        if (leg) setActiveLegend(leg);
-
-        const stats = existingSavedLayer.metadata?.statistics || existingSavedLayer.statistics;
-        if (stats) {
-          setSelectedLayerStats(stats);
-          setIsChartOpen(true);
-        }
-        setIsAnalysisSaved(true);
-        addNotification('info', `Layer ${layerId} (${reqStartDate} - ${reqEndDate}) sudah tersimpan di proyek.`);
-      } else {
-        // BELUM TERSIMPAN: Lakukan analisis baru ke microservice Flask/GEE, lalu simpan otomatis ke AstraGIS
-        if (!activeProject?.id) {
-          addNotification('error', 'Silakan pilih proyek terlebih dahulu.');
-          return;
-        }
-
-        addNotification('info', `Menganalisis komponen ${layerId} (${aoiLabel}) untuk ${reqStartDate} s/d ${reqEndDate}...`);
-        setLoadingComponentLayer(prev => ({ ...prev, [layerId]: true }));
-
-        try {
-          let currentGeom = drawnGeometryData ? drawnGeometryData.geometry : (selectedAoi?.geometry || []);
-          if (typeof currentGeom === 'string') {
-            try { currentGeom = JSON.parse(currentGeom); } catch (e) {}
-          }
-          if (currentGeom && currentGeom.coordinates) {
-            currentGeom = currentGeom.coordinates;
-          }
-
-          const payload = {
-            analysis_type: `component_${compKey}`,
-            component: compKey,
-            aoi_id: selectedAoi ? selectedAoi.id : null,
-            start_date: reqStartDate,
-            end_date: reqEndDate,
-            aoi_type: drawnGeometryData ? drawnGeometryData.type : 'polygon',
-            geometry: currentGeom
-          };
-
-          const res = await projectService.runAnalysis(activeProject.id, payload);
-          const analysisData = res?.data || res;
-
-          if (analysisData?.id) {
-            // Otomatis simpan ke AstraGIS agar WMS layer resmi terdaftar di panel Analysis Results
-            try {
-              const saveRes = await projectService.saveAnalysis(activeProject.id, {
-                analysis_id: analysisData.id
-              });
-              const newWms = saveRes?.data?.wms_layer;
-
-              if (newWms) {
-                setUserAnalysisLayers(prev => [newWms, ...prev.filter(l => l.id !== newWms.id)]);
-                setActiveUserLayers(prev => ({ ...prev, [newWms.id]: newWms }));
-                
-                const leg = resolveLayerLegend(newWms);
-                if (leg) setActiveLegend(leg);
-
-                const stats = newWms.metadata?.statistics || newWms.statistics || analysisData?.statistics;
-                if (stats) {
-                  setSelectedLayerStats(stats);
-                  setIsChartOpen(true);
-                }
-
-                setIsAnalysisSaved(true);
-                addNotification('success', `Komponen ${layerId} berhasil dianalisis dan disimpan ke proyek.`);
-                await loadUserAnalysisLayers(activeProject.id);
-                await loadUserLayerGroups();
-              } else {
-                handleLayerToggle(layerId, analysisData.maps?.[compKey] || true);
-              }
-            } catch (saveErr) {
-              console.warn("Gagal simpan komponen ke AstraGIS:", saveErr);
-              handleLayerToggle(layerId, analysisData.maps?.[compKey] || true);
-            }
-          } else {
-            handleLayerToggle(layerId, true);
-          }
-        } catch (err) {
-          console.error(`Gagal menganalisis komponen ${layerId}:`, err);
-          const msg = err.response?.data?.message || `Gagal menganalisis komponen ${layerId}.`;
-          addNotification('error', msg);
-        } finally {
-          setLoadingComponentLayer(prev => ({ ...prev, [layerId]: false }));
-        }
+    if (isChecked) {
+      const legend = previewKey ? availableLegends[previewKey] : null;
+      if (legend) setActiveLegend(legend);
+      if (statisticsData && Object.keys(statisticsData).length > 0) {
+        setSelectedLayerStats(statisticsData);
+        setIsChartOpen(true);
       }
     } else {
-      // Uncheck: Nonaktifkan layer komponen dari activeUserLayers
-      const activeEntry = Object.values(activeUserLayers).find(l => {
-        const meta = l.metadata || {};
-        const metaType = (meta.analysis_type || '').toLowerCase();
-        const metaComp = (meta.component || '').toLowerCase();
-        const name = (l.layer_name || l.title || l.name || '').toLowerCase();
-        return metaComp === compKey || metaType === `component_${compKey}` || metaType === compKey || name.includes(compKey);
-      });
-
-      if (activeEntry) {
-        handleUserLayerToggle(activeEntry, false);
+      const remainingPreviewCount = Object.keys(activeLayers).filter((key) => key !== (previewKey || layerId)).length;
+      if (remainingPreviewCount === 0) {
+        setActiveLegend(null);
+        setIsChartOpen(false);
       }
-      handleLayerToggle(layerId, false);
     }
   };
-
   const handleRunAnalysis = async (projectId, payload) => {
     if (!projectId) {
       addNotification('error', 'Silakan pilih proyek terlebih dahulu.');
       return;
     }
 
-    const aoiLabel = selectedAoi?.name || (selectedAoi?.id ? `AOI #${selectedAoi.id}` : 'Drawn Area');
-
-    // 1. Ekstrak parameter tanggal & bobot dari payload
-    const reqStartDate = payload?.start_date || payload?.startDate;
-    const reqEndDate = payload?.end_date || payload?.endDate;
-    const reqWeights = payload?.weights;
-    const analysisType = payload?.analysis_type || 'flood_risk';
-
-    // 2. Cek apakah ada layer analisis yang tersimpan dengan PARAMETER IDENTIK (type, AOI, dan rentang tanggal persis sama)
-    const exactMatchLayer = findMatchingSavedLayer(analysisType, selectedAoi, reqStartDate, reqEndDate, reqWeights);
-
-    if (exactMatchLayer) {
-      // Jika parameter dan tanggal 100% identik dengan yang sudah tersimpan: aktifkan layer yang ada
-      handleUserLayerToggle(exactMatchLayer, true);
-      const leg = resolveLayerLegend(exactMatchLayer);
-      if (leg) setActiveLegend(leg);
-
-      const stats = exactMatchLayer.metadata?.statistics || exactMatchLayer.statistics;
-      if (stats) {
-        setSelectedLayerStats(stats);
-        setIsChartOpen(true);
-      }
-
-      setIsAnalysisSaved(true);
-      setActiveLayers({});
-
-      addNotification('info', `Hasil analisis untuk ${aoiLabel} (${reqStartDate || ''} s/d ${reqEndDate || ''}) sudah tersimpan di proyek. Menampilkan layer.`);
-      return;
-    }
-
-    // 3. Pastikan area analisis (AOI) sudah ditentukan
+    // Pastikan area analisis (AOI) sudah ditentukan
     const hasDrawnGeom = drawnGeometryData && drawnGeometryData.geometry && (
       Array.isArray(drawnGeometryData.geometry) ? drawnGeometryData.geometry.length > 0 : true
     );
@@ -1344,7 +1315,6 @@ export default function Dashboard() {
       addNotification('error', 'Silakan tentukan area (AOI) terlebih dahulu dengan menggambar di peta atau memilih dari daftar AOI tersimpan.');
       return;
     }
-    
     const finalPayload = {
       ...payload,
       aoi_id: selectedAoi ? selectedAoi.id : (payload.aoi_id || null),
@@ -1353,43 +1323,16 @@ export default function Dashboard() {
     };
 
     setIsAnalysisSaved(false);
+    setSelectedComponentLayers({});
+    setComponentSavePending(false);
 
     try {
       const res = await executeAnalysis(projectId, finalPayload);
       const analysisData = res?.data || res;
 
-      // Otomatis simpan ke AstraGIS agar WMS layer langsung tercatat di panel Analysis Results
+      setIsAnalysisSaved(false);
       if (analysisData?.id) {
-        try {
-          setIsSavingAnalysis(true);
-          const saveRes = await projectService.saveAnalysis(projectId, {
-            analysis_id: analysisData.id
-          });
-          const savedWms = saveRes?.data?.wms_layer;
-          if (savedWms) {
-            setUserAnalysisLayers((prev) => [savedWms, ...prev.filter((l) => l.id !== savedWms.id)]);
-            setActiveUserLayers((prev) => ({ ...prev, [savedWms.id]: savedWms }));
-            // Bersihkan tile preview GEE agar digantikan sepenuhnya oleh WMS resmi
-            setActiveLayers({});
-            
-            const leg = resolveLayerLegend(savedWms);
-            if (leg) setActiveLegend(leg);
-            
-            const stats = savedWms.metadata?.statistics || savedWms.statistics || analysisData?.statistics;
-            if (stats) {
-              setSelectedLayerStats(stats);
-              setIsChartOpen(true);
-            }
-          }
-          setIsAnalysisSaved(true);
-          await loadUserAnalysisLayers(projectId);
-          await loadUserLayerGroups();
-        } catch (saveErr) {
-          console.warn("Auto-save analysis to AstraGIS had an issue (manual save is available):", saveErr);
-          setIsAnalysisSaved(false);
-        } finally {
-          setIsSavingAnalysis(false);
-        }
+        addNotification('success', 'Analisis selesai. Pilih component layer melalui checkbox; tekan Save jika ingin menyimpannya ke GeoServer.');
       }
     } catch (err) {
       console.error("Execute analysis error:", err);
@@ -1412,24 +1355,70 @@ export default function Dashboard() {
 
     try {
       setIsSavingAnalysis(true);
+      const componentNames = { rainfall: 'Rainfall', elevation: 'Elevation', distance: 'Distance', tpi: 'TPI', ndvi: 'NDVI', ndwi: 'NDWI' };
+      const selectedComponents = Object.keys(selectedComponentLayers)
+        .filter((key) => selectedComponentLayers[key])
+        .map((key) => componentNames[key])
+        .filter(Boolean);
       const saveRes = await projectService.saveAnalysis(activeProject.id, {
-        analysis_id: latestAnalysisId
+        analysis_id: latestAnalysisId,
+        components: selectedComponents
       });
       const savedWms = saveRes?.data?.wms_layer;
-      if (savedWms) {
-        setUserAnalysisLayers((prev) => [savedWms, ...prev.filter((l) => l.id !== savedWms.id)]);
-        setActiveUserLayers((prev) => ({ ...prev, [savedWms.id]: savedWms }));
-        setActiveLayers({});
-        
-        const leg = resolveLayerLegend(savedWms);
-        if (leg) setActiveLegend(leg);
+      const savedComponents = saveRes?.data?.saved_layers || {};
+      const savedComponentEntries = Object.entries(savedComponents).map(([component, layer]) => {
+        const versionedLayer = {
+          ...layer,
+          id: layer.id || layer.layer_name || layer.store_name || `component-${latestAnalysisId}-${component.toLowerCase()}`,
+          layer_name: layer.layer_name || layer.store_name || `analysis_component_${component.toLowerCase()}_${latestAnalysisId}`,
+          display_name: layer.display_name || `${component} ${analysisResult?.data?.parameters?.start_date?.slice(0, 4) || ''}`.trim(),
+          _v: layer.updated_at || new Date().toISOString(),
+        };
+        return [component.toLowerCase(), versionedLayer];
+      });
+
+      if (savedComponentEntries.length > 0) {
+        setUserAnalysisLayers((previous) => [
+          ...savedComponentEntries.map(([, layer]) => layer),
+          ...previous.filter((layer) => !savedComponentEntries.some(([, saved]) => saved.layer_name === layer.layer_name)),
+        ]);
       }
+
+      if (savedWms) {
+        const versionedWms = {
+          ...savedWms,
+          _v: savedWms.updated_at || new Date().toISOString()
+        };
+        setUserAnalysisLayers((prev) => [versionedWms, ...prev.filter((l) => l.id !== versionedWms.id)]);
+      }
+      const failedComponents = saveRes?.data?.failed_components || {};
+      if (!savedWms) {
+        throw new Error('FloodRisk utama belum berhasil disimpan ke Analysis Results.');
+      }
+      if (Object.keys(failedComponents).length > 0) {
+        const remainingSelectedComponents = Object.fromEntries(
+          Object.entries(selectedComponentLayers).filter(([key]) => {
+            const component = ({ rainfall: 'Rainfall', elevation: 'Elevation', distance: 'Distance', tpi: 'TPI', ndvi: 'NDVI', ndwi: 'NDWI' })[key];
+            return failedComponents[component];
+          })
+        );
+        setSelectedComponentLayers(remainingSelectedComponents);
+        setComponentSavePending(true);
+        addNotification('error', `Sebagian komponen gagal disimpan: ${Object.keys(failedComponents).join(', ')}. Tekan Save lagi untuk mencoba ulang.`);
+        return;
+      }
+      setComponentSavePending(false);
       setIsAnalysisSaved(true);
-      await loadUserAnalysisLayers(activeProject.id);
-      await loadUserLayerGroups();
-      addNotification('success', 'Hasil analisis berhasil disimpan ke proyek.');
+      userListCacheRef.current.layers.delete(String(activeProject.id));
+      userListCacheRef.current.groups = null;
+      await loadUserAnalysisLayers(activeProject.id, true);
+      await loadUserLayerGroups(true);
+      addNotification('success', selectedComponents.length > 0
+        ? 'FloodRisk dan component layer yang dipilih berhasil disimpan ke proyek.'
+        : 'FloodRisk berhasil disimpan ke proyek.');
     } catch (err) {
       console.error('Save analysis error:', err);
+      setComponentSavePending(false);
       const msg = err.response?.data?.message || 'Gagal menyimpan hasil analisis ke proyek.';
       addNotification('error', msg);
     } finally {
@@ -1491,7 +1480,11 @@ export default function Dashboard() {
         <div className="absolute inset-0 z-0">
           <MapViewer 
             maps={activeLayers} 
-            wmsLayers={{ ...activeUserLayers, ...activeUserGroups, ...activeGeosocialWms }}
+            wmsLayers={{
+              ...Object.fromEntries(Object.entries(activeUserLayers).map(([key, layer]) => [`user:${key}`, layer])),
+              ...Object.fromEntries(Object.entries(activeUserGroups).map(([key, layer]) => [`group:${key}`, layer])),
+              ...Object.fromEntries(Object.entries(activeGeosocialWms).map(([key, layer]) => [`geosocial:${key}`, layer])),
+            }}
             geosocialPointLayers={activeGeosocialPoints}
             basemap={selectedBasemapId} 
             mapRef={mapRef}
@@ -1610,7 +1603,7 @@ export default function Dashboard() {
 
               {/* 4. Vegetation (NDVI) Component */}
               {stats.avg_ndvi !== undefined && !stats.risk_distribution && (
-                <div className="bg-emerald-50 border border-emerald-100 p-3.5 rounded-xl space-y-2">
+        <div className="bg-green-50 border border-green-100 p-3.5 rounded-xl space-y-2">
                   <span className="text-emerald-800 font-semibold text-xs block">Vegetation Index (NDVI)</span>
                   <div className="flex justify-between items-baseline">
                     <span className="text-gray-600 text-xs">Average NDVI:</span>
@@ -1712,12 +1705,11 @@ export default function Dashboard() {
         
         onLayerToggle={handleLayerToggle}
         activeLayers={activeLayers}
-
+        selectedComponentLayers={selectedComponentLayers}
         userAnalysisLayers={userAnalysisLayers}
         activeUserLayers={activeUserLayers}
         onToggleUserLayer={handleUserLayerToggle}
         onToggleComponentLayer={handleToggleComponentLayer}
-        loadingComponentLayer={loadingComponentLayer}
         selectedAoi={selectedAoi}
 
         onClearAoi={handleClearAoi}
@@ -1726,7 +1718,7 @@ export default function Dashboard() {
         onSaveAnalysis={handleSaveAnalysis}
         isSavingAnalysis={isSavingAnalysis}
         isAnalysisSaved={isAnalysisSaved}
-        hasAnalysisToSave={Boolean(analysisResult?.data || analysisResult || Object.keys(activeUserLayers).length > 0 || Object.keys(activeLayers).length > 0)}
+        hasAnalysisToSave={Boolean(analysisResult?.data || analysisResult || Object.keys(activeUserLayers).length > 0 || Object.keys(activeLayers).length > 0 || componentSavePending)}
         onParametersChange={handleAnalysisParamsChange}
         onDownloadProject={handleDownloadProject}
         onSaveProject={handleSaveProject}
@@ -1791,8 +1783,10 @@ export default function Dashboard() {
         onZoomToUserLayer={handleZoomToUserLayer}
         onZoomToUserGroup={handleZoomToUserGroup}
         onRefreshUserLayers={() => {
-          loadUserAnalysisLayers();
-          loadUserLayerGroups();
+          userListCacheRef.current.layers.delete(String(activeProject?.id));
+          userListCacheRef.current.groups = null;
+          loadUserAnalysisLayers(activeProject?.id, true);
+          loadUserLayerGroups(true);
         }}
         onCreateUserGroup={handleCreateUserGroup}
         onUpdateUserGroup={handleUpdateUserGroup}
@@ -1830,7 +1824,7 @@ export default function Dashboard() {
             { time: 3, text: 'Menghubungkan ke layanan Google Earth Engine...' },
             { time: 8, text: 'Mengambil citra satelit & reduksi matriks piksel...' },
             { time: 18, text: 'Menyusun visualisasi spasial dan layer peta...' },
-            { time: 24, text: 'Mempublikasikan layer ke Analysis Results...' }
+            { time: 24, text: 'Menyiapkan preview FloodRisk dan component layers...' }
           ]}
         />
       )}

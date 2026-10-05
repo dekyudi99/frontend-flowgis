@@ -8,6 +8,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
 import { baseMaps } from '@/lib/basemap';
+import { syncWmsLayers, clearWmsLayers } from '@/lib/wmsLayerManager';
 
 const hospitalIcon = L.icon({
   iconUrl: '/icons/hospital.png',
@@ -60,55 +61,22 @@ function WmsLayerManager({ wmsLayers = {} }) {
   useEffect(() => {
     if (!map) return;
 
-    const currentMap = layersMapRef.current;
-    const incomingKeys = new Set(Object.keys(wmsLayers));
-
-    // Remove layers that are no longer active
-    currentMap.forEach((leafletLayer, key) => {
-      if (!incomingKeys.has(key)) {
-        map.removeLayer(leafletLayer);
-        currentMap.delete(key);
-      }
-    });
-
-    // Add or update layers
-    Object.entries(wmsLayers).forEach(([key, layer]) => {
-      if (!layer || !layer.wms_url || !layer.wms_layers_param) return;
-
-      const existingWms = currentMap.get(key);
-      if (existingWms) {
-        if (layer._t && existingWms.options?._t !== layer._t) {
-          map.removeLayer(existingWms);
-          currentMap.delete(key);
-        } else {
-          return;
-        }
-      }
-
-      const wmsUrl = layer._t
-        ? `${layer.wms_url}${layer.wms_url.includes('?') ? '&' : '?'}_t=${layer._t}`
-        : layer.wms_url;
-
-      const wms = L.tileLayer.wms(wmsUrl, {
-        layers: layer.wms_layers_param,
-        format: 'image/png',
-        transparent: true,
-        version: '1.1.1',
-        zIndex: 40,
-        _t: layer._t,
-        opacity: layer.opacity !== undefined ? layer.opacity : 0.85,
-      });
-      wms.addTo(map);
-      currentMap.set(key, wms);
-    });
-
-    return () => {
-      currentMap.forEach((leafletLayer) => {
-        map.removeLayer(leafletLayer);
-      });
-      currentMap.clear();
-    };
+    syncWmsLayers(map, layersMapRef.current, wmsLayers, (config) => L.tileLayer.wms(config.url, {
+        layers: config.layers,
+        styles: config.styles,
+        format: config.format,
+        transparent: config.transparent,
+        version: config.version,
+        zIndex: config.zIndex,
+        opacity: config.opacity,
+      }));
   }, [map, wmsLayers]);
+
+  useEffect(() => {
+    return () => {
+      clearWmsLayers(map, layersMapRef.current);
+    };
+  }, [map]);
 
   return null;
 }

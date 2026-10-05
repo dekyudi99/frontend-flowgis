@@ -1,17 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useAnalysis } from "@/context/AnalysisContext";
-import { Loader2 } from "lucide-react";
 
 export default function FloodRiskAnalysis({ 
   onAnalyze, 
-  activeLayers = {}, 
   onToggleLayer,
+  selectedComponentLayers = {},
   userAnalysisLayers = [],
-  activeUserLayers = {},
   onToggleComponentLayer,
-  loadingComponentLayer = {},
   selectedAoi = null,
-  drawnGeometryData = null,
   onParametersChange = null
 }) {
   const { analysisResult } = useAnalysis();
@@ -30,6 +26,9 @@ export default function FloodRiskAnalysis({
 
   // Komponen layer tetap bisa digunakan jika ada hasil analisis atau histori layer
   const resultData = analysisResult?.data || analysisResult;
+  const availableComponentKeys = Object.entries(resultData?.maps || {})
+    .filter(([, url]) => typeof url === 'string' && url.startsWith('http'))
+    .map(([key]) => key.toLowerCase());
   const hasCompletedAnalysis = Boolean(
     resultData?.analysis_type === 'flood_risk' || 
     resultData?.wms_layer || 
@@ -88,31 +87,10 @@ export default function FloodRiskAnalysis({
     onAnalyze(payload);
   };
 
-  // Cek apakah komponen ini sudah dianalisis dan AKTIF di peta untuk AOI saat ini
+  // The checkbox selection is also the source for the Save payload; preview visibility stays independent.
   const isComponentChecked = (id) => {
     const key = id.toLowerCase();
-    
-    // Cek apakah ada layer aktif di activeUserLayers yang merupakan komponen ini dan cocok dengan AOI
-    const isUserLayerActive = Object.values(activeUserLayers || {}).some(l => {
-      const meta = l.metadata || {};
-      const metaType = (meta.analysis_type || '').toLowerCase();
-      const metaComp = (meta.component || '').toLowerCase();
-      const name = (l.layer_name || l.title || l.name || '').toLowerCase();
-      const isCompMatch = metaComp === key || metaType === `component_${key}` || metaType === key || name.includes(key);
-      if (!isCompMatch) return false;
-
-      // Pastikan juga cocok dengan AOI saat ini jika AOI dipilih
-      const layerAoiId = meta.aoi_id || meta.extra?.aoi_id;
-      if (selectedAoi?.id && layerAoiId && String(layerAoiId) !== String(selectedAoi.id)) {
-        return false;
-      }
-      return true;
-    });
-
-    if (isUserLayerActive) return true;
-    if (activeLayers && (activeLayers[id] || activeLayers[key])) return true;
-
-    return false;
+    return Boolean(selectedComponentLayers?.[key]);
   };
 
   const componentList = [
@@ -192,7 +170,7 @@ export default function FloodRiskAnalysis({
       </button>
 
       {/* Komponen layer tetap bisa digunakan setelah analisis selesai atau jika sudah ada histori */}
-      {hasCompletedAnalysis && (
+      {hasCompletedAnalysis && componentList.some((layer) => availableComponentKeys.includes(layer.id.toLowerCase())) && (
         <div className="border-t border-gray-200 pt-4 mt-4">
           <div className="flex items-center justify-between mb-3">
             <label className="block text-sm font-semibold text-teal-700">Component Layers</label>
@@ -201,8 +179,7 @@ export default function FloodRiskAnalysis({
             </span>
           </div>
           <div className="space-y-2.5">
-            {componentList.map((layer) => {
-              const isLoading = !!loadingComponentLayer[layer.id];
+            {componentList.filter((layer) => availableComponentKeys.includes(layer.id.toLowerCase())).map((layer) => {
               const isChecked = isComponentChecked(layer.id);
 
               return (
@@ -211,30 +188,18 @@ export default function FloodRiskAnalysis({
                     <input
                       type="checkbox"
                       checked={isChecked}
-                      disabled={isLoading}
                       onChange={(e) => {
                         if (onToggleComponentLayer) {
-                          onToggleComponentLayer(layer.id, e.target.checked, {
-                            startDate,
-                            endDate,
-                            start_date: startDate,
-                            end_date: endDate
-                          });
+                          onToggleComponentLayer(layer.id, e.target.checked);
                         } else if (onToggleLayer) {
                           onToggleLayer(layer.id, e.target.checked);
                         }
                       }}
-                      className="w-4 h-4 text-teal-600 rounded border-gray-300 focus:ring-teal-500 cursor-pointer disabled:opacity-50"
+                      className="w-4 h-4 text-teal-600 rounded border-gray-300 focus:ring-teal-500 cursor-pointer"
                     />
                     <span className="text-sm text-gray-700 group-hover:text-teal-700">{layer.label}</span>
                   </div>
 
-                  {isLoading && (
-                    <span className="flex items-center text-xs text-teal-600 font-medium">
-                      <Loader2 className="w-3.5 h-3.5 animate-spin mr-1" />
-                      Analyze...
-                    </span>
-                  )}
                 </label>
               );
             })}
