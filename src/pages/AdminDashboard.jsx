@@ -312,11 +312,14 @@ export default function AdminDashboard() {
       const styleName = res?.data?.style_name || res?.style_name || styleData.style_name;
       const updatedAt = res?.data?.updated_at || res?.updated_at || new Date().toISOString();
 
+      const returnedConfig = res?.data?.style_config || styleData;
+
       setGeosocialList((prev) =>
         prev.map((item) => (item.id === layerId ? { 
           ...item, 
           legend_url: styleData.fill_color,
           style_name: styleName || item.style_name,
+          style_config: returnedConfig,
           updated_at: updatedAt
         } : item))
       );
@@ -325,6 +328,7 @@ export default function AdminDashboard() {
         if (prev && prev.id === layerId) {
           return { 
             ...prev, 
+            style_name: styleName || prev.style_name,
             styles: styleName || prev.styles,
             _v: updatedAt,
             _t: Date.now() 

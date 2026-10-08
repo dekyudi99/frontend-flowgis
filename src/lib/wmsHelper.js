@@ -6,6 +6,17 @@
 
 const DEFAULT_GEOSERVER_WMS = (typeof import.meta !== 'undefined' && import.meta?.env?.VITE_GEOSERVER_WMS_URL) || 'http://localhost:8080/geoserver/wms';
 
+function cleanDuplicateWorkspace(param) {
+  if (!param || typeof param !== 'string') return '';
+  const trimmed = param.trim();
+  const parts = trimmed.split(':');
+  // Jika workspace berulang seperti ws_flood:ws_flood:vec_point
+  if (parts.length >= 3 && parts[0] === parts[1]) {
+    return `${parts[0]}:${parts.slice(2).join(':')}`;
+  }
+  return trimmed;
+}
+
 /**
  * Resolves the WMS layers parameter cleanly from diverse layer schemas:
  * - layer.wms_layers_param (legacy explicit param)
@@ -15,22 +26,24 @@ const DEFAULT_GEOSERVER_WMS = (typeof import.meta !== 'undefined' && import.meta
  */
 export function resolveWmsLayersParam(layer) {
   if (!layer) return '';
-  if (layer.wms_layers_param) return layer.wms_layers_param;
+  if (layer.wms_layers_param) return cleanDuplicateWorkspace(layer.wms_layers_param);
 
   const ws = layer.workspace_name;
   const store = layer.store_name || layer.geoserver_name;
   const lyrName = layer.layer_name || layer.name;
 
   if (ws && store) {
-    return `${ws}:${store}`;
+    if (store.startsWith(`${ws}:`)) return cleanDuplicateWorkspace(store);
+    return cleanDuplicateWorkspace(`${ws}:${store}`);
   }
   if (ws && lyrName) {
-    return `${ws}:${lyrName}`;
+    if (lyrName.startsWith(`${ws}:`)) return cleanDuplicateWorkspace(lyrName);
+    return cleanDuplicateWorkspace(`${ws}:${lyrName}`);
   }
-  if (layer.geoserver_name) return layer.geoserver_name;
-  if (layer.layer_key) return layer.layer_key;
-  if (layer.layer_name) return layer.layer_name;
-  if (layer.name) return layer.name;
+  if (layer.geoserver_name) return cleanDuplicateWorkspace(layer.geoserver_name);
+  if (layer.layer_key) return cleanDuplicateWorkspace(layer.layer_key);
+  if (layer.layer_name) return cleanDuplicateWorkspace(layer.layer_name);
+  if (layer.name) return cleanDuplicateWorkspace(layer.name);
 
   return '';
 }
@@ -112,7 +125,8 @@ export function buildWmsLayerConfig(layer, customOptions = {}) {
     ? `${baseUrl}?_v=${encodeURIComponent(versionKey)}`
     : baseUrl;
 
-  const normalizedBounds = normalizeBbox(layer.bbox);
+  const rawBounds = layer.bbox || (layer.minx !== undefined ? [layer.minx, layer.miny, layer.maxx, layer.maxy] : null);
+  const normalizedBounds = normalizeBbox(rawBounds);
 
   return {
     id: layer.id || layersParam,

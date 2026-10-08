@@ -33,6 +33,16 @@ console.log('--- Running FlowGIS wmsHelper Regression Tests ---');
     'nakhon:admin_subdistrict',
     'layer_key fallback works'
   );
+  assert.strictEqual(
+    resolveWmsLayersParam({ workspace_name: 'ws_flood', layer_name: 'ws_flood:vec_point' }),
+    'ws_flood:vec_point',
+    'Cleans duplicate workspace prefix when layer_name already has ws:'
+  );
+  assert.strictEqual(
+    resolveWmsLayersParam({ wms_layers_param: 'ws_flood:ws_flood:vec_point' }),
+    'ws_flood:vec_point',
+    'Cleans duplicate workspace prefix in explicit wms_layers_param'
+  );
   console.log('✓ resolveWmsLayersParam tests passed');
 }
 
