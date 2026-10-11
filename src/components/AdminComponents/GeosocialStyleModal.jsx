@@ -444,7 +444,7 @@ export default function GeosocialStyleModal({
           {/* Tipe Garis Tepi (Stroke Style) */}
           <div>
             <label className="block text-xs font-semibold text-gray-700 mb-1.5">
-              Pola Garis Tepi (Stroke Style)
+              Stroke Style
             </label>
             <div className="grid grid-cols-3 gap-2">
               {STROKE_DASH_OPTIONS.map((opt) => (
@@ -488,7 +488,7 @@ export default function GeosocialStyleModal({
             {/* Stroke Opacity */}
             <div>
               <div className="flex items-center justify-between text-xs mb-1 font-semibold text-gray-700">
-                <span>Transparansi Garis</span>
+                <span>Line Transparency</span>
                 <span className="font-mono text-teal-700 text-[10px] bg-teal-50 px-1.5 py-0.5 rounded border border-teal-200">
                   {Math.round(strokeOpacity * 100)}%
                 </span>
