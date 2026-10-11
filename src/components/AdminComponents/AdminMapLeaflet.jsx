@@ -20,16 +20,16 @@ const createCustomIcon = (type) => {
   if (type === 'CCTV Station') {
     bgColor = '#0284c7'; // sky blue
     emoji = '🎥';
-  } else if (type === 'Hospital' || type === 'hospital' || type === 'Rumah Sakit') {
+  } else if (type === 'Hospital' || type === 'hospital' || type === 'Hospital') {
     bgColor = '#e11d48'; // rose red
     emoji = '🏥';
   } else if (type === 'Water Station' || type === 'water_station') {
     bgColor = '#2563eb'; // blue
     emoji = '💧';
-  } else if (type === 'Evacuation Center' || type === 'evacuation_center' || type === 'Posko Evakuasi') {
+  } else if (type === 'Evacuation Center' || type === 'evacuation_center' || type === 'Evacuation Center') {
     bgColor = '#059669'; // emerald green
     emoji = '⛺';
-  } else if (type === 'Fire Station' || type === 'fire_station' || type === 'Pemadam Kebakaran') {
+  } else if (type === 'Fire Station' || type === 'fire_station' || type === 'Fire Department') {
     bgColor = '#ea580c'; // orange
     emoji = '🚒';
   }
@@ -242,7 +242,7 @@ export default function AdminMapLeaflet({
                   text-align: center;
                 "
               >
-                🎥 Tonton Live Stream CCTV
+                🎥 Watch the CCTV Live Stream
               </button>
             ` : ''}
           </div>
@@ -272,7 +272,7 @@ export default function AdminMapLeaflet({
         fillOpacity: 0.85,
         radius: 9,
         weight: 3
-      }).addTo(map).bindPopup('Titik Lokasi Baru Terpilih').openPopup();
+      }).addTo(map).bindPopup('New Selected Location').openPopup();
 
       map.panTo([selectedLocation.lat, selectedLocation.lng]);
     }
@@ -283,7 +283,7 @@ export default function AdminMapLeaflet({
       {/* Pick Mode Banner */}
       {isPickMode && (
         <div className="absolute top-3 left-1/2 -translate-x-1/2 z-[1000] bg-teal-700 text-white text-xs px-4 py-1.5 rounded-full shadow-lg font-medium animate-pulse">
-          Klik lokasi pada peta Leaflet untuk menentukan koordinat
+          Click a location on the Leaflet map to determine the coordinates
         </div>
       )}
 
@@ -301,7 +301,7 @@ export default function AdminMapLeaflet({
               <button
                 onClick={onRemoveWmsLayer}
                 className="p-1 text-gray-400 hover:text-red-500 rounded transition"
-                title="Sembunyikan WMS Layer"
+                title="Hide WMS Layer"
               >
                 <EyeOff className="w-3.5 h-3.5" />
               </button>

@@ -81,10 +81,10 @@ export default function GeosocialTable({
       <CardHeader className="pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <CardTitle className="text-base font-bold text-gray-800 flex items-center gap-2">
-            <Layers className="w-5 h-5 text-teal-600" /> Katalog Layer Spasial & Geosocial
+            <Layers className="w-5 h-5 text-teal-600" /> Spatial & Geosocial Layers Catalog
           </CardTitle>
           <span className="text-xs text-gray-500 font-medium">
-            Total: {filteredLayers.length} Layer Terdaftar {search ? `(dari pencarian)` : ''}
+            Total: {filteredLayers.length} Registered Layers {search ? `(from the search)` : ''}
           </span>
         </div>
 
@@ -92,7 +92,7 @@ export default function GeosocialTable({
           <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" />
           <input
             type="text"
-            placeholder="Cari nama, tipe, atau key..."
+            placeholder="Search by name, type, or key..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full pl-8 pr-3 py-1.5 text-xs bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
@@ -103,22 +103,22 @@ export default function GeosocialTable({
         {isLoading ? (
           <div className="p-8 text-center text-gray-500 flex flex-col items-center justify-center gap-2">
             <Loader2 className="w-6 h-6 animate-spin text-teal-600" />
-            <span className="text-xs">Memuat daftar layer spasial...</span>
+            <span className="text-xs">Loading the list of spatial layers...</span>
           </div>
         ) : filteredLayers.length === 0 ? (
           <div className="p-8 text-center text-gray-400 text-xs">
-            {search ? 'Tidak ada layer yang sesuai dengan pencarian.' : 'Belum ada layer geosocial terdaftar. Silakan upload file spasial di atas.'}
+            {search ? 'No layers match the search criteria.' : 'No geosocial layers have been registered yet. Please upload the spatial file above.'}
           </div>
         ) : (
           <table className="w-full text-left border-collapse text-xs">
             <thead>
               <tr className="bg-gray-50 border-y border-gray-200 text-gray-600 font-semibold">
-                <th className="p-3">Nama Layer & Identifier</th>
-                <th className="p-3">Tipe Format</th>
-                <th className="p-3">Status Publik</th>
-                <th className="p-3">Ukuran / Info</th>
-                <th className="p-3">Tanggal Dibuat</th>
-                <th className="p-3 text-center">Aksi Manajemen</th>
+                <th className="p-3">Layer Name & Identifier</th>
+                <th className="p-3">Type Format</th>
+                <th className="p-3">Public Status</th>
+                <th className="p-3">Size / Info</th>
+                <th className="p-3">Date Created</th>
+                <th className="p-3 text-center">Management Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100 text-gray-700">
@@ -144,13 +144,13 @@ export default function GeosocialTable({
                             onClick={() => handleSave(item.id)}
                             className="text-[10px] bg-teal-600 hover:bg-teal-700 text-white px-2 py-1 rounded"
                           >
-                            Simpan
+                            Save
                           </button>
                           <button
                             onClick={() => setEditingId(null)}
                             className="text-[10px] bg-gray-200 hover:bg-gray-300 text-gray-700 px-2 py-1 rounded"
                           >
-                            Batal
+                            Cancel
                           </button>
                         </div>
                       ) : (
@@ -177,15 +177,15 @@ export default function GeosocialTable({
                             ? 'bg-teal-50 text-teal-700 border-teal-200 hover:bg-teal-100'
                             : 'bg-gray-100 text-gray-500 border-gray-200 hover:bg-gray-200'
                         }`}
-                        title="Klik untuk mengubah status aktif"
+                        title="Click to change the active status"
                       >
                         {isActive ? (
                           <>
-                            <CheckCircle className="w-3 h-3 text-teal-600" /> Aktif
+                            <CheckCircle className="w-3 h-3 text-teal-600" /> Aktive
                           </>
                         ) : (
                           <>
-                            <XCircle className="w-3 h-3 text-gray-400" /> Nonaktif
+                            <XCircle className="w-3 h-3 text-gray-400" /> Inactive
                           </>
                         )}
                       </button>
@@ -197,21 +197,21 @@ export default function GeosocialTable({
                         <button
                           onClick={() => onSelectLayerToView && onSelectLayerToView(item)}
                           className="p-1.5 text-teal-600 hover:bg-teal-50 rounded"
-                          title="Tampilkan di Peta"
+                          title="Show on Map"
                         >
                           <Eye className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => handleStartEdit(item)}
                           className="p-1.5 text-blue-600 hover:bg-blue-50 rounded"
-                          title="Ubah Nama Layer"
+                          title="Rename Layer"
                         >
                           <Edit2 className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => onOpenStyleModal && onOpenStyleModal(item)}
                           className="p-1.5 text-purple-600 hover:bg-purple-50 rounded"
-                          title="Atur / Edit Style Visual (SLD)"
+                          title="Edit Style Visual (SLD)"
                         >
                           <Palette className="w-4 h-4" />
                         </button>
@@ -219,7 +219,7 @@ export default function GeosocialTable({
                           disabled={deletingId === item.id}
                           onClick={() => handleDeleteClick(item)}
                           className="p-1.5 text-red-600 hover:bg-red-50 rounded disabled:opacity-40"
-                          title="Hapus Layer"
+                          title="Delete Layer"
                         >
                           {deletingId === item.id ? (
                             <Loader2 className="w-4 h-4 animate-spin text-red-600" />
@@ -253,11 +253,11 @@ export default function GeosocialTable({
         onClose={() => setConfirmDeleteTarget(null)}
         onConfirm={handleConfirmDelete}
         isLoading={!!deletingId}
-        title="Hapus Layer Spasial?"
-        message={`Apakah Anda yakin ingin menghapus layer "${confirmDeleteTarget?.name || confirmDeleteTarget?.display_name || 'ini'}" dari GeoServer dan database? Tindakan ini tidak dapat dibatalkan.`}
-        confirmText="Ya, Hapus Layer"
-        cancelText="Batal"
+        title="Delete Spatial Layer?"
+        message={`Are you sure you want to delete "${confirmDeleteTarget?.name || confirmDeleteTarget?.display_name || 'this'}" from GeoServer and the database? This action cannot be undone.`}
+        confirmText="Yes, Delete Layer"
+        cancelText="Cancel"
       />
     </Card>
   );
-}
+}

@@ -56,7 +56,7 @@ export default function FileUploadPopup({ isOpen, onClose, onFileSubmit }) {
     if (files.length > 0) {
       const selected = files[0];
       if (selected.name.toLowerCase().endsWith('.shp')) {
-        alert('Format ESRI Shapefile (.shp) membutuhkan file pendamping (.shx, .dbf, .prj). Mohon satukan/kompres seluruh berkas tersebut ke dalam format .zip sebelum diunggah.');
+        alert('The ESRI Shapefile (.shp) format requires accompanying files (.shx, .dbf, .prj). Please combine/compress all of these files into a .zip file before uploading.');
         return;
       }
       setUploadedFile(selected)
@@ -68,7 +68,7 @@ export default function FileUploadPopup({ isOpen, onClose, onFileSubmit }) {
     if (files.length > 0) {
       const selected = files[0];
       if (selected.name.toLowerCase().endsWith('.shp')) {
-        alert('Format ESRI Shapefile (.shp) membutuhkan file pendamping (.shx, .dbf, .prj). Mohon satukan/kompres seluruh berkas tersebut ke dalam format .zip sebelum diunggah.');
+        alert('The ESRI Shapefile (.shp) format requires accompanying files (.shx, .dbf, .prj). Please combine/compress all of these files into a .zip file before uploading.');
         return;
       }
       setUploadedFile(selected)

@@ -43,9 +43,9 @@ function Loader({
 
   // Tahapan default yang cerdas jika tidak disediakan caller
   const defaultStages = [
-    { time: 0, text: 'Memverifikasi permintaan & parameter data...' },
-    { time: 2, text: 'Menghubungi server & memproses ke database...' },
-    { time: 6, text: 'Menyinkronkan transaksi data ke sistem...' },
+    { time: 0, text: 'Verifying requests and data parameters...' },
+    { time: 2, text: 'Connecting to the server and processing data in the database...' },
+    { time: 6, text: 'Synchronizing transaction data with the system...' },
   ];
 
   const activeStages = stages && stages.length > 0 ? stages : defaultStages;
@@ -53,14 +53,14 @@ function Loader({
   // Tentukan teks tahap saat ini berdasarkan detik berjalan
   const currentStageText = isDeterminate
     ? (progress >= 100 
-        ? 'Memvalidasi geometri dan menyimpan data...' 
+        ? 'Validate the geometry and save the data...' 
         : progress >= 30
-        ? `Mengunggah file ke server (${Math.round(progress)}%)...`
-        : 'Membaca & mengekstrak berkas spasial...')
+        ? `Uploading files to the server (${Math.round(progress)}%)...`
+        : 'Reading and extracting spatial files...')
     : ([...activeStages].reverse().find((s) => elapsedSeconds >= s.time)?.text || activeStages[0].text);
 
-  const displayMessage = message || t('common.processing') || 'Memproses Analisis';
-  const displaySubtitle = subtitle || (isDeterminate ? 'Proses transmisi data aktif' : 'Sedang memproses permintaan ke server...');
+  const displayMessage = message || t('common.processing') || 'Processing the Analysis';
+  const displaySubtitle = subtitle || (isDeterminate ? 'Active data transmission process' : 'Processing a request to the server...');
 
   const loaderContent = (
     <div
@@ -105,7 +105,7 @@ function Loader({
                 </div>
               </div>
               <div className="flex justify-between items-center text-xs font-semibold text-slate-500 px-1">
-                <span>{progress >= 100 ? 'Selesai Mengunggah' : 'Mengirim'}</span>
+                <span>{progress >= 100 ? 'Upload Complete' : 'Sending'}</span>
                 <span className="text-teal-600 font-mono text-sm">{Math.round(progress || 0)}%</span>
               </div>
             </div>
@@ -132,7 +132,7 @@ function Loader({
         {/* Status Waktu Riil (Stopwatch) */}
         {showTimer && (
           <div className="flex items-center justify-between w-full text-xs text-slate-400 px-1 border-t border-slate-100 pt-3">
-            <span className="text-slate-400">Durasi proses:</span>
+            <span className="text-slate-400">Process duration:</span>
             <span className="font-mono font-semibold text-slate-700 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
               ⏱ {formatTime(elapsedSeconds)}
             </span>
@@ -142,7 +142,7 @@ function Loader({
         {/* Tip Informatif jika proses memakan waktu > 12 detik */}
         {!isDeterminate && elapsedSeconds >= 12 && (
           <div className="w-full text-[11px] text-amber-800 bg-amber-50/90 border border-amber-200/70 px-3 py-2 rounded-lg text-center leading-relaxed">
-            {tip || '💡 Proses membutuhkan waktu lebih lama di server. Mohon tunggu sejenak hingga transaksi selesai.'}
+            {tip || '💡 The process is taking longer on the server. Please wait a moment until the transaction is complete.'}
           </div>
         )}
 
@@ -153,7 +153,7 @@ function Loader({
             onClick={onCancel}
             className="text-xs font-semibold text-slate-400 hover:text-rose-600 transition-colors py-1 px-3 rounded-md hover:bg-rose-50 border border-transparent hover:border-rose-100"
           >
-            Batalkan Permintaan
+            Cancel Request
           </button>
         )}
 

@@ -76,7 +76,7 @@ export default function CctvStreamModal({ station, isOpen, onClose }) {
           {loading && (
             <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-slate-950/70 text-slate-400 text-xs">
               <RefreshCw className="w-7 h-7 animate-spin text-teal-500 mb-2" />
-              <span>Menghubungkan ke Feed Kamera...</span>
+              <span>Connecting to the Camera Feed...</span>
             </div>
           )}
 
@@ -96,10 +96,10 @@ export default function CctvStreamModal({ station, isOpen, onClose }) {
             <div className="flex flex-col items-center justify-center p-6 text-center text-slate-400 max-w-md">
               <AlertCircle className="w-10 h-10 text-amber-400 mb-2" />
               <h4 className="text-sm font-semibold text-white mb-1">
-                Kamera Tidak Merespons Stream Langsung
+                Camera Not Responding to Live Stream
               </h4>
               <p className="text-xs text-slate-400 mb-4 leading-relaxed">
-                Kamera CCTV di stasiun ini sedang luring atau membutuhkan autentikasi jaringan lokal. Anda dapat mencoba mode snapshot JPEG.
+                The CCTV camera at this station is currently offline or requires local network authentication. You can try JPEG snapshot mode.
               </p>
               <div className="flex gap-2">
                 <button
@@ -109,13 +109,13 @@ export default function CctvStreamModal({ station, isOpen, onClose }) {
                   }}
                   className="px-3 py-1.5 bg-teal-600 hover:bg-teal-500 text-white rounded-lg text-xs font-medium"
                 >
-                  Gunakan Snapshot Terkini
+                  Use the Latest Snapshot
                 </button>
                 <button
                   onClick={handleReload}
                   className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs"
                 >
-                  Coba Lagi
+                  Try Again
                 </button>
               </div>
             </div>
@@ -149,7 +149,7 @@ export default function CctvStreamModal({ station, isOpen, onClose }) {
             onClick={onClose}
             className="px-4 py-1.5 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-xs font-medium transition"
           >
-            Tutup
+            Close
           </button>
         </div>
 

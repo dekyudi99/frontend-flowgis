@@ -70,12 +70,12 @@ export default function Pagination({
       {/* Informasi Baris & Selector Ukuran Halaman */}
       <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2.5 sm:gap-4 text-gray-500 w-full sm:w-auto">
         <span>
-          Menampilkan <strong className="text-gray-800 font-semibold">{startIndex}</strong> - <strong className="text-gray-800 font-semibold">{endIndex}</strong> dari <strong className="text-gray-800 font-semibold">{totalItems}</strong> data
+          Displaying <strong className="text-gray-800 font-semibold">{startIndex}</strong> - <strong className="text-gray-800 font-semibold">{endIndex}</strong> dari <strong className="text-gray-800 font-semibold">{totalItems}</strong> data
         </span>
 
         {onPageSizeChange && pageSizeOptions && pageSizeOptions.length > 0 && (
           <div className="flex items-center gap-1.5 border-l border-gray-200 pl-3">
-            <span className="text-gray-400 text-[11px]">Per halaman:</span>
+            <span className="text-gray-400 text-[11px]">Per page:</span>
             <select
               value={pageSize}
               onChange={(e) => {
@@ -87,7 +87,7 @@ export default function Pagination({
             >
               {pageSizeOptions.map((opt) => (
                 <option key={opt} value={opt}>
-                  {opt} baris
+                  {opt} line
                 </option>
               ))}
             </select>
@@ -107,7 +107,7 @@ export default function Pagination({
               ? 'opacity-30 cursor-not-allowed border-gray-200 bg-gray-50'
               : 'hover:bg-white hover:border-gray-300 bg-white border-gray-200 shadow-2xs'
           }`}
-          title="Halaman Pertama"
+          title="First Page"
         >
           <ChevronsLeft className="w-3.5 h-3.5" />
         </button>
@@ -122,7 +122,7 @@ export default function Pagination({
               ? 'opacity-30 cursor-not-allowed border-gray-200 bg-gray-50'
               : 'hover:bg-white hover:border-gray-300 bg-white border-gray-200 shadow-2xs'
           }`}
-          title="Halaman Sebelumnya"
+          title="Previous Page"
         >
           <ChevronLeft className="w-3.5 h-3.5" />
         </button>
@@ -166,7 +166,7 @@ export default function Pagination({
               ? 'opacity-30 cursor-not-allowed border-gray-200 bg-gray-50'
               : 'hover:bg-white hover:border-gray-300 bg-white border-gray-200 shadow-2xs'
           }`}
-          title="Halaman Selanjutnya"
+          title="Next Page"
         >
           <ChevronRight className="w-3.5 h-3.5" />
         </button>
@@ -181,7 +181,7 @@ export default function Pagination({
               ? 'opacity-30 cursor-not-allowed border-gray-200 bg-gray-50'
               : 'hover:bg-white hover:border-gray-300 bg-white border-gray-200 shadow-2xs'
           }`}
-          title="Halaman Terakhir"
+          title="Last Page"
         >
           <ChevronsRight className="w-3.5 h-3.5" />
         </button>

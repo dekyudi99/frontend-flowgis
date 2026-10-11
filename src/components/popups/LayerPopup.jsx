@@ -77,7 +77,7 @@ export default function LayerPopup({
         <div className="flex items-center gap-1">
           <button
             onClick={() => setIsWide(!isWide)}
-            title={isWide ? "Perkecil menu layer" : "Perlebar menu layer"}
+            title={isWide ? "Collapse the layer menu" : "Expand the layer menu"}
             className="p-1.5 text-gray-400 hover:text-teal-600 hover:bg-teal-50 rounded-lg transition-colors"
           >
             {isWide ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}

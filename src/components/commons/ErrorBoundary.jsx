@@ -28,16 +28,16 @@ export default class ErrorBoundary extends React.Component {
           <div className="w-12 h-12 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center mb-3">
             <AlertTriangle className="w-6 h-6" />
           </div>
-          <h3 className="text-base font-bold text-gray-800 mb-1">Terjadi Kesalahan pada Tampilan</h3>
+          <h3 className="text-base font-bold text-gray-800 mb-1">An Error Occurred on the Screen</h3>
           <p className="text-xs text-gray-600 max-w-md mb-4 font-mono">
-            {this.state.error?.message || 'Komponen gagal dimuat dengan sempurna.'}
+            {this.state.error?.message || 'The component failed to load completely.'}
           </p>
           <Button 
             size="sm" 
             onClick={this.handleReset}
             className="bg-teal-600 hover:bg-teal-700 text-white text-xs gap-1.5"
           >
-            <RefreshCw className="w-3.5 h-3.5" /> Muat Ulang Halaman
+            <RefreshCw className="w-3.5 h-3.5" /> Reload Page
           </Button>
         </div>
       );

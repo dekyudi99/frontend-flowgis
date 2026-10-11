@@ -45,10 +45,10 @@ export default function ConfirmModal({
 
         {/* Konten Teks */}
         <h3 className="text-lg font-bold text-gray-800 text-center mb-2">
-          {title || 'Hapus Data?'}
+          {title || 'Delete Data?'}
         </h3>
         <p className="text-sm text-gray-500 text-center mb-6">
-          {message || 'Tindakan ini tidak dapat dibatalkan. Data akan dihapus secara permanen.'}
+          {message || 'This action cannot be undone. The data will be permanently deleted.'}
         </p>
 
         {/* Tombol Aksi */}
@@ -67,7 +67,7 @@ export default function ConfirmModal({
             disabled={isLoading}
             className="flex-1 py-2.5 px-4 rounded-xl bg-red-500 hover:bg-red-600 text-white font-medium transition-colors shadow-lg shadow-red-200 disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
           >
-            {isLoading ? 'Menghapus...' : confirmText}
+            {isLoading ? 'Delete...' : confirmText}
           </button>
         </div>
 

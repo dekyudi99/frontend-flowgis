@@ -166,17 +166,17 @@ export default function CctvManagement({
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.lat || !formData.lng) {
-      notify.error('Silakan tentukan koordinat lokasi terlebih dahulu (bisa klik "Pilih Titik di Peta" atau masukkan manual)!');
+      notify.error('Please specify the location coordinates first (you can click "Select a Point on the Map" or enter them manually)!');
       return;
     }
 
     const isEdit = !!editingCctv;
     setActionLoading({
-      message: isEdit ? 'Memperbarui Kamera CCTV...' : 'Menambahkan Kamera CCTV...',
-      subtitle: `Menyimpan data kamera "${formData.name}" ke database...`,
+      message: isEdit ? 'Updating the CCTV Camera...' : 'Adding a CCTV Camera...',
+      subtitle: `Saving camera data "${formData.name}" to database...`,
       stages: [
-        { time: 0, text: 'Memverifikasi konfigurasi stream RTSP/HLS & koordinat...' },
-        { time: 2, text: 'Menyimpan entitas kamera ke database telemetri...' },
+        { time: 0, text: 'Verifying the RTSP/HLS stream configuration and coordinates...' },
+        { time: 2, text: 'Saving the camera entity to the telemetry database...' },
       ],
     });
     setSaving(true);
@@ -184,18 +184,18 @@ export default function CctvManagement({
     try {
       if (editingCctv) {
         await cctvService.updateCctv(editingCctv.id, formData);
-        notify.success(`Kamera CCTV "${formData.name}" berhasil diperbarui!`);
+        notify.success(`CCTV Camera "${formData.name}" successfully updated!`);
         handleCancelEdit();
       } else {
         await cctvService.createCctv(formData);
-        notify.success(`Kamera CCTV baru "${formData.name}" berhasil ditambahkan ke database!`);
+        notify.success(`New CCTV Camera "${formData.name}" Successfully added to the database!`);
         handleCancelEdit();
       }
       await fetchCctvs();
       if (onCctvChanged) onCctvChanged();
     } catch (err) {
       console.error('Error saving CCTV:', err);
-      notify.error(err.response?.data?.message || err.message || 'Gagal menyimpan data CCTV');
+      notify.error(err.response?.data?.message || err.message || 'Failed to save CCTV data');
     } finally {
       setSaving(false);
       setActionLoading(null);
@@ -205,10 +205,10 @@ export default function CctvManagement({
   const handleToggleActive = async (id) => {
     const target = cctvs.find((c) => c.id === id);
     setActionLoading({
-      message: 'Mengubah Status Kamera CCTV...',
-      subtitle: `Menyinkronkan status kamera "${target?.name || ''}"...`,
+      message: 'Changing the CCTV Camera Status...',
+      subtitle: `Synchronize camera status "${target?.name || ''}"...`,
       stages: [
-        { time: 0, text: 'Memperbarui status operasional kamera...' },
+        { time: 0, text: 'Updating the camera operational status...' },
       ],
     });
     try {
@@ -216,11 +216,11 @@ export default function CctvManagement({
       setCctvs((prev) =>
         prev.map((c) => (c.id === id ? { ...c, is_active: !c.is_active } : c))
       );
-      notify.info('Status kamera CCTV berhasil diperbarui!');
+      notify.info('The CCTV camera status has been successfully updated!');
       if (onCctvChanged) onCctvChanged();
     } catch (err) {
       console.error('Toggle status error:', err);
-      notify.error('Gagal memperbarui status kamera CCTV');
+      notify.error('Failed to update the CCTV camera status');
     } finally {
       setActionLoading(null);
     }
@@ -232,21 +232,21 @@ export default function CctvManagement({
     setConfirmDeleteTarget(null);
     setIsDeleting(true);
     setActionLoading({
-      message: 'Menghapus Kamera CCTV...',
-      subtitle: `Menghapus stasiun "${target.name}" dari database...`,
+      message: 'Removing a CCTV Camera...',
+      subtitle: `Deleting a station "${target.name}" from the database...`,
       stages: [
-        { time: 0, text: 'Memproses permintaan penghapusan stasiun...' },
-        { time: 2, text: 'Menghapus data CCTV dari database...' },
+        { time: 0, text: 'Processing a request to remove a station...' },
+        { time: 2, text: 'Deleting CCTV data from the database...' },
       ],
     });
     try {
       await cctvService.deleteCctv(target.id);
       setCctvs((prev) => prev.filter((c) => c.id !== target.id));
-      notify.success(`Kamera "${target.name}" berhasil dihapus dari database!`);
+      notify.success(`Camera "${target.name}" was successfully deleted from the database!`);
       if (onCctvChanged) onCctvChanged();
     } catch (err) {
       console.error('Delete error:', err);
-      notify.error('Gagal menghapus kamera CCTV');
+      notify.error('Failed to delete CCTV footage');
     } finally {
       setIsDeleting(false);
       setActionLoading(null);
@@ -285,7 +285,7 @@ export default function CctvManagement({
               <Camera className="w-5 h-5" />
             </div>
             <div>
-              <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Total Kamera CCTV</p>
+              <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Total Camera CCTV</p>
               <h4 className="text-xl font-bold text-gray-800">{cctvs.length}</h4>
             </div>
           </CardContent>
@@ -297,7 +297,7 @@ export default function CctvManagement({
               <Radio className="w-5 h-5 animate-pulse text-emerald-600" />
             </div>
             <div>
-              <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Kamera Aktif / Live</p>
+              <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Active Camera / Live</p>
               <h4 className="text-xl font-bold text-gray-800">
                 {cctvs.filter((c) => c.is_active !== false).length}
               </h4>
@@ -311,7 +311,7 @@ export default function CctvManagement({
               <Shield className="w-5 h-5" />
             </div>
             <div>
-              <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Wilayah Telemetri</p>
+              <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Telemetry Region</p>
               <h4 className="text-xl font-bold text-gray-800">Nakhon Pathom</h4>
             </div>
           </CardContent>
@@ -332,15 +332,15 @@ export default function CctvManagement({
               <div className="min-w-0">
                 <CardTitle className="text-sm sm:text-base font-bold text-gray-800 flex items-center gap-2">
                   <Map className="w-4 h-4 text-teal-600" />
-                  <span>Peta Stasiun Pemantauan CCTV</span>
+                  <span>Map of CCTV Monitoring Stations</span>
                   {isFullMap && (
                     <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-teal-100 text-teal-800 border border-teal-300">
-                      Layar Penuh
+                      Full Screen
                     </span>
                   )}
                 </CardTitle>
                 <CardDescription className="text-[11px] sm:text-xs text-gray-500 truncate">
-                  Visualisasi sebaran kamera CCTV di Nakhon Pathom. Klik tombol &quot;Pilih Titik di Peta&quot; untuk memilih koordinat stasiun.
+                  Visualization of the distribution of CCTV cameras in Nakhon Pathom. Click the button &quot;Select a Point on the Map&quot; to select station coordinates.
                 </CardDescription>
               </div>
 
@@ -352,7 +352,7 @@ export default function CctvManagement({
                 className={`h-8 gap-1.5 text-xs font-semibold shrink-0 cursor-pointer shadow-xs transition-all ${
                   isFullMap ? 'bg-teal-600 hover:bg-teal-700 text-white' : 'hover:bg-slate-100 text-gray-700'
                 }`}
-                title={isFullMap ? "Keluar Layar Penuh (Esc)" : "Perbesar Peta"}
+                title={isFullMap ? "Exit Full Screen (Esc)" : "Zoom In on the Map"}
               >
                 {isFullMap ? (
                   <>
@@ -384,21 +384,21 @@ export default function CctvManagement({
             <CardHeader className="pb-3">
               <CardTitle className="text-base font-bold text-gray-800 flex items-center gap-2">
                 <Camera className="w-5 h-5 text-teal-600" />
-                {editingCctv ? 'Edit Kamera CCTV' : 'Tambah Kamera CCTV Baru'}
+                {editingCctv ? 'Edit CCTV Camera' : 'Add a New CCTV Camera'}
               </CardTitle>
               <CardDescription className="text-xs text-gray-500">
-                Hubungkan feed streaming Axis kamera ke sistem telemetri peta FlowGIS.
+                Connect the Axis camera's live stream to the FlowGIS map telemetry system.
               </CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-3.5">
                 <div>
                   <label className="block text-xs font-semibold text-gray-700 mb-1">
-                    Kode Stasiun (Station Code) <span className="text-rose-500">*</span>
+                    Station Code (Station Code) <span className="text-rose-500">*</span>
                   </label>
                   <input
                     type="text"
-                    placeholder="Contoh: TA130207"
+                    placeholder="Example: TA130207"
                     value={formData.station_code}
                     onChange={(e) => setFormData({ ...formData, station_code: e.target.value })}
                     className="w-full px-3 py-1.5 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 font-mono"
@@ -408,11 +408,11 @@ export default function CctvManagement({
 
                 <div>
                   <label className="block text-xs font-semibold text-gray-700 mb-1">
-                    Nama Stasiun / CCTV <span className="text-rose-500">*</span>
+                    Station Name / CCTV <span className="text-rose-500">*</span>
                   </label>
                   <input
                     type="text"
-                    placeholder="Contoh: Pintu Air Sungai Tha Chin 02"
+                    placeholder="Example: Tha Chin River Sluice Gate 02"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     className="w-full px-3 py-1.5 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
@@ -421,10 +421,10 @@ export default function CctvManagement({
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-gray-700 mb-1">Lokasi / Keterangan Wilayah</label>
+                  <label className="block text-xs font-semibold text-gray-700 mb-1">Location / Regional Information</label>
                   <input
                     type="text"
-                    placeholder="Contoh: Sam Phran, Nakhon Pathom"
+                    placeholder="Example: Sam Phran, Nakhon Pathom"
                     value={formData.location}
                     onChange={(e) => setFormData({ ...formData, location: e.target.value })}
                     className="w-full px-3 py-1.5 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
@@ -447,7 +447,7 @@ export default function CctvManagement({
 
                 <div className="grid grid-cols-2 gap-2.5">
                   <div>
-                    <label className="block text-xs font-semibold text-gray-700 mb-1">Username Kamera</label>
+                    <label className="block text-xs font-semibold text-gray-700 mb-1">Username Camera</label>
                     <input
                       type="text"
                       placeholder="live"
@@ -457,7 +457,7 @@ export default function CctvManagement({
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-gray-700 mb-1">Password Kamera</label>
+                    <label className="block text-xs font-semibold text-gray-700 mb-1">Password</label>
                     <div className="relative">
                       <input
                         type={showPassword ? "text" : "password"}
@@ -471,7 +471,7 @@ export default function CctvManagement({
                         onClick={() => setShowPassword((prev) => !prev)}
                         className="absolute inset-y-0 right-0 pr-2 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none cursor-pointer"
                         tabIndex="-1"
-                        title={showPassword ? "Sembunyikan password" : "Lihat password"}
+                        title={showPassword ? "Hide password" : "Show password"}
                       >
                         {showPassword ? (
                           <EyeOff className="w-3.5 h-3.5 text-gray-500 hover:text-teal-600 transition-colors" />
@@ -527,12 +527,12 @@ export default function CctvManagement({
                     }`}
                   >
                     <MapPin className="w-3.5 h-3.5" />
-                    {isPickMode ? 'Klik lokasi di peta Leaflet di samping...' : 'Pilih Titik di Peta (Map Picker)'}
+                    {isPickMode ? 'Click a location on the Leaflet map on the right...' : 'Select a Point on the Map (Map Picker)'}
                   </Button>
 
                   {formData.lat && formData.lng && (
                     <div className="text-center text-[11px] text-teal-800 font-mono bg-teal-50/80 py-1 rounded-md border border-teal-200">
-                      Koordinat: {Number(formData.lat).toFixed(4)}, {Number(formData.lng).toFixed(4)}
+                      Coordinate: {Number(formData.lat).toFixed(4)}, {Number(formData.lng).toFixed(4)}
                     </div>
                   )}
                 </div>
@@ -545,7 +545,7 @@ export default function CctvManagement({
                       onClick={handleCancelEdit}
                       className="flex-1 text-xs justify-center"
                     >
-                      Batal
+                      Cancel
                     </Button>
                   )}
                   <Button
@@ -553,7 +553,7 @@ export default function CctvManagement({
                     disabled={saving}
                     className="flex-1 bg-teal-600 hover:bg-teal-700 text-white text-xs font-semibold justify-center"
                   >
-                    {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : editingCctv ? 'Simpan Perubahan' : 'Simpan CCTV'}
+                    {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : editingCctv ? 'Save Changes' : 'Save CCTV'}
                   </Button>
                 </div>
               </form>
@@ -568,10 +568,10 @@ export default function CctvManagement({
         <CardHeader className="pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <CardTitle className="text-base font-bold text-gray-800 flex items-center gap-2">
-              <Video className="w-5 h-5 text-teal-600" /> Daftar Kamera CCTV Telemetri
+              <Video className="w-5 h-5 text-teal-600" /> List of Telemetry CCTV Cameras
             </CardTitle>
             <CardDescription className="text-xs text-gray-500">
-              Data CCTV tersimpan di database dan dikontrol langsung oleh Admin.
+              CCTV data is stored in a database and managed directly by the administrator.
             </CardDescription>
           </div>
 
@@ -579,7 +579,7 @@ export default function CctvManagement({
             <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" />
             <input
               type="text"
-              placeholder="Cari nama / kode CCTV..."
+              placeholder="Search for CCTV name / code..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="w-full pl-8 pr-3 py-1.5 text-xs border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
@@ -590,21 +590,21 @@ export default function CctvManagement({
           {loading ? (
             <div className="p-8 text-center text-gray-500 flex flex-col items-center justify-center gap-2">
               <Loader2 className="w-6 h-6 animate-spin text-teal-600" />
-              <span className="text-xs">Memuat data kamera CCTV dari database...</span>
+              <span className="text-xs">Loading CCTV camera data from the database...</span>
             </div>
           ) : filteredCctvs.length === 0 ? (
             <div className="p-8 text-center text-gray-400 text-xs">
-              Tidak ada data kamera CCTV ditemukan.
+              No CCTV footage was found.
             </div>
           ) : (
             <table className="w-full text-left border-collapse text-xs">
               <thead>
                 <tr className="bg-gray-50 border-y border-gray-200 text-gray-600 font-semibold">
-                  <th className="p-3">Kode & Nama Kamera</th>
-                  <th className="p-3">Lokasi / Wilayah</th>
-                  <th className="p-3">Koordinat</th>
+                  <th className="p-3">Camera Code & Name</th>
+                  <th className="p-3">Location / Region</th>
+                  <th className="p-3">Coordinate</th>
                   <th className="p-3">Status</th>
-                  <th className="p-3 text-center">Aksi Manajemen</th>
+                  <th className="p-3 text-center">Management Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 text-gray-700">
@@ -633,15 +633,15 @@ export default function CctvManagement({
                             ? 'bg-teal-50 text-teal-700 border-teal-200 hover:bg-teal-100'
                             : 'bg-gray-100 text-gray-500 border-gray-200 hover:bg-gray-200'
                         }`}
-                        title="Klik untuk mengubah status aktif"
+                        title="Click to change the active status"
                       >
                         {item.is_active !== false ? (
                           <>
-                            <CheckCircle className="w-3 h-3 text-teal-600" /> Aktif
+                            <CheckCircle className="w-3 h-3 text-teal-600" /> Aktive
                           </>
                         ) : (
                           <>
-                            <XCircle className="w-3 h-3 text-gray-400" /> Nonaktif
+                            <XCircle className="w-3 h-3 text-gray-400" /> Inactive
                           </>
                         )}
                       </button>
@@ -651,7 +651,7 @@ export default function CctvManagement({
                         <button
                           onClick={() => setActiveModalCctv(item)}
                           className="px-2.5 py-1 text-[11px] bg-teal-600 hover:bg-teal-700 text-white rounded font-medium flex items-center gap-1 shadow-sm transition"
-                          title="Tonton Live Stream"
+                          title="Watch Live Stream"
                         >
                           <Video className="w-3 h-3" /> Live
                         </button>
@@ -665,7 +665,7 @@ export default function CctvManagement({
                         <button
                           onClick={() => setConfirmDeleteTarget({ id: item.id, name: item.name })}
                           className="p-1.5 text-red-600 hover:bg-red-50 rounded transition"
-                          title="Hapus CCTV"
+                          title="Delete CCTV"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -704,10 +704,10 @@ export default function CctvManagement({
         onClose={() => setConfirmDeleteTarget(null)}
         onConfirm={handleConfirmDelete}
         isLoading={isDeleting}
-        title="Hapus Kamera CCTV?"
-        message={`Apakah Anda yakin ingin menghapus kamera "${confirmDeleteTarget?.name}" dari database? Data kamera tidak akan ditampilkan lagi pada peta monitoring.`}
-        confirmText="Ya, Hapus CCTV"
-        cancelText="Batal"
+        title="Remove the CCTV Camera?"
+        message={`Are you sure you want to remove the camera? "${confirmDeleteTarget?.name}" from the database? The camera data will no longer be displayed on the monitoring map.`}
+        confirmText="Yes, Delete the CCTV Footage"
+        cancelText="Cancel"
       />
 
       {/* Loader Operasi CRUD CCTV */}

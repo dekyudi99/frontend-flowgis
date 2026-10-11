@@ -173,12 +173,12 @@ export default function SidebarLayout({
 
   const handleSaveProjectForm = async () => {
     if (projectTitle.trim() === '') {
-      notify.error('Silakan masukkan judul proyek terlebih dahulu!');
+      notify.error('Please enter the project title first!');
       return;
     }
 
     if (!isLoggedIn()) {
-      notify.error('Silakan login terlebih dahulu untuk membuat atau mengedit proyek.');
+      notify.error('Please log in first to create or edit a project.');
       navigate('/login', { state: { from: location.pathname } });
       return;
     }
@@ -192,13 +192,13 @@ export default function SidebarLayout({
         const res = await projectService.updateProject(editingProjectId, projectData);
         savedProject = res?.data || res;
         setProjects(prev => prev.map(p => p.id === editingProjectId ? savedProject : p));
-        notify.success(`Proyek "${savedProject.name || projectTitle}" berhasil diperbarui!`);
+        notify.success(`Proyek "${savedProject.name || projectTitle}" successfully updated!`);
       } else {
         const res = await projectService.createProject(projectData);
         savedProject = res?.data || res;
         setProjects(prev => [savedProject, ...prev]);
         if (onProjectCreated) onProjectCreated(savedProject);
-        notify.success(`Proyek "${savedProject.name || projectTitle}" berhasil dibuat!`);
+        notify.success(`Proyek "${savedProject.name || projectTitle}" successfully created!`);
       }
 
       setActiveProject(savedProject);
@@ -209,7 +209,7 @@ export default function SidebarLayout({
       setCurrentStep(2);
     } catch (error) {
       console.error("Failed to save project:", error);
-      notify.error(error.response?.data?.message || 'Gagal menyimpan proyek.');
+      notify.error(error.response?.data?.message || 'Failed to save the project.');
     } finally {
       setLoading(false);
     }
@@ -246,10 +246,10 @@ export default function SidebarLayout({
         setActiveProject(null);
         setCurrentStep(0);
       }
-      notify.success(`Proyek "${deletedName}" berhasil dihapus!`);
+      notify.success(`Proyek "${deletedName}" Successfully deleted!`);
     } catch (error) {
       console.error("Failed to delete project:", error);
-      notify.error(error.response?.data?.message || 'Gagal menghapus proyek.');
+      notify.error(error.response?.data?.message || 'Failed to delete the project.');
     } finally {
       setIsDeleting(false);
       setDeleteModalOpen(false);
@@ -259,7 +259,7 @@ export default function SidebarLayout({
 
   const handleNewProjectClick = () => {
     if (!isLoggedIn()) {
-      notify.error('Silakan login terlebih dahulu untuk membuat proyek baru.');
+      notify.error('Please log in first to create a new project.');
       navigate('/login', { state: { from: location.pathname } });
       return;
     }
@@ -310,9 +310,9 @@ export default function SidebarLayout({
                 <Lock className="w-7 h-7" />
               </div>
               <div className="space-y-1">
-                <h3 className="font-bold text-gray-800 text-base">Login Diperlukan</h3>
+                <h3 className="font-bold text-gray-800 text-base">Login Required</h3>
                 <p className="text-xs text-gray-500 leading-relaxed max-w-xs">
-                  Anda harus login untuk membuat proyek analisis, mengelola AOI, dan mengakses riwayat proyek spasial.
+                  You must log in to create an analysis project, manage AOIs, and access your spatial project history.
                 </p>
               </div>
               <div className="w-full space-y-2 pt-2">
@@ -320,13 +320,13 @@ export default function SidebarLayout({
                   onClick={() => navigate('/login', { state: { from: location.pathname } })}
                   className="w-full py-2.5 px-4 bg-teal-600 hover:bg-teal-700 text-white text-sm font-medium rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
                 >
-                  <LogIn className="w-4 h-4" /> Masuk ke Akun
+                  <LogIn className="w-4 h-4" /> Sign In
                 </button>
                 <button
                   onClick={() => navigate('/signup')}
                   className="w-full py-2 px-4 bg-gray-50 hover:bg-gray-100 text-gray-700 text-xs font-medium rounded-xl border border-gray-200 transition-colors cursor-pointer"
                 >
-                  Belum punya akun? Daftar
+                  Don't have an account yet? Sign up
                 </button>
               </div>
             </div>
@@ -448,7 +448,7 @@ export default function SidebarLayout({
                     setCurrentStep(0);
                   }}
                   className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-teal-700 transition-colors group w-fit -mt-1"
-                  title="Kembali ke daftar proyek"
+                  title="Back to the project list"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
@@ -575,19 +575,19 @@ export default function SidebarLayout({
                         ? "bg-gray-100 border-2 border-gray-200 text-gray-400 cursor-not-allowed"
                         : "bg-teal-600 hover:bg-teal-700 text-white hover:shadow-md cursor-pointer"
                   }`}
-                  title={!hasAnalysisToSave ? "Jalankan analisis terlebih dahulu untuk menyimpan" : (isAnalysisSaved ? "Hasil analisis sudah tersimpan ke proyek" : "Simpan hasil analisis ke proyek")}
+                  title={!hasAnalysisToSave ? "Run the analysis first to save" : (isAnalysisSaved ? "The analysis results have been saved to the project" : "Save the analysis results to the project")}
                 >
                   {isSavingAnalysis ? (
                     <>
-                      <Loader2 className="w-5 h-5 animate-spin" /> Menyimpan ke Proyek...
+                      <Loader2 className="w-5 h-5 animate-spin" /> Save to Project...
                     </>
                   ) : isAnalysisSaved ? (
                     <>
-                      <Check className="w-5 h-5 text-emerald-600" /> Hasil Tersimpan di Proyek
+                      <Check className="w-5 h-5 text-emerald-600" /> Results Saved in the Project
                     </>
                   ) : (
                     <>
-                      <Save className="w-5 h-5" /> Simpan Hasil Analisis
+                      <Save className="w-5 h-5" /> Save Analysis Results
                     </>
                   )}
                 </button>

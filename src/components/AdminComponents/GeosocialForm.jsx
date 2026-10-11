@@ -24,7 +24,7 @@ export default function GeosocialForm({ onAddLayer }) {
 
     if (selected) {
       if (selected.name.toLowerCase().endsWith('.shp')) {
-        setErrorMsg('Format ESRI Shapefile (.shp) membutuhkan berkas pendamping (.shx, .dbf, .prj). Mohon satukan seluruh berkas tersebut ke dalam satu berkas .zip sebelum diunggah.');
+        setErrorMsg('The ESRI Shapefile (.shp) format requires accompanying files (.shx, .dbf, .prj). Please combine all of these files into a single .zip file before uploading.');
       }
 
       if (!layerName) {
@@ -40,7 +40,7 @@ export default function GeosocialForm({ onAddLayer }) {
     if (!file || !layerName) return;
 
     if (file.name.toLowerCase().endsWith('.shp')) {
-      const shpErr = 'Format ESRI Shapefile (.shp) tidak bisa diunggah mandiri tanpa file pendampingnya (.shx, .dbf, .prj). Mohon kompres semua file tersebut ke dalam format .zip lalu unggah kembali.';
+      const shpErr = 'ESRI Shapefile (.shp) files cannot be uploaded on their own without their accompanying files (.shx, .dbf, .prj). Please compress all of these files into a .zip file and then upload them again.';
       setErrorMsg(shpErr);
       notify.error(shpErr);
       return;
@@ -104,7 +104,7 @@ export default function GeosocialForm({ onAddLayer }) {
       if (onAddLayer) {
         onAddLayer(createdItem);
       } else {
-        notify.success(`Layer "${createdItem.name || layerName}" berhasil diunggah!`);
+        notify.success(`Layer "${createdItem.name || layerName}" Uploaded successfully!`);
       }
 
       setFile(null);
@@ -184,11 +184,11 @@ export default function GeosocialForm({ onAddLayer }) {
           >
             {loading ? (
               <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" /> Mengunggah & Memproses Layer...
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" /> Uploading & Processing Layers...
               </>
             ) : (
               <>
-                <UploadCloud className="w-4 h-4 mr-2" /> Upload & Publikasikan Layer
+                <UploadCloud className="w-4 h-4 mr-2" /> Upload & Publish Layer
               </>
             )}
           </Button>
@@ -200,16 +200,16 @@ export default function GeosocialForm({ onAddLayer }) {
         <Loader
           mode={uploadProgress >= 100 ? "indeterminate" : "determinate"}
           progress={uploadProgress}
-          message={uploadProgress >= 100 ? "Memproses & Menerbitkan ke GeoServer..." : "Mengunggah Berkas Spasial..."}
-          subtitle={uploadProgress >= 100 ? "Mengekstrak geometri, registrasi PostGIS & publikasi WMS..." : `Mengirim berkas ${file?.name} (${Math.round(uploadProgress)}%)...`}
+          message={uploadProgress >= 100 ? "Processing & Publishing to GeoServer..." : "Uploading Spatial Files..."}
+          subtitle={uploadProgress >= 100 ? "Extracting geometry, PostGIS registration, and WMS publication..." : `Submitting a file ${file?.name} (${Math.round(uploadProgress)}%)...`}
           stages={[
-            { time: 0, text: 'Membaca dan memvalidasi berkas spasial...' },
-            { time: 2, text: 'Mengunggah berkas spasial ke backend FlowGIS...' },
-            { time: 6, text: 'Mengekstrak geometri & reproyeksi WGS84 (EPSG:4326)...' },
-            { time: 12, text: 'Menyimpan ke PostGIS & mempublikasikan WMS GeoServer...' },
+            { time: 0, text: 'Reading and validating spatial files...' },
+            { time: 2, text: 'Uploading spatial files to the FlowGIS backend...' },
+            { time: 6, text: 'Extract geometry & reproject to WGS84 (EPSG:4326)...' },
+            { time: 12, text: 'Storing Data in PostGIS & Publishing a WMS via GeoServer...' },
           ]}
         />
       )}
     </Card>
   );
-}
+}

@@ -79,7 +79,7 @@ export default function GeosocialStyleModal({
       onClose();
     } catch (err) {
       console.error('Save style error:', err);
-      const errMsg = err.response?.data?.message || err.message || 'Gagal menyimpan style ke GeoServer.';
+      const errMsg = err.response?.data?.message || err.message || 'Failed to save the style to GeoServer.';
       setErrorMsg(errMsg);
       notify.error(errMsg);
     } finally {
@@ -104,7 +104,7 @@ export default function GeosocialStyleModal({
             </div>
             <div>
               <h3 className="text-sm font-bold text-gray-900 leading-tight">
-                Atur Style Layer Spasial
+                Set Spatial Layer Style
               </h3>
               <p className="text-[11px] text-gray-500 font-mono truncate max-w-xs" title={layerKey}>
                 {layerKey}
@@ -141,7 +141,7 @@ export default function GeosocialStyleModal({
           {/* Preset Palet Warna Cepat */}
           <div>
             <label className="flex items-center gap-1.5 text-xs font-semibold text-gray-700 mb-2">
-              <Sparkles className="w-3.5 h-3.5 text-teal-600" /> Preset Warna Cepat
+              <Sparkles className="w-3.5 h-3.5 text-teal-600" /> Quick Color Presets
             </label>
             <div className="grid grid-cols-7 gap-2">
               {PRESET_PALETTES.map((preset) => {
@@ -177,7 +177,7 @@ export default function GeosocialStyleModal({
           <div className="p-3.5 bg-gradient-to-b from-gray-50 to-slate-100/70 border border-gray-200 rounded-xl">
             <div className="flex items-center justify-between mb-2">
               <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1">
-                <Sliders className="w-3 h-3 text-teal-600" /> Pratinjau Tampilan (Live Preview)
+                <Sliders className="w-3 h-3 text-teal-600" /> Preview (Live Preview)
               </span>
               <span className="text-[10px] text-gray-400">SLD Vector Preview</span>
             </div>
@@ -208,7 +208,7 @@ export default function GeosocialStyleModal({
                     strokeLinecap="round"
                   />
                 </svg>
-                <span className="text-[9px] font-medium text-gray-400">Garis</span>
+                <span className="text-[9px] font-medium text-gray-400">Line</span>
               </div>
 
               {/* Preview Point */}
@@ -234,7 +234,7 @@ export default function GeosocialStyleModal({
             {/* Fill Color */}
             <div>
               <label className="block text-xs font-semibold text-gray-700 mb-1">
-                Warna Isian (Fill Color)
+                Fill Color
               </label>
               <div className="flex items-center gap-2">
                 <input
@@ -255,7 +255,7 @@ export default function GeosocialStyleModal({
             {/* Stroke Color */}
             <div>
               <label className="block text-xs font-semibold text-gray-700 mb-1">
-                Warna Garis Tepi (Stroke)
+                Border Color (Stroke)
               </label>
               <div className="flex items-center gap-2">
                 <input
@@ -279,7 +279,7 @@ export default function GeosocialStyleModal({
             {/* Fill Opacity */}
             <div>
               <div className="flex items-center justify-between text-xs mb-1 font-semibold text-gray-700">
-                <span>Transparansi Isian (Fill Opacity)</span>
+                <span>Transparency of Content (Fill Opacity)</span>
                 <span className="font-mono text-teal-700 text-[11px] bg-teal-50 px-2 py-0.5 rounded border border-teal-200">
                   {Math.round(fillOpacity * 100)}%
                 </span>
@@ -298,7 +298,7 @@ export default function GeosocialStyleModal({
             {/* Stroke Width */}
             <div>
               <div className="flex items-center justify-between text-xs mb-1 font-semibold text-gray-700">
-                <span>Ketebalan Garis (Stroke Width)</span>
+                <span>Line Thickness (Stroke Width)</span>
                 <span className="font-mono text-teal-700 text-[11px] bg-teal-50 px-2 py-0.5 rounded border border-teal-200">
                   {strokeWidth} px
                 </span>
@@ -317,7 +317,7 @@ export default function GeosocialStyleModal({
             {/* Point Size */}
             <div>
               <div className="flex items-center justify-between text-xs mb-1 font-semibold text-gray-700">
-                <span>Ukuran Titik Marker (Point Size)</span>
+                <span>Marker Point Size (Point Size)</span>
                 <span className="font-mono text-teal-700 text-[11px] bg-teal-50 px-2 py-0.5 rounded border border-teal-200">
                   {pointSize} px
                 </span>
@@ -350,7 +350,7 @@ export default function GeosocialStyleModal({
                 onClick={onClose}
                 className="px-4 py-2 text-xs font-semibold text-gray-600 hover:bg-gray-100 rounded-xl transition"
               >
-                Batal
+                Cancel
               </button>
               <button
                 type="submit"
@@ -359,11 +359,11 @@ export default function GeosocialStyleModal({
               >
                 {saving ? (
                   <>
-                    <Loader2 className="w-4 h-4 animate-spin" /> Menerapkan ke GeoServer...
+                    <Loader2 className="w-4 h-4 animate-spin" /> Apply to GeoServer...
                   </>
                 ) : (
                   <>
-                    <Check className="w-4 h-4" /> Simpan & Terapkan Style
+                    <Check className="w-4 h-4" /> Save & Apply Style
                   </>
                 )}
               </button>

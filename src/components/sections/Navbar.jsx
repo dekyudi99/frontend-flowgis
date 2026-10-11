@@ -247,10 +247,10 @@ export default function Navbar() {
           onConfirm={handleConfirmLogout}
           isLoading={isLoggingOut}
           type="logout"
-          title="Konfirmasi Logout"
-          message="Apakah Anda yakin ingin keluar dari akun ini?"
-          confirmText="Ya, Logout"
-          cancelText="Batal"
+          title="Logout Confirmation"
+          message="Are you sure you want to log out of this account??"
+          confirmText="Yes, Log Out"
+          cancelText="Cancel"
         />
       </div>
     </nav>

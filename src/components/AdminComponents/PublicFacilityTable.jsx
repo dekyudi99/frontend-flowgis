@@ -6,40 +6,40 @@ import Pagination from '@/components/elements/Pagination';
 
 const getCategoryBadge = (category) => {
   const cat = (category || '').toLowerCase();
-  if (cat.includes('hospital') || cat.includes('rumah sakit')) {
+  if (cat.includes('hospital') || cat.includes('hospital')) {
     return {
-      label: 'Rumah Sakit',
+      label: 'Hospital',
       icon: Hospital,
       className: 'bg-rose-50 text-rose-700 border-rose-200',
       iconColor: 'text-rose-600',
     };
   }
-  if (cat.includes('evacuation') || cat.includes('posko')) {
+  if (cat.includes('evacuation') || cat.includes('evacuation')) {
     return {
-      label: 'Posko Evakuasi',
+      label: 'Evacuation',
       icon: Tent,
       className: 'bg-emerald-50 text-emerald-700 border-emerald-200',
       iconColor: 'text-emerald-600',
     };
   }
-  if (cat.includes('water') || cat.includes('air')) {
+  if (cat.includes('water') || cat.includes('water')) {
     return {
-      label: 'Stasiun Air',
+      label: 'Water Station',
       icon: Droplet,
       className: 'bg-blue-50 text-blue-700 border-blue-200',
       iconColor: 'text-blue-600',
     };
   }
-  if (cat.includes('fire') || cat.includes('damkar')) {
+  if (cat.includes('fire') || cat.includes('fire')) {
     return {
-      label: 'Pemadam Kebakaran',
+      label: 'Fire Department',
       icon: Flame,
       className: 'bg-amber-50 text-amber-700 border-amber-200',
       iconColor: 'text-amber-600',
     };
   }
   return {
-    label: category || 'Layanan Publik',
+    label: category || 'Public Facilities',
     icon: Building2,
     className: 'bg-slate-100 text-slate-700 border-slate-200',
     iconColor: 'text-slate-600',
@@ -94,10 +94,10 @@ export default function PublicFacilityTable({ facilities = [], onDeleteFacility,
       <CardHeader className="pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <CardTitle className="text-base font-bold text-gray-800 flex items-center gap-2">
-            <Building2 className="w-5 h-5 text-teal-600" /> Daftar Fasilitas Publik
+            <Building2 className="w-5 h-5 text-teal-600" /> List of Public Facilities
           </CardTitle>
           <CardDescription className="text-xs text-gray-500">
-            Daftar infrastruktur pelayanan darurat, fasilitas kesehatan, dan pos penanganan publik.
+            List of emergency response infrastructure, health facilities, and public assistance centers.
           </CardDescription>
         </div>
 
@@ -105,7 +105,7 @@ export default function PublicFacilityTable({ facilities = [], onDeleteFacility,
           <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" />
           <input
             type="text"
-            placeholder="Cari nama atau alamat fasilitas..."
+            placeholder="Search for the name or address of a facility..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full pl-8 pr-3 py-1.5 text-xs bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
@@ -116,18 +116,18 @@ export default function PublicFacilityTable({ facilities = [], onDeleteFacility,
       <CardContent className="p-0 overflow-x-auto">
         {filteredFacilities.length === 0 ? (
           <div className="p-8 text-center text-gray-400 text-xs">
-            Tidak ada data fasilitas publik ditemukan.
+            No data on public facilities was found.
           </div>
         ) : (
           <table className="w-full text-left border-collapse text-xs">
             <thead>
               <tr className="bg-gray-50 border-y border-gray-200 text-gray-600 font-semibold">
-                <th className="p-3.5">Nama Fasilitas</th>
-                <th className="p-3.5">Kategori</th>
-                <th className="p-3.5">Alamat & Kontak</th>
-                <th className="p-3.5">Kapasitas</th>
-                <th className="p-3.5">Koordinat</th>
-                <th className="p-3.5 text-center">Aksi</th>
+                <th className="p-3.5">Facility Name</th>
+                <th className="p-3.5">Category</th>
+                <th className="p-3.5">Address & Contact Information</th>
+                <th className="p-3.5">Capacity</th>
+                <th className="p-3.5">Coordinate</th>
+                <th className="p-3.5 text-center">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100 text-gray-700">
@@ -180,7 +180,7 @@ export default function PublicFacilityTable({ facilities = [], onDeleteFacility,
                     <td className="p-3.5">
                       {item.capacity && (item.category === 'Hospital' || item.category === 'Evacuation Center') ? (
                         <span className="font-semibold text-teal-800 bg-teal-50 px-2 py-0.5 rounded border border-teal-200 text-[11px]">
-                          {item.capacity.toLocaleString()} {item.category === 'Hospital' ? 'Beds' : 'Jiwa'}
+                          {item.capacity.toLocaleString()} {item.category === 'Hospital' ? 'Beds' : 'People'}
                         </span>
                       ) : (
                         <span className="text-gray-400 italic text-[11px]">-</span>
@@ -200,14 +200,14 @@ export default function PublicFacilityTable({ facilities = [], onDeleteFacility,
                         <button
                           onClick={() => onStartEdit(item)}
                           className="p-1.5 text-blue-600 hover:bg-blue-50 rounded transition"
-                          title="Edit Fasilitas"
+                          title="Edit Facilities"
                         >
                           <Edit2 className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => setConfirmDeleteTarget(item)}
                           className="p-1.5 text-red-600 hover:bg-red-50 rounded transition"
-                          title="Hapus Fasilitas"
+                          title="Delete Facilities"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -237,10 +237,10 @@ export default function PublicFacilityTable({ facilities = [], onDeleteFacility,
         onClose={() => setConfirmDeleteTarget(null)}
         onConfirm={handleConfirmDelete}
         isLoading={isDeleting}
-        title="Hapus Fasilitas Publik?"
-        message={`Apakah Anda yakin ingin menghapus fasilitas "${confirmDeleteTarget?.name || 'ini'}"? Tindakan ini tidak dapat dibatalkan.`}
-        confirmText="Ya, Hapus Fasilitas"
-        cancelText="Batal"
+        title="Delete Public Facilities?"
+        message={`Are you sure you want to delete "${confirmDeleteTarget?.name || 'this'}"? This action cannot be undone.`}
+        confirmText="Yes, Remove the Feature"
+        cancelText="Cancel"
       />
     </Card>
   );

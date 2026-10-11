@@ -25,7 +25,7 @@ export default function AdminHeader({ onToggleSidebar }) {
           type="button"
           onClick={onToggleSidebar}
           className="lg:hidden p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg focus:outline-none transition shrink-0"
-          aria-label="Buka menu navigasi"
+          aria-label="Open the navigation menu"
         >
           <Menu className="w-5 h-5" />
         </button>
@@ -60,7 +60,7 @@ export default function AdminHeader({ onToggleSidebar }) {
           type="button"
           onClick={() => setIsLogoutModalOpen(true)}
           className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors border border-transparent hover:border-red-200"
-          title="Logout dari akun"
+          title="Log out of your account"
         >
           <LogOut className="w-4 h-4" />
           <span className="hidden sm:inline">Logout</span>
@@ -74,10 +74,10 @@ export default function AdminHeader({ onToggleSidebar }) {
         onConfirm={handleConfirmLogout}
         isLoading={isLoggingOut}
         type="logout"
-        title="Konfirmasi Logout"
-        message="Apakah Anda yakin ingin keluar dari sesi akun Admin FlowGIS?"
-        confirmText="Ya, Logout"
-        cancelText="Batal"
+        title="Logout Confirmation"
+        message="Are you sure you want to log out of your FlowGIS Admin account?"
+        confirmText="Yes, Log Out"
+        cancelText="Cancel"
       />
     </header>
   );

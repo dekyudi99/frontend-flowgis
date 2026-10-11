@@ -64,7 +64,7 @@ export default function UserManagement() {
       setUsers(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error('Failed to fetch users from database:', err);
-      notify.error(err.response?.data?.message || err.message || 'Gagal memuat data pengguna dari database');
+      notify.error(err.response?.data?.message || err.message || 'Failed to load user data from the database');
       setUsers([]);
     } finally {
       setLoading(false);
@@ -113,11 +113,11 @@ export default function UserManagement() {
     // Tutup dialog form agar layar bebas dan loader fokus di depan
     setIsModalOpen(false);
     setActionLoading({
-      message: isEdit ? 'Memperbarui Akun Pengguna...' : 'Menambahkan Pengguna Baru...',
-      subtitle: `Menyimpan data "${targetName}" ke sistem...`,
+      message: isEdit ? 'Updating a User Account...' : 'Adding a New User...',
+      subtitle: `Saving data "${targetName}" into the system...`,
       stages: [
-        { time: 0, text: 'Memvalidasi kredensial & hak akses role...' },
-        { time: 2, text: 'Menyimpan entitas pengguna ke database...' },
+        { time: 0, text: 'Validating credentials and role-based access rights...' },
+        { time: 2, text: 'Saving user entities to the database...' },
       ],
     });
     setModalSaving(true);
@@ -126,10 +126,10 @@ export default function UserManagement() {
     try {
       if (editingUser) {
         await userService.updateUser(editingUser.id, formData);
-        notify.success(`Data pengguna "${targetName}" berhasil diperbarui!`);
+        notify.success(`User data "${targetName}" Successfully updated!`);
       } else {
         await userService.createUser(formData);
-        notify.success(`Pengguna baru "${targetName}" berhasil ditambahkan!`);
+        notify.success(`New users "${targetName}" successfully added!`);
       }
       handleCloseModal();
       await fetchUsers();
@@ -138,7 +138,7 @@ export default function UserManagement() {
       const validationErrors = err.response?.data?.errors;
       const errMsg = validationErrors
         ? Object.values(validationErrors).flat().join(' ')
-        : (err.response?.data?.message || err.message || 'Gagal menyimpan data pengguna ke database');
+        : (err.response?.data?.message || err.message || 'Failed to save user data to the database');
       notify.error(errMsg);
       // Buka kembali modal jika terjadi error agar pengguna dapat memperbaiki data input
       setIsModalOpen(true);
@@ -151,15 +151,15 @@ export default function UserManagement() {
   const handleToggleRole = async (user) => {
     const nextRole = user.role === 'admin' ? 'analyst' : 'admin';
     const confirmMsg = user.role === 'admin' 
-      ? `Apakah Anda ingin mengubah peran ${user.name} menjadi Pengguna Biasa / Analis?`
-      : `Apakah Anda ingin mengangkat ${user.name} menjadi Administrator FlowGIS?`;
+      ? `Would you like to change your role? ${user.name} Become a Regular User / Analyst?`
+      : `Would you like to lift ${user.name} Become a FlowGIS Administrator?`;
 
     if (window.confirm(confirmMsg)) {
       setActionLoading({
-        message: 'Mengubah Peran Pengguna...',
-        subtitle: `Memperbarui hak akses "${user.name}" menjadi ${nextRole}...`,
+        message: 'Changing a Users Role...',
+        subtitle: `Updating access rights "${user.name}" to become ${nextRole}...`,
         stages: [
-          { time: 0, text: 'Memperbarui role akses pengguna di database...' },
+          { time: 0, text: 'Updating user access roles in the database...' },
         ],
       });
       try {
@@ -167,10 +167,10 @@ export default function UserManagement() {
         setUsers((prev) =>
           prev.map((u) => (u.id === user.id ? { ...u, role: nextRole } : u))
         );
-        notify.success(`Peran ${user.name} berhasil diubah menjadi "${nextRole}"!`);
+        notify.success(`Role ${user.name} was successfully converted to "${nextRole}"!`);
       } catch (err) {
         console.error('Error changing role:', err);
-        notify.error('Gagal mengubah peran pengguna');
+        notify.error('Failed to change the users role');
       } finally {
         setActionLoading(null);
       }
@@ -183,11 +183,11 @@ export default function UserManagement() {
     setConfirmDeleteTarget(null);
     setIsDeleting(true);
     setActionLoading({
-      message: 'Menghapus Akun Pengguna...',
-      subtitle: `Menghapus akun "${target.name}" dari sistem...`,
+      message: 'Deleting a User Account...',
+      subtitle: `Delete account "${target.name}" from the system...`,
       stages: [
-        { time: 0, text: 'Memproses permintaan penghapusan akun...' },
-        { time: 2, text: 'Menghapus data pengguna dari database...' },
+        { time: 0, text: 'Processing account deletion requests...' },
+        { time: 2, text: 'Deleting user data from the database...' },
       ],
     });
     try {
@@ -197,10 +197,10 @@ export default function UserManagement() {
         return;
       }
       setUsers((prev) => prev.filter((u) => u.id !== target.id));
-      notify.success(`Pengguna "${target.name}" berhasil dihapus.`);
+      notify.success(`User "${target.name}" successfully deleted.`);
     } catch (err) {
       console.error('Error deleting user:', err);
-      notify.error('Gagal menghapus pengguna');
+      notify.error('Failed to delete user');
     } finally {
       setIsDeleting(false);
       setActionLoading(null);
@@ -237,7 +237,7 @@ export default function UserManagement() {
               <Users className="w-5 h-5" />
             </div>
             <div>
-              <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Total Pengguna Terdaftar</p>
+              <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Total Registered Users</p>
               <h4 className="text-xl font-bold text-gray-800">{users.length}</h4>
             </div>
           </CardContent>
@@ -261,7 +261,7 @@ export default function UserManagement() {
               <UserCheck className="w-5 h-5" />
             </div>
             <div>
-              <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Analis & Pengguna Biasa</p>
+              <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Analysts & Regular Users</p>
               <h4 className="text-xl font-bold text-sky-900">{analystCount}</h4>
             </div>
           </CardContent>
@@ -273,10 +273,10 @@ export default function UserManagement() {
         <CardHeader className="pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <CardTitle className="text-base font-bold text-gray-800 flex items-center gap-2">
-              <Users className="w-5 h-5 text-teal-600" /> Manajemen Akun & Hak Akses Pengguna
+              <Users className="w-5 h-5 text-teal-600" /> Account Management & User Access Rights
             </CardTitle>
             <CardDescription className="text-xs text-gray-500">
-              Kelola role administrator dan akses analitik seluruh staf serta pengguna terdaftar.
+              Manage administrator roles and analytics access for all staff and registered users.
             </CardDescription>
           </div>
 
@@ -285,7 +285,7 @@ export default function UserManagement() {
               onClick={handleOpenAddModal}
               className="bg-teal-600 hover:bg-teal-700 text-white text-xs font-semibold gap-1.5 h-8 px-3"
             >
-              <UserPlus className="w-3.5 h-3.5" /> Tambah Pengguna
+              <UserPlus className="w-3.5 h-3.5" /> Add User
             </Button>
           </div>
         </CardHeader>
@@ -296,7 +296,7 @@ export default function UserManagement() {
             <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" />
             <input
               type="text"
-              placeholder="Cari nama atau email..."
+              placeholder="Search by name or email..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="w-full pl-8 pr-3 py-1.5 text-xs bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
@@ -310,7 +310,7 @@ export default function UserManagement() {
               onChange={(e) => setRoleFilter(e.target.value)}
               className="text-xs bg-white border border-gray-200 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-teal-500"
             >
-              <option value="">Semua Role</option>
+              <option value="">All Role</option>
               <option value="admin">Administrator</option>
               <option value="analyst">Analyst</option>
               <option value="user">User</option>
@@ -340,21 +340,21 @@ export default function UserManagement() {
           {loading ? (
             <div className="p-8 text-center text-gray-500 flex flex-col items-center justify-center gap-2">
               <Loader2 className="w-6 h-6 animate-spin text-teal-600" />
-              <span className="text-xs">Memuat daftar pengguna...</span>
+              <span className="text-xs">Loading the user list...</span>
             </div>
           ) : users.length === 0 ? (
             <div className="p-8 text-center text-gray-400 text-xs">
-              Tidak ada pengguna ditemukan.
+              No users were found.
             </div>
           ) : (
             <table className="w-full text-left border-collapse text-xs">
               <thead>
                 <tr className="bg-gray-50 border-b border-gray-200 text-gray-600 font-semibold">
-                  <th className="p-3.5">Nama Pengguna</th>
-                  <th className="p-3.5">Alamat Email</th>
-                  <th className="p-3.5">Peran (Role) Saat Ini</th>
-                  <th className="p-3.5">Terdaftar Sejak</th>
-                  <th className="p-3.5 text-center">Ganti Role & Aksi</th>
+                  <th className="p-3.5">Username</th>
+                  <th className="p-3.5">Email Address</th>
+                  <th className="p-3.5">Current Role</th>
+                  <th className="p-3.5">Registered Since</th>
+                  <th className="p-3.5 text-center">Change Role & Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 text-gray-700">
@@ -404,17 +404,17 @@ export default function UserManagement() {
                                 ? 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300'
                                 : 'bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-300'
                             }`}
-                            title={isAdmin ? 'Ubah menjadi pengguna biasa' : 'Jadikan admin'}
+                            title={isAdmin ? 'Switch to a regular user' : 'Make an admin'}
                           >
                             <ShieldCheck className="w-3 h-3" />
-                            {isAdmin ? 'Jadikan User Biasa' : 'Jadikan Admin'}
+                            {isAdmin ? 'Make Them Regular Users' : '"Make an Admin'}
                           </button>
 
                           {/* Tombol Edit */}
                           <button
                             onClick={() => handleOpenEditModal(item)}
                             className="p-1.5 text-blue-600 hover:bg-blue-50 rounded"
-                            title="Edit Data Pengguna"
+                            title="Edit Data User"
                           >
                             <Edit2 className="w-3.5 h-3.5" />
                           </button>
@@ -423,7 +423,7 @@ export default function UserManagement() {
                           <button
                             onClick={() => setConfirmDeleteTarget({ id: item.id, name: item.name })}
                             className="p-1.5 text-red-600 hover:bg-red-50 rounded"
-                            title="Hapus Pengguna"
+                            title="Delete User"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
@@ -455,7 +455,7 @@ export default function UserManagement() {
             <div className="flex items-center justify-between px-5 py-3.5 border-b border-gray-100">
               <h3 className="text-sm font-bold text-gray-800 flex items-center gap-2">
                 <Users className="w-4 h-4 text-teal-600" />
-                {editingUser ? 'Edit Data Pengguna' : 'Tambah Pengguna Baru'}
+                {editingUser ? "Edit User Data": "Add New User"}
               </h3>
               <button onClick={handleCloseModal} className="text-gray-400 hover:text-gray-600">
                 <X className="w-4 h-4" />
@@ -464,10 +464,10 @@ export default function UserManagement() {
 
             <form onSubmit={handleSaveUser} className="p-5 space-y-3.5">
               <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1">Nama Lengkap</label>
+                <label className="block text-xs font-semibold text-gray-700 mb-1">Full Name</label>
                 <input
                   type="text"
-                  placeholder="Contoh: Sarah Connor"
+                  placeholder="Example: Yani Agustini"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   className="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
@@ -476,10 +476,10 @@ export default function UserManagement() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1">Alamat Email</label>
+                <label className="block text-xs font-semibold text-gray-700 mb-1">Email Address</label>
                 <input
                   type="email"
-                  placeholder="sarah@example.com"
+                  placeholder="yani@example.com"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   className="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
@@ -489,12 +489,12 @@ export default function UserManagement() {
 
               <div>
                 <label className="block text-xs font-semibold text-gray-700 mb-1">
-                  {editingUser ? 'Password Baru (Kosongkan jika tidak diubah)' : 'Password Masuk'}
+                  {editingUser ? 'New Password (Leave blank if not changing)' : 'Login Password'}
                 </label>
                 <div className="relative">
                   <input
                     type={showPassword ? "text" : "password"}
-                    placeholder="Minimal 6 karakter"
+                    placeholder="At least 6 characters"
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                     className="w-full pl-3 pr-9 py-2 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 [&::-ms-reveal]:hidden [&::-ms-clear]:hidden"
@@ -505,7 +505,7 @@ export default function UserManagement() {
                     onClick={() => setShowPassword((prev) => !prev)}
                     className="absolute inset-y-0 right-0 pr-2.5 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none cursor-pointer"
                     tabIndex="-1"
-                    title={showPassword ? "Sembunyikan password" : "Lihat password"}
+                    title={showPassword ? "Hide password" : "Show password"}
                   >
                     {showPassword ? (
                       <EyeOff className="w-4 h-4 text-gray-500 hover:text-teal-600 transition-colors" />
@@ -517,15 +517,15 @@ export default function UserManagement() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1">Peran Akses (Role)</label>
+                <label className="block text-xs font-semibold text-gray-700 mb-1">Access Role</label>
                 <select
                   value={formData.role}
                   onChange={(e) => setFormData({ ...formData, role: e.target.value })}
                   className="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
                 >
-                  <option value="analyst">Analyst (Pengguna Biasa Analitik)</option>
-                  <option value="admin">Administrator (Akses Penuh Manajemen)</option>
-                  <option value="user">User (Tampilan Publik)</option>
+                  <option value="analyst">Analyst</option>
+                  <option value="admin">Administrator</option>
+                  <option value="user">User</option>
                 </select>
               </div>
 
@@ -536,14 +536,14 @@ export default function UserManagement() {
                   onClick={handleCloseModal}
                   className="flex-1 text-xs justify-center"
                 >
-                  Batal
+                  Cancel
                 </Button>
                 <Button
                   type="submit"
                   disabled={modalSaving}
                   className="flex-1 bg-teal-600 hover:bg-teal-700 text-white text-xs font-semibold justify-center"
                 >
-                  {modalSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : editingUser ? 'Simpan Perubahan' : 'Tambah User'}
+                  {modalSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : editingUser ? 'Save Changes' : 'Add User'}
                 </Button>
               </div>
             </form>
@@ -558,10 +558,10 @@ export default function UserManagement() {
         onClose={() => setConfirmDeleteTarget(null)}
         onConfirm={handleConfirmDeleteUser}
         isLoading={isDeleting}
-        title="Hapus Pengguna?"
-        message={`Apakah Anda yakin ingin menghapus akun pengguna "${confirmDeleteTarget?.name}"? Tindakan ini tidak dapat dibatalkan.`}
-        confirmText="Ya, Hapus Pengguna"
-        cancelText="Batal"
+        title="Delete User?"
+        message={`Are you sure you want to delete user account "${confirmDeleteTarget?.name}"? This action cannot be undone.`}
+        confirmText="Yes, Delete User"
+        cancelText="Cancel"
       />
 
       {/* Loader Operasi CRUD User Management */}

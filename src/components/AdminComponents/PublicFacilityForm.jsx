@@ -69,7 +69,7 @@ export default function PublicFacilityForm({
     e.preventDefault();
 
     if (!formData.lat || !formData.lng) {
-      notify.error('Silakan tentukan koordinat lokasi terlebih dahulu (bisa klik "Pilih Titik di Peta" atau masukkan manual)!');
+      notify.error('Please specify the location coordinates first (you can click "Select a Point on the Map" or enter it manually)!');
       return;
     }
 
@@ -104,7 +104,7 @@ export default function PublicFacilityForm({
       }
     } catch (err) {
       console.error('Error submitting facility form:', err);
-      notify.error(err.response?.data?.message || err.message || 'Gagal menyimpan fasilitas publik');
+      notify.error(err.response?.data?.message || err.message || 'Failure to maintain public facilities');
     } finally {
       setSaving(false);
     }
@@ -115,10 +115,10 @@ export default function PublicFacilityForm({
       <CardHeader className="pb-3">
         <CardTitle className="text-base font-bold text-gray-800 flex items-center gap-2">
           <Building2 className="w-5 h-5 text-teal-600" />
-          {editingFacility ? 'Edit Fasilitas Publik' : 'Tambah Fasilitas Publik Baru'}
+          {editingFacility ? 'Edit Public Facilities' : 'Add New Public Facilities'}
         </CardTitle>
         <CardDescription className="text-xs text-gray-500">
-          Kelola data fasilitas pelayanan publik (Rumah Sakit, Posko Evakuasi, Stasiun Air, dll.).
+          Manage data on public service facilities (hospitals, evacuation centers, water stations, etc.).
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -127,11 +127,11 @@ export default function PublicFacilityForm({
             {/* Nama Fasilitas */}
             <div>
               <label className="block text-xs font-semibold text-gray-700 mb-1">
-                Nama Fasilitas Publik <span className="text-rose-500">*</span>
+                Name of Public Facility <span className="text-rose-500">*</span>
               </label>
               <input
                 type="text"
-                placeholder="Contoh: RSUD Pratama Nakhon Pathom / Posko Evakuasi Bang Len"
+                placeholder="Example: Nakhon Pathom Pratama Regional General Hospital / Bang Len Evacuation Center"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 className="w-full px-3 py-1.5 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
@@ -142,7 +142,7 @@ export default function PublicFacilityForm({
             {/* Kategori Fasilitas */}
             <div>
               <label className="block text-xs font-semibold text-gray-700 mb-1">
-                Kategori Fasilitas <span className="text-rose-500">*</span>
+                Facility Categories <span className="text-rose-500">*</span>
               </label>
               <select
                 value={formData.category}
@@ -157,22 +157,22 @@ export default function PublicFacilityForm({
                 className="w-full px-3 py-1.5 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
                 required
               >
-                <option value="Hospital">Rumah Sakit (Hospital)</option>
-                <option value="Evacuation Center">Posko Evakuasi / Pengungsian</option>
-                <option value="Water Station">Stasiun Pemantauan Air (Non-CCTV)</option>
-                <option value="Fire Station">Pos Pemadam Kebakaran</option>
-                <option value="Public Service">Layanan Publik Lainnya</option>
+                <option value="Hospital">Hospital</option>
+                <option value="Evacuation Center">Evacuation Center / Shelter</option>
+                <option value="Water Station">Water Monitoring Station (Non-CCTV)</option>
+                <option value="Fire Station">Fire Station</option>
+                <option value="Public Service">Other Public Services</option>
               </select>
             </div>
 
             {/* Alamat Lengkap */}
             <div>
               <label className="block text-xs font-semibold text-gray-700 mb-1">
-                Alamat / Keterangan Lokasi
+                Address / Location Information
               </label>
               <input
                 type="text"
-                placeholder="Contoh: 196 Thetsaban Rd, Phra Pathom Chedi, Mueang Nakhon Pathom"
+                placeholder="Example: 196 Thetsaban Rd, Phra Pathom Chedi, Mueang Nakhon Pathom"
                 value={formData.address}
                 onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                 className="w-full px-3 py-1.5 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
@@ -189,7 +189,7 @@ export default function PublicFacilityForm({
                 <div className={`grid gap-2.5 ${supportsCapacity ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1'}`}>
                   <div>
                     <label className="block text-xs font-semibold text-gray-700 mb-1 flex items-center gap-1">
-                      <Phone className="w-3.5 h-3.5 text-gray-400" /> Nomor Telepon / Kontak
+                      <Phone className="w-3.5 h-3.5 text-gray-400" /> Phone Number / Contact Information
                     </label>
                     <input
                       type="text"
@@ -204,12 +204,12 @@ export default function PublicFacilityForm({
                     <div className="animate-in fade-in duration-200">
                       <label className="block text-xs font-semibold text-gray-700 mb-1 flex items-center gap-1">
                         <Users className="w-3.5 h-3.5 text-teal-600" /> 
-                        {isHospital ? 'Kapasitas Tempat Tidur (Beds)' : 'Daya Tampung Evakuasi (Jiwa)'}
+                        {isHospital ? 'Bed Capacity' : 'Evacuation Capacity (People)'}
                       </label>
                       <input
                         type="number"
                         min="0"
-                        placeholder={isHospital ? "Contoh: 250 (tempat tidur)" : "Contoh: 500 (jiwa)"}
+                        placeholder={isHospital ? "Example: 250 (bed)" : "Contoh: 500"}
                         value={formData.capacity}
                         onChange={(e) => setFormData({ ...formData, capacity: e.target.value })}
                         className="w-full px-3 py-1.5 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
@@ -266,12 +266,12 @@ export default function PublicFacilityForm({
               }`}
             >
               <MapPin className="w-3.5 h-3.5" />
-              {isPickMode ? 'Klik lokasi di peta Leaflet di samping...' : 'Pilih Titik di Peta (Map Picker)'}
+              {isPickMode ? 'Click the location on the Leaflet map on the side...' : 'Select a Point on the Map (Map Picker)'}
             </Button>
             
             {formData.lat && formData.lng && (
               <div className="text-center text-[11px] text-teal-800 font-mono bg-teal-50/80 py-1 rounded-md border border-teal-200">
-                Koordinat: {Number(formData.lat).toFixed(4)}, {Number(formData.lng).toFixed(4)}
+                Coordinate: {Number(formData.lat).toFixed(4)}, {Number(formData.lng).toFixed(4)}
               </div>
             )}
 
@@ -283,7 +283,7 @@ export default function PublicFacilityForm({
                   onClick={handleCancelEdit}
                   className="flex-1 text-xs justify-center"
                 >
-                  Batal
+                  Cancel
                 </Button>
               )}
               <Button 
@@ -291,7 +291,7 @@ export default function PublicFacilityForm({
                 disabled={saving}
                 className="flex-1 bg-teal-600 hover:bg-teal-700 text-white text-xs font-semibold justify-center"
               >
-                {saving ? 'Menyimpan...' : editingFacility ? 'Simpan Perubahan' : 'Simpan Fasilitas Baru'}
+                {saving ? 'Saving...' : editingFacility ? 'Save Changes': 'Save New Facility'}
               </Button>
             </div>
           </div>

@@ -154,21 +154,21 @@ export default function AdminDashboard() {
 
   const handleAddFacility = async (newFac) => {
     setAdminLoading({
-      message: 'Menambahkan Fasilitas Publik...',
-      subtitle: `Menyimpan fasilitas "${newFac.name}" ke database...`,
+      message: 'Adding Public Facilities...',
+      subtitle: `Saving facilities "${newFac.name}" to the database...`,
       stages: [
-        { time: 0, text: 'Memverifikasi koordinat dan atribut fasilitas...' },
-        { time: 2, text: 'Menyimpan entitas fasilitas ke database PostGIS...' },
+        { time: 0, text: 'Verifying facility coordinates and attributes...' },
+        { time: 2, text: 'Storing facility entities in a PostGIS database...' },
       ],
     });
     try {
       const res = await facilityService.createFacility(newFac);
       const created = res.data || newFac;
       setFacilities((prev) => [created, ...prev]);
-      notify.success(`Fasilitas "${newFac.name}" berhasil ditambahkan!`);
+      notify.success(`Facilities "${newFac.name}" successfully added!`);
     } catch (err) {
       setFacilities((prev) => [newFac, ...prev]);
-      notify.success(`Fasilitas "${newFac.name}" berhasil disimpan!`);
+      notify.success(`Facilities "${newFac.name}" successfully saved!`);
     } finally {
       setAdminLoading(null);
     }
@@ -177,18 +177,18 @@ export default function AdminDashboard() {
 
   const handleDeleteFacility = async (id) => {
     setAdminLoading({
-      message: 'Menghapus Fasilitas Publik...',
-      subtitle: 'Menghapus data fasilitas dari database...',
+      message: 'Removing Public Facilities...',
+      subtitle: 'Deleting facility data from the database...',
       stages: [
-        { time: 0, text: 'Memproses permintaan penghapusan...' },
-        { time: 2, text: 'Menghapus data fasilitas dari database...' },
+        { time: 0, text: 'Processing a deletion request...' },
+        { time: 2, text: 'Deleting facility data from the database...' },
       ],
     });
     try {
       await facilityService.deleteFacility(id);
-      notify.success('Fasilitas publik berhasil dihapus!');
+      notify.success('Public facilities have been successfully removed!');
     } catch (e) {
-      notify.error('Gagal menghapus fasilitas publik dari database');
+      notify.error('Failed to remove public facilities from the database');
     } finally {
       setAdminLoading(null);
     }
@@ -197,19 +197,19 @@ export default function AdminDashboard() {
 
   const handleEditFacility = async (id, updatedData) => {
     setAdminLoading({
-      message: 'Memperbarui Fasilitas Publik...',
-      subtitle: `Menyimpan perubahan data "${updatedData.name || 'fasilitas'}"...`,
+      message: 'Upgrading Public Facilities...',
+      subtitle: `Saving data changes "${updatedData.name || 'facilities'}"...`,
       stages: [
-        { time: 0, text: 'Memvalidasi perubahan data fasilitas...' },
-        { time: 2, text: 'Menyimpan pembaruan data ke database...' },
+        { time: 0, text: 'Validating facility data changes...' },
+        { time: 2, text: 'Saving data updates to the database...' },
       ],
     });
     try {
       await facilityService.updateFacility(id, updatedData);
-      notify.success('Data fasilitas publik berhasil diperbarui!');
+      notify.success('Public facility data has been successfully updated!');
     } catch (err) {
       console.warn('API updateFacility failed, updating state:', err);
-      notify.error('Gagal memperbarui fasilitas publik di server');
+      notify.error('Failed to update public facilities on the server');
     } finally {
       setAdminLoading(null);
     }
@@ -224,26 +224,26 @@ export default function AdminDashboard() {
     setGeosocialList((prev) => [newEntry, ...prev.filter((x) => x.id !== newEntry.id)]);
     // Langsung aktifkan WMS di peta
     handleSelectLayerToView(newEntry);
-    notify.success(`Layer "${newEntry.name || newEntry.display_name}" berhasil diunggah!`);
+    notify.success(`Layer "${newEntry.name || newEntry.display_name}" Uploaded successfully!`);
   };
 
   const handleDeleteGeosocial = async (id) => {
     const target = geosocialList.find((item) => item.id === id);
     setAdminLoading({
-      message: 'Menghapus Layer Spasial...',
-      subtitle: `Menghapus "${target?.display_name || target?.name || 'layer'}" dari GeoServer dan database...`,
+      message: 'Deleting a Spatial Layer...',
+      subtitle: `Delete "${target?.display_name || target?.name || 'layer'}" from GeoServer and the database...`,
       stages: [
-        { time: 0, text: 'Menghubungi GeoServer REST API...' },
-        { time: 2, text: 'Menghapus layer, datastore & tabel PostGIS...' },
-        { time: 4, text: 'Menyinkronkan katalog layer spasial...' },
+        { time: 0, text: 'Connecting to the GeoServer REST API...' },
+        { time: 2, text: 'Deleting PostGIS layers, datastores, and tables...' },
+        { time: 4, text: 'Synchronizing the spatial layer catalog...' },
       ],
     });
     try {
       await geosocialService.deleteLayer(id);
-      notify.success('Layer spasial berhasil dihapus dari sistem!');
+      notify.success('The spatial layer was successfully removed from the system!');
     } catch (err) {
       console.warn('API delete layer failed, updating local state:', err);
-      notify.error('Gagal menghapus layer dari server');
+      notify.error('Failed to delete the layer from the server');
     } finally {
       setAdminLoading(null);
     }
@@ -255,18 +255,18 @@ export default function AdminDashboard() {
 
   const handleSaveEditGeosocial = async (id, newName) => {
     setAdminLoading({
-      message: 'Memperbarui Nama Layer...',
-      subtitle: `Menyimpan nama "${newName}" ke sistem...`,
+      message: 'Updating a Layer Name...',
+      subtitle: `Saving a name "${newName}" into the system...`,
       stages: [
-        { time: 0, text: 'Menyimpan nama layer ke database...' },
+        { time: 0, text: 'Saving layer names to the database...' },
       ],
     });
     try {
       await geosocialService.updateLayer(id, newName);
-      notify.success('Nama layer berhasil diperbarui!');
+      notify.success('The layer name was successfully updated!');
     } catch (err) {
       console.warn('API update layer failed, updating local state:', err);
-      notify.error('Gagal memperbarui nama layer di server');
+      notify.error('Failed to update the layer name on the server');
     } finally {
       setAdminLoading(null);
     }
@@ -277,18 +277,18 @@ export default function AdminDashboard() {
 
   const handleToggleStatusGeosocial = async (id) => {
     setAdminLoading({
-      message: 'Mengubah Status Layer...',
-      subtitle: 'Menyinkronkan status publikasi layer spasial...',
+      message: 'Changing the Layer Status...',
+      subtitle: 'Synchronizing the publication status of spatial layers...',
       stages: [
-        { time: 0, text: 'Memperbarui status layer di database...' },
+        { time: 0, text: 'Update the layer status in the database...' },
       ],
     });
     try {
       await geosocialService.toggleActive(id);
-      notify.info('Status aktif layer berhasil diubah!');
+      notify.info('The active layer status has been successfully changed!');
     } catch (err) {
       console.warn('API toggle layer status failed, toggling local state:', err);
-      notify.error('Gagal mengubah status layer di server');
+      notify.error('Failed to change the layer status on the server');
     } finally {
       setAdminLoading(null);
     }
@@ -299,12 +299,12 @@ export default function AdminDashboard() {
 
   const handleSaveLayerStyle = async (layerId, styleData) => {
     setAdminLoading({
-      message: 'Menyimpan Style Layer (SLD)...',
-      subtitle: 'Menyusun style XML/SLD dan memperbarui GeoServer...',
+      message: 'Saving a Style Layer (SLD)...',
+      subtitle: 'Creating XML/SLD styles and updating GeoServer...',
       stages: [
-        { time: 0, text: 'Menyusun aturan SLD (Fill, Stroke, Opacity)...' },
-        { time: 2, text: 'Mengunggah SLD ke GeoServer REST...' },
-        { time: 4, text: 'Menyinkronkan cache WMS layer peta...' },
+        { time: 0, text: 'Setting SLD properties (Fill, Stroke, Opacity)...' },
+        { time: 2, text: 'Uploading SLD to GeoServer REST...' },
+        { time: 4, text: 'Synchronizing the WMS map layer cache...' },
       ],
     });
     try {
@@ -332,10 +332,10 @@ export default function AdminDashboard() {
         }
         return prev;
       });
-      notify.success('Style layer berhasil diperbarui di GeoServer!');
+      notify.success('The style layer has been successfully updated in GeoServer!');
       return res;
     } catch (err) {
-      notify.error(err.response?.data?.message || err.message || 'Gagal memperbarui style layer di GeoServer');
+      notify.error(err.response?.data?.message || err.message || 'Failed to update the layer style in GeoServer');
       throw err;
     } finally {
       setAdminLoading(null);
@@ -402,15 +402,15 @@ export default function AdminDashboard() {
                   <CardHeader className="flex flex-row items-center justify-between p-3 sm:p-4 pb-2 border-b border-gray-100 shrink-0 gap-2">
                     <div className="min-w-0">
                       <CardTitle className="text-sm sm:text-base font-bold text-gray-800 flex items-center gap-2 flex-wrap">
-                        <span>Peta Pemantauan Telemetri & Layer Spasial</span>
+                        <span>Telemetry Monitoring Map & Spatial Layers</span>
                         {isFullMap && (
                           <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-teal-100 text-teal-800 border border-teal-300">
-                            Layar Penuh (Full View)
+                            Full Screen (Full View)
                           </span>
                         )}
                       </CardTitle>
                       <CardDescription className="text-[11px] sm:text-xs text-gray-500 truncate">
-                        Menampilkan stasiun CCTV, fasilitas publik, dan overlay WMS layer GeoServer AstraGIS
+                        Displaying CCTV stations, public facilities, and the AstraGIS GeoServer WMS layer overlay
                       </CardDescription>
                     </div>
                     <Button 
@@ -462,7 +462,7 @@ export default function AdminDashboard() {
                         </div>
                         <div>
                           <h4 className="text-xl sm:text-2xl font-bold text-gray-800">235</h4>
-                          <p className="text-[10px] sm:text-xs text-gray-500 font-medium uppercase tracking-wider">Total Eksekusi Analisis</p>
+                          <p className="text-[10px] sm:text-xs text-gray-500 font-medium uppercase tracking-wider">Total Execution Analysis</p>
                         </div>
                       </CardContent>
                     </Card>
@@ -474,7 +474,7 @@ export default function AdminDashboard() {
                         </div>
                         <div>
                           <h4 className="text-xl sm:text-2xl font-bold text-gray-800">{facilities.length}</h4>
-                          <p className="text-[10px] sm:text-xs text-gray-500 font-medium uppercase tracking-wider">Fasilitas Publik Terdata</p>
+                          <p className="text-[10px] sm:text-xs text-gray-500 font-medium uppercase tracking-wider">Registered Public Facilities</p>
                         </div>
                       </CardContent>
                     </Card>
@@ -486,7 +486,7 @@ export default function AdminDashboard() {
                         </div>
                         <div>
                           <h4 className="text-xl sm:text-2xl font-bold text-gray-800">{cctvs.length}</h4>
-                          <p className="text-[10px] sm:text-xs text-gray-500 font-medium uppercase tracking-wider">Kamera CCTV Telemetri</p>
+                          <p className="text-[10px] sm:text-xs text-gray-500 font-medium uppercase tracking-wider">CCTV Camera Telemetry</p>
                         </div>
                       </CardContent>
                     </Card>
@@ -501,7 +501,7 @@ export default function AdminDashboard() {
                             {geosocialList.filter((l) => l.is_active !== false).length}
                             <span className="text-sm font-normal text-gray-400"> / {geosocialList.length}</span>
                           </h4>
-                          <p className="text-[10px] sm:text-xs text-gray-500 font-medium uppercase tracking-wider">Layer Spasial Geosocial Aktif</p>
+                          <p className="text-[10px] sm:text-xs text-gray-500 font-medium uppercase tracking-wider">Active Geosocial Spatial Layer</p>
                         </div>
                       </CardContent>
                     </Card>

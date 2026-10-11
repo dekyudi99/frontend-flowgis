@@ -178,10 +178,10 @@ export default function Dashboard() {
     const analysisType = (layer?.metadata?.analysis_type || '').toLowerCase();
     const name = (layer?.layer_name || layer?.name || '').toLowerCase();
 
-    if (analysisType === 'flood_risk' || name.includes('flood risk') || name.includes('risiko banjir') || legends.FloodRisk) {
+    if (analysisType === 'flood_risk' || name.includes('flood risk') || name.includes('flood risk') || legends.FloodRisk) {
       if (legends.FloodRisk) return legends.FloodRisk;
     }
-    if (analysisType === 'flood_event' || name.includes('flood event') || name.includes('kejadian banjir') || legends.FloodEvent || legends.NewFloodedArea) {
+    if (analysisType === 'flood_event' || name.includes('flood event') || name.includes('flood event') || legends.FloodEvent || legends.NewFloodedArea) {
       return legends.FloodEvent || legends.NewFloodedArea || null;
     }
     if (analysisType === 'rainfall' || analysisType.includes('rainfall') || name.includes('rainfall') || name.includes('curah hujan') || name.includes('precipitation') || legends.Rainfall || legends.DailyPrecipitation) {
@@ -402,13 +402,13 @@ export default function Dashboard() {
 
   const handleFileUploadSubmit = async (file) => {
     if (!isLoggedIn()) {
-      notify.error("Silakan login terlebih dahulu sebelum mengunggah file!");
+      notify.error("Please log in first before uploading a file!");
       setIsFileUploadOpen(false);
       return;
     }
 
     if (!activeProject) {
-      notify.error("Silakan pilih atau buat proyek terlebih dahulu di Sidebar sebelum mengunggah file!");
+      notify.error("Please select or create a project in the sidebar before uploading files!");
       setIsFileUploadOpen(false);
       return;
     }
@@ -736,7 +736,7 @@ export default function Dashboard() {
         }
         return filtered;
       } catch (error) {
-        if (error.response?.status !== 401) console.error('Gagal memuat layer analisis pengguna:', error);
+        if (error.response?.status !== 401) console.error('Failed to load the user analysis layer:', error);
         return [];
       } finally {
         if (userListRequestsRef.current.layers.get(requestKey) === request) {
@@ -779,7 +779,7 @@ export default function Dashboard() {
         if (authGeneration === authGenerationRef.current) setUserLayerGroups(list);
         return list;
       } catch (error) {
-        if (error.response?.status !== 401) console.error('Gagal memuat layer group pengguna:', error);
+        if (error.response?.status !== 401) console.error('Failed to load the user layer group:', error);
         return [];
       } finally {
         if (userListRequestsRef.current.groups.get(requestKey) === request) {
@@ -799,7 +799,7 @@ export default function Dashboard() {
         setGeosocialList(data);
       }
     } catch (err) {
-      console.error("Gagal memuat daftar layer Geosocial:", err);
+      console.error("Failed to load the Geosocial layer list:", err);
     }
   };
 
@@ -952,7 +952,7 @@ export default function Dashboard() {
           return nextPoints;
         });
       } catch (err) {
-        console.error("Gagal memuat layer titik Geosocial:", err);
+        console.error("Failed to load the Geosocial point layer:", err);
       }
     }
   };
@@ -1265,7 +1265,7 @@ export default function Dashboard() {
     const previewUrl = previewKey ? availableMaps[previewKey] : null;
 
     if (isChecked && (typeof previewUrl !== 'string' || !previewUrl.startsWith('http'))) {
-      addNotification('info', `Preview layer ${layerId} belum tersedia. Jalankan analisis terlebih dahulu.`);
+      addNotification('info', `Preview layer ${layerId} Not available yet. Run the analysis first.`);
       return;
     }
 
@@ -1303,7 +1303,7 @@ export default function Dashboard() {
   };
   const handleRunAnalysis = async (projectId, payload) => {
     if (!projectId) {
-      addNotification('error', 'Silakan pilih proyek terlebih dahulu.');
+      addNotification('error', 'Please select a project first.');
       return;
     }
 
@@ -1312,7 +1312,7 @@ export default function Dashboard() {
       Array.isArray(drawnGeometryData.geometry) ? drawnGeometryData.geometry.length > 0 : true
     );
     if (!selectedAoi && !hasDrawnGeom) {
-      addNotification('error', 'Silakan tentukan area (AOI) terlebih dahulu dengan menggambar di peta atau memilih dari daftar AOI tersimpan.');
+      addNotification('error', 'Please define the area of interest (AOI) first by drawing on the map or selecting from the list of saved AOIs.');
       return;
     }
     const finalPayload = {
@@ -1332,24 +1332,24 @@ export default function Dashboard() {
 
       setIsAnalysisSaved(false);
       if (analysisData?.id) {
-        addNotification('success', 'Analisis selesai. Pilih component layer melalui checkbox; tekan Save jika ingin menyimpannya ke GeoServer.');
+        addNotification('success', 'The analysis is complete. Select the component layer using the checkbox; click Save if you want to save it to GeoServer.');
       }
     } catch (err) {
       console.error("Execute analysis error:", err);
-      const msg = err.response?.data?.message || err.message || 'Gagal menjalankan analisis spasial.';
+      const msg = err.response?.data?.message || err.message || 'Failed to perform spatial analysis.';
       addNotification('error', msg);
     }
   };
 
   const handleSaveAnalysis = async () => {
     if (!activeProject?.id) {
-      addNotification('error', 'Silakan pilih proyek terlebih dahulu.');
+      addNotification('error', 'Please select a project first.');
       return;
     }
 
     const latestAnalysisId = analysisResult?.data?.id || analysisResult?.id;
     if (!latestAnalysisId) {
-      addNotification('info', 'Tidak ada hasil analisis baru yang perlu disimpan.');
+      addNotification('info', 'There are no new analysis results to save.');
       return;
     }
 
@@ -1393,7 +1393,7 @@ export default function Dashboard() {
       }
       const failedComponents = saveRes?.data?.failed_components || {};
       if (!savedWms) {
-        throw new Error('FloodRisk utama belum berhasil disimpan ke Analysis Results.');
+        throw new Error('The main FloodRisk has not been successfully saved to Analysis Results.');
       }
       if (Object.keys(failedComponents).length > 0) {
         const remainingSelectedComponents = Object.fromEntries(
@@ -1404,7 +1404,7 @@ export default function Dashboard() {
         );
         setSelectedComponentLayers(remainingSelectedComponents);
         setComponentSavePending(true);
-        addNotification('error', `Sebagian komponen gagal disimpan: ${Object.keys(failedComponents).join(', ')}. Tekan Save lagi untuk mencoba ulang.`);
+        addNotification('error', `Some components could not be saved: ${Object.keys(failedComponents).join(', ')}. Click Save again to try again.`);
         return;
       }
       setComponentSavePending(false);
@@ -1414,12 +1414,12 @@ export default function Dashboard() {
       await loadUserAnalysisLayers(activeProject.id, true);
       await loadUserLayerGroups(true);
       addNotification('success', selectedComponents.length > 0
-        ? 'FloodRisk dan component layer yang dipilih berhasil disimpan ke proyek.'
-        : 'FloodRisk berhasil disimpan ke proyek.');
+        ? 'FloodRisk and the selected component layer have been successfully saved to the project.'
+        : 'FloodRisk successfully saved to the project.');
     } catch (err) {
       console.error('Save analysis error:', err);
       setComponentSavePending(false);
-      const msg = err.response?.data?.message || 'Gagal menyimpan hasil analisis ke proyek.';
+      const msg = err.response?.data?.message || 'Failed to save the analysis results to the project.';
       addNotification('error', msg);
     } finally {
       setIsSavingAnalysis(false);
@@ -1461,16 +1461,16 @@ export default function Dashboard() {
       link.click();
       link.remove();
 
-      notify.success('File GeoTIFF berhasil diunduh!');
+      notify.success('The GeoTIFF file was successfully downloaded!');
     } catch (err) {
       console.error("Download failed:", err);
-      notify.error('Gagal mengunduh file GeoTIFF.');
+      notify.error('Failed to download the GeoTIFF file.');
     }
   };
 
 
   const handleSaveProject = () => {
-    notify.success('Status peta dan konfigurasi berhasil disimpan sementara!');
+    notify.success('The map status and configuration have been successfully saved temporarily!');
   };
 
   return (
@@ -1603,7 +1603,7 @@ export default function Dashboard() {
 
               {/* 4. Vegetation (NDVI) Component */}
               {stats.avg_ndvi !== undefined && !stats.risk_distribution && (
-        <div className="bg-green-50 border border-green-100 p-3.5 rounded-xl space-y-2">
+                <div className="bg-green-50 border border-green-100 p-3.5 rounded-xl space-y-2">
                   <span className="text-emerald-800 font-semibold text-xs block">Vegetation Index (NDVI)</span>
                   <div className="flex justify-between items-baseline">
                     <span className="text-gray-600 text-xs">Average NDVI:</span>
@@ -1817,14 +1817,14 @@ export default function Dashboard() {
 
       {loading && (
         <Loader 
-          message="Memproses Analisis Google Earth Engine"
+          message="Processing Google Earth Engine Analysis"
           onCancel={cancelAnalysis}
           stages={[
-            { time: 0, text: 'Memvalidasi geometri AOI & parameter analisis...' },
-            { time: 3, text: 'Menghubungkan ke layanan Google Earth Engine...' },
-            { time: 8, text: 'Mengambil citra satelit & reduksi matriks piksel...' },
-            { time: 18, text: 'Menyusun visualisasi spasial dan layer peta...' },
-            { time: 24, text: 'Menyiapkan preview FloodRisk dan component layers...' }
+            { time: 0, text: 'Validating AOI geometry and analysis parameters...' },
+            { time: 3, text: 'Connecting to the Google Earth Engine service...' },
+            { time: 8, text: 'Acquiring satellite imagery & pixel matrix reduction...' },
+            { time: 18, text: 'Creating spatial visualizations and map layers...' },
+            { time: 24, text: 'Preparing preview FloodRisk and component layers...' }
           ]}
         />
       )}
@@ -1833,7 +1833,7 @@ export default function Dashboard() {
         <Loader 
           mode="determinate"
           progress={uploadProgress}
-          message={uploadProgress >= 100 ? "Memvalidasi Geometri AOI..." : "Mengunggah File Spasial..."}
+          message={uploadProgress >= 100 ? "Validating AOI Geometry..." : "Uploading Spatial Files..."}
         />
       )}
     </div>

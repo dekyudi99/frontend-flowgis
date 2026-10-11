@@ -102,11 +102,11 @@ export default function UserAnalysisLayers({
   const handleSaveEditGroup = async (e) => {
     e.preventDefault();
     if (!editGroupName.trim()) {
-      notify.error("Masukkan nama layer group!");
+      notify.error("Enter the layer group name!");
       return;
     }
     if (editSelectedLayerIds.length === 0) {
-      notify.error("Pilih minimal 1 layer anggota!");
+      notify.error("Select at least 1 member layer!");
       return;
     }
 
@@ -120,8 +120,8 @@ export default function UserAnalysisLayers({
       }
       setEditingGroup(null);
     } catch (err) {
-      console.error("Gagal mengupdate group:", err);
-      notify.error("Gagal mengupdate Layer Group: " + (err.response?.data?.detail || err.message));
+      console.error("Failed to update the group:", err);
+      notify.error("Failed to update Layer Group: " + (err.response?.data?.detail || err.message));
     } finally {
       setUpdatingGroup(false);
     }
@@ -130,11 +130,11 @@ export default function UserAnalysisLayers({
   const handleSaveNewGroup = async (e) => {
     e.preventDefault();
     if (!newGroupName.trim()) {
-      notify.error("Masukkan nama layer group!");
+      notify.error("Enter the layer group name!");
       return;
     }
     if (selectedLayerIdsForGroup.length === 0) {
-      notify.error("Pilih minimal 1 layer untuk dimasukkan ke dalam group!");
+      notify.error("Select at least 1 layer to add to the group!");
       return;
     }
 
@@ -151,8 +151,8 @@ export default function UserAnalysisLayers({
       setSelectedLayerIdsForGroup([]);
       setShowCreateGroupModal(false);
     } catch (err) {
-      console.error("Gagal membuat group:", err);
-      notify.error("Gagal membuat Layer Group: " + (err.response?.data?.detail || err.message));
+      console.error("Failed to create a group:", err);
+      notify.error("Failed to create a Layer Group: " + (err.response?.data?.detail || err.message));
     } finally {
       setCreatingGroup(false);
     }
@@ -169,8 +169,8 @@ export default function UserAnalysisLayers({
       }
       setDeleteConfirmState({ isOpen: false, type: null, id: null, title: '' });
     } catch (err) {
-      console.error("Gagal menghapus:", err);
-      notify.error("Gagal menghapus: " + (err.response?.data?.detail || err.message));
+      console.error("Failed to delete:", err);
+      notify.error("Failed to delete: " + (err.response?.data?.detail || err.message));
     } finally {
       setIsDeleting(false);
     }
