@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Lightbulb, MapPin, Maximize2, Minimize2, Layers, Video, Users } from 'lucide-react';
+import { Lightbulb, MapPin, Maximize2, Minimize2, Layers, Video, Users, ChevronDown, ChevronUp, Table } from 'lucide-react';
 import AdminSidebar from '@/components/AdminComponents/AdminSidebar';
 import AdminHeader from '@/components/AdminComponents/AdminHeader';
 import AdminMapLeaflet from '@/components/AdminComponents/AdminMapLeaflet';
@@ -35,7 +35,9 @@ export default function AdminDashboard() {
   const [editingFacility, setEditingFacility] = useState(null);
   const [adminLoading, setAdminLoading] = useState(null);
 
-  // Responsiveness: Drawer sidebar untuk layar mobile / tablet
+  // State untuk Buka-Tutup Panel Tabel List Data
+  const [isTableOpen, setIsTableOpen] = useState(true);
+
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   // Fitur Full Map interaktif
@@ -391,14 +393,70 @@ export default function AdminDashboard() {
             <FacilitySummaryCards facilities={facilities} />
           )}
 
-          {/* Bagian Peta Leaflet Utama & Form Samping (Dashboard, Geosocial, Facilities) */}
+          {/* Bagian Peta Leaflet Utama & Form (Dashboard, Geosocial, Facilities) */}
           {(activeMenu === 'dashboard' || activeMenu === 'geosocial' || activeMenu === 'facilities') && (
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
+            <div className="space-y-4 sm:space-y-6">
+              
+              {activeMenu === 'dashboard' && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                  <Card className="border-border/60 shadow-sm">
+                    <CardContent className="p-3.5 sm:p-4 flex items-center gap-3 sm:gap-4">
+                      <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center flex-shrink-0">
+                        <Lightbulb className="w-5 h-5 sm:w-6 sm:h-6" />
+                      </div>
+                      <div>
+                        <h4 className="text-xl sm:text-2xl font-bold text-gray-800">235</h4>
+                        <p className="text-[10px] sm:text-xs text-gray-500 font-medium uppercase tracking-wider">Total Execution Analysis</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="border-border/60 shadow-sm">
+                    <CardContent className="p-3.5 sm:p-4 flex items-center gap-3 sm:gap-4">
+                      <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center flex-shrink-0">
+                        <MapPin className="w-5 h-5 sm:w-6 sm:h-6" />
+                      </div>
+                      <div>
+                        <h4 className="text-xl sm:text-2xl font-bold text-gray-800">{facilities.length}</h4>
+                        <p className="text-[10px] sm:text-xs text-gray-500 font-medium uppercase tracking-wider">Registered Public Facilities</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="border-border/60 shadow-sm">
+                    <CardContent className="p-3.5 sm:p-4 flex items-center gap-3 sm:gap-4">
+                      <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center flex-shrink-0">
+                        <Video className="w-5 h-5 sm:w-6 sm:h-6" />
+                      </div>
+                      <div>
+                        <h4 className="text-xl sm:text-2xl font-bold text-gray-800">{cctvs.length}</h4>
+                        <p className="text-[10px] sm:text-xs text-gray-500 font-medium uppercase tracking-wider">CCTV Camera Telemetry</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="border-border/60 shadow-sm">
+                    <CardContent className="p-3.5 sm:p-4 flex items-center gap-3 sm:gap-4">
+                      <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center flex-shrink-0">
+                        <Layers className="w-5 h-5 sm:w-6 sm:h-6" />
+                      </div>
+                      <div>
+                        <h4 className="text-xl sm:text-2xl font-bold text-gray-800">
+                          {geosocialList.filter((l) => l.is_active !== false).length}
+                          <span className="text-sm font-normal text-gray-400"> / {geosocialList.length}</span>
+                        </h4>
+                        <p className="text-[10px] sm:text-xs text-gray-500 font-medium uppercase tracking-wider">Active Geosocial Spatial Layer</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              )}
+
               <div 
                 className={
                   isFullMap 
                     ? "fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md p-2 sm:p-5 flex flex-col animate-in fade-in duration-200" 
-                    : "lg:col-span-7 space-y-4 sm:space-y-6"
+                    : "w-full"
                 } 
                 id="admin-leaflet-card"
               >
@@ -407,17 +465,17 @@ export default function AdminDashboard() {
                     <div className="min-w-0">
                       <CardTitle className="text-sm sm:text-base font-bold text-gray-800 flex items-center gap-2 flex-wrap">
                         <span>Telemetry Monitoring Map & Spatial Layers</span>
-                        {isFullMap && (
+                        {/* {isFullMap && (
                           <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-teal-100 text-teal-800 border border-teal-300">
                             Full Screen (Full View)
                           </span>
-                        )}
+                        )} */}
                       </CardTitle>
                       <CardDescription className="text-[11px] sm:text-xs text-gray-500 truncate">
                         Displaying CCTV stations, public facilities, and the AstraGIS GeoServer WMS layer overlay
                       </CardDescription>
                     </div>
-                    <Button 
+                    {/* <Button 
                       size="sm" 
                       variant={isFullMap ? "default" : "outline"}
                       onClick={() => setIsFullMap((prev) => !prev)}
@@ -439,9 +497,9 @@ export default function AdminDashboard() {
                           <span>Full Map</span>
                         </>
                       )}
-                    </Button>
+                    </Button> */}
                   </CardHeader>
-                  <CardContent className={`p-2 sm:p-3 relative ${isFullMap ? 'flex-1 h-full min-h-0' : 'h-72 sm:h-96 md:h-[420px]'}`}>
+                  <CardContent className={`p-2 sm:p-3 relative ${isFullMap ? 'flex-1 h-full min-h-0' : 'h-80 sm:h-[420px] md:h-[480px]'}`}>
                     <AdminMapLeaflet
                       facilities={facilities}
                       cctvStations={cctvs}
@@ -456,78 +514,25 @@ export default function AdminDashboard() {
                 </Card>
               </div>
 
-              <div className="lg:col-span-5 space-y-4">
-                {activeMenu === 'dashboard' && (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-3 sm:gap-4">
-                    <Card className="border-border/60 shadow-sm">
-                      <CardContent className="p-3.5 sm:p-4 flex items-center gap-3 sm:gap-4">
-                        <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center flex-shrink-0">
-                          <Lightbulb className="w-5 h-5 sm:w-6 sm:h-6" />
-                        </div>
-                        <div>
-                          <h4 className="text-xl sm:text-2xl font-bold text-gray-800">235</h4>
-                          <p className="text-[10px] sm:text-xs text-gray-500 font-medium uppercase tracking-wider">Total Execution Analysis</p>
-                        </div>
-                      </CardContent>
-                    </Card>
+              {(activeMenu === 'geosocial' || activeMenu === 'facilities') && (
+                <div className="w-full">
+                  {activeMenu === 'geosocial' && (
+                    <GeosocialForm onAddLayer={handleAddGeosocial} />
+                  )}
 
-                    <Card className="border-border/60 shadow-sm">
-                      <CardContent className="p-3.5 sm:p-4 flex items-center gap-3 sm:gap-4">
-                        <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center flex-shrink-0">
-                          <MapPin className="w-5 h-5 sm:w-6 sm:h-6" />
-                        </div>
-                        <div>
-                          <h4 className="text-xl sm:text-2xl font-bold text-gray-800">{facilities.length}</h4>
-                          <p className="text-[10px] sm:text-xs text-gray-500 font-medium uppercase tracking-wider">Registered Public Facilities</p>
-                        </div>
-                      </CardContent>
-                    </Card>
-
-                    <Card className="border-border/60 shadow-sm">
-                      <CardContent className="p-3.5 sm:p-4 flex items-center gap-3 sm:gap-4">
-                        <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center flex-shrink-0">
-                          <Video className="w-5 h-5 sm:w-6 sm:h-6" />
-                        </div>
-                        <div>
-                          <h4 className="text-xl sm:text-2xl font-bold text-gray-800">{cctvs.length}</h4>
-                          <p className="text-[10px] sm:text-xs text-gray-500 font-medium uppercase tracking-wider">CCTV Camera Telemetry</p>
-                        </div>
-                      </CardContent>
-                    </Card>
-
-                    <Card className="border-border/60 shadow-sm">
-                      <CardContent className="p-3.5 sm:p-4 flex items-center gap-3 sm:gap-4">
-                        <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center flex-shrink-0">
-                          <Layers className="w-5 h-5 sm:w-6 sm:h-6" />
-                        </div>
-                        <div>
-                          <h4 className="text-xl sm:text-2xl font-bold text-gray-800">
-                            {geosocialList.filter((l) => l.is_active !== false).length}
-                            <span className="text-sm font-normal text-gray-400"> / {geosocialList.length}</span>
-                          </h4>
-                          <p className="text-[10px] sm:text-xs text-gray-500 font-medium uppercase tracking-wider">Active Geosocial Spatial Layer</p>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </div>
-                )}
-
-                {activeMenu === 'geosocial' && (
-                  <GeosocialForm onAddLayer={handleAddGeosocial} />
-                )}
-
-                {activeMenu === 'facilities' && (
-                  <PublicFacilityForm
-                    onAddFacility={handleAddFacility}
-                    onEditFacility={handleEditFacility}
-                    selectedLocation={selectedLocation}
-                    isPickMode={isPickMode}
-                    setIsPickMode={setIsPickMode}
-                    editingFacility={editingFacility}
-                    setEditingFacility={setEditingFacility}
-                  />
-                )}
-              </div>
+                  {activeMenu === 'facilities' && (
+                    <PublicFacilityForm
+                      onAddFacility={handleAddFacility}
+                      onEditFacility={handleEditFacility}
+                      selectedLocation={selectedLocation}
+                      isPickMode={isPickMode}
+                      setIsPickMode={setIsPickMode}
+                      editingFacility={editingFacility}
+                      setEditingFacility={setEditingFacility}
+                    />
+                  )}
+                </div>
+              )}
             </div>
           )}
 
@@ -545,26 +550,70 @@ export default function AdminDashboard() {
             <UserManagement />
           )}
 
-          {/* Tabel Fasilitas Publik */}
+          {/* Tabel Fasilitas Publik dalam bentuk Panel Buka-Tutup */}
           {activeMenu === 'facilities' && (
-            <PublicFacilityTable
-              facilities={facilities}
-              onDeleteFacility={handleDeleteFacility}
-              onStartEdit={(fac) => setEditingFacility(fac)}
-            />
+            <div className="space-y-3">
+              <div className="flex items-center justify-between bg-white px-4 py-3 rounded-xl border border-border/60 shadow-sm">
+                <div className="flex items-center gap-2">
+                  <Table className="w-4 h-4 text-teal-600" />
+                  <span className="text-sm font-bold text-gray-800">
+                    Public Facility Data Table ({facilities.length} items)
+                  </span>
+                </div>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setIsTableOpen((prev) => !prev)}
+                  className="h-8 text-xs font-semibold text-gray-600 hover:text-teal-700 flex items-center gap-1.5"
+                >
+                  <span>{isTableOpen ? 'Hide Panel' : 'Show Panel'}</span>
+                  {isTableOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                </Button>
+              </div>
+              {isTableOpen && (
+                <PublicFacilityTable
+                  facilities={facilities}
+                  onDeleteFacility={handleDeleteFacility}
+                  onStartEdit={(fac) => setEditingFacility(fac)}
+                />
+              )}
+            </div>
           )}
 
-          {/* Tabel Layer Geosocial dengan integrasi render WMS langsung ke Leaflet Map */}
+          {/* Tabel Layer Geosocial dalam bentuk Panel Buka-Tutup */}
           {activeMenu === 'geosocial' && (
-            <GeosocialTable
-              geosocialList={geosocialList}
-              isLoading={isGeosocialLoading}
-              onDeleteLayer={handleDeleteGeosocial}
-              onSaveEdit={handleSaveEditGeosocial}
-              onToggleStatus={handleToggleStatusGeosocial}
-              onSelectLayerToView={handleSelectLayerToView}
-              onOpenStyleModal={(layer) => setStylingLayer(layer)}
-            />
+            <div className="space-y-3">
+              <div className="flex items-center justify-between bg-white px-4 py-3 rounded-xl border border-border/60 shadow-sm">
+                <div className="flex items-center gap-2">
+                  <Layers className="w-4 h-4 text-teal-600" />
+                  <span className="text-sm font-bold text-gray-800">
+                    Geosocial Spatial Layer List ({geosocialList.length} layers)
+                  </span>
+                </div>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setIsTableOpen((prev) => !prev)}
+                  className="h-8 text-xs font-semibold text-gray-600 hover:text-teal-700 flex items-center gap-1.5"
+                >
+                  <span>{isTableOpen ? 'Hide Panel' : 'Show Panel'}</span>
+                  {isTableOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                </Button>
+              </div>
+              {isTableOpen && (
+                <GeosocialTable
+                  geosocialList={geosocialList}
+                  isLoading={isGeosocialLoading}
+                  onDeleteLayer={handleDeleteGeosocial}
+                  onSaveEdit={handleSaveEditGeosocial}
+                  onToggleStatus={handleToggleStatusGeosocial}
+                  onSelectLayerToView={handleSelectLayerToView}
+                  onOpenStyleModal={(layer) => setStylingLayer(layer)}
+                />
+              )}
+            </div>
           )}
 
           </main>

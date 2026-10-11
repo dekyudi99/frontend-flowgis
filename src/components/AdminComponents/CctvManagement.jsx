@@ -20,7 +20,10 @@ import {
   Maximize2,
   Minimize2,
   Eye,
-  EyeOff
+  EyeOff,
+  ChevronDown,
+  ChevronUp,
+  Table
 } from 'lucide-react';
 import { cctvService } from '@/services/cctvService';
 import { useNotification } from '@/context/NotificationContext';
@@ -47,6 +50,9 @@ export default function CctvManagement({
   const [activeModalCctv, setActiveModalCctv] = useState(null);
   const [editingCctv, setEditingCctv] = useState(null);
   const [saving, setSaving] = useState(false);
+
+  // State Buka-Tutup Panel Tabel List Data CCTV
+  const [isTableOpen, setIsTableOpen] = useState(true);
 
   // Hook global notifikasi toast
   const { notify } = useNotification();
@@ -318,14 +324,12 @@ export default function CctvManagement({
         </Card>
       </div>
 
-      {/* Grid: Peta Telemetri CCTV (7 cols) & Form Input CCTV (5 cols) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        
-        {/* Peta Leaflet Telemetri CCTV */}
+      <div className="space-y-6">
+      
         <div className={
           isFullMap 
             ? "fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md p-2 sm:p-5 flex flex-col animate-in fade-in duration-200" 
-            : "lg:col-span-7 space-y-4"
+            : "w-full"
         }>
           <Card className={`border-border/60 shadow-sm bg-white overflow-hidden flex flex-col ${isFullMap ? 'h-full flex-1 rounded-2xl shadow-2xl border-slate-700' : ''}`}>
             <CardHeader className="flex flex-row items-center justify-between p-3 sm:p-4 pb-2 border-b border-gray-100 shrink-0 gap-2">
@@ -333,18 +337,18 @@ export default function CctvManagement({
                 <CardTitle className="text-sm sm:text-base font-bold text-gray-800 flex items-center gap-2">
                   <Map className="w-4 h-4 text-teal-600" />
                   <span>Map of CCTV Monitoring Stations</span>
-                  {isFullMap && (
+                  {/* {isFullMap && (
                     <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-teal-100 text-teal-800 border border-teal-300">
                       Full Screen
                     </span>
-                  )}
+                  )} */}
                 </CardTitle>
                 <CardDescription className="text-[11px] sm:text-xs text-gray-500 truncate">
                   Visualization of the distribution of CCTV cameras in Nakhon Pathom. Click the button &quot;Select a Point on the Map&quot; to select station coordinates.
                 </CardDescription>
               </div>
 
-              <Button
+              {/* <Button
                 type="button"
                 size="sm"
                 variant={isFullMap ? "default" : "outline"}
@@ -363,9 +367,9 @@ export default function CctvManagement({
                     <Maximize2 className="w-3.5 h-3.5" /> <span>Full Map</span>
                   </>
                 )}
-              </Button>
+              </Button> */}
             </CardHeader>
-            <CardContent className={`p-2 sm:p-3 relative ${isFullMap ? 'flex-1 h-full min-h-0' : 'h-72 sm:h-96 md:h-[430px]'}`}>
+            <CardContent className={`p-2 sm:p-3 relative ${isFullMap ? 'flex-1 h-full min-h-0' : 'h-80 sm:h-[420px] md:h-[480px]'}`}>
               <AdminMapLeaflet
                 facilities={facilities}
                 cctvStations={cctvs}
@@ -378,8 +382,7 @@ export default function CctvManagement({
           </Card>
         </div>
 
-        {/* Form Input CCTV */}
-        <div className="lg:col-span-5">
+        <div className="w-full">
           <Card className="border-border/60 shadow-sm bg-white">
             <CardHeader className="pb-3">
               <CardTitle className="text-base font-bold text-gray-800 flex items-center gap-2">
@@ -392,32 +395,34 @@ export default function CctvManagement({
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-3.5">
-                <div>
-                  <label className="block text-xs font-semibold text-gray-700 mb-1">
-                    Station Code (Station Code) <span className="text-rose-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Example: TA130207"
-                    value={formData.station_code}
-                    onChange={(e) => setFormData({ ...formData, station_code: e.target.value })}
-                    className="w-full px-3 py-1.5 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 font-mono"
-                    required
-                  />
-                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-700 mb-1">
+                      Station Code (Station Code) <span className="text-rose-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Example: TA130207"
+                      value={formData.station_code}
+                      onChange={(e) => setFormData({ ...formData, station_code: e.target.value })}
+                      className="w-full px-3 py-1.5 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 font-mono"
+                      required
+                    />
+                  </div>
 
-                <div>
-                  <label className="block text-xs font-semibold text-gray-700 mb-1">
-                    Station Name / CCTV <span className="text-rose-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Example: Tha Chin River Sluice Gate 02"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full px-3 py-1.5 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
-                    required
-                  />
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-700 mb-1">
+                      Station Name / CCTV <span className="text-rose-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Example: Tha Chin River Sluice Gate 02"
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      className="w-full px-3 py-1.5 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                      required
+                    />
+                  </div>
                 </div>
 
                 <div>
@@ -445,7 +450,7 @@ export default function CctvManagement({
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-2.5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                   <div>
                     <label className="block text-xs font-semibold text-gray-700 mb-1">Username Camera</label>
                     <input
@@ -483,7 +488,7 @@ export default function CctvManagement({
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-2.5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                   <div>
                     <label className="block text-xs font-semibold text-gray-700 mb-1">
                       Latitude <span className="text-rose-500">*</span>
@@ -527,7 +532,7 @@ export default function CctvManagement({
                     }`}
                   >
                     <MapPin className="w-3.5 h-3.5" />
-                    {isPickMode ? 'Click a location on the Leaflet map on the right...' : 'Select a Point on the Map (Map Picker)'}
+                    {isPickMode ? 'Click a location on the Leaflet map above...' : 'Select a Point on the Map (Map Picker)'}
                   </Button>
 
                   {formData.lat && formData.lng && (
@@ -563,130 +568,150 @@ export default function CctvManagement({
 
       </div>
 
-      {/* Tabel CCTV (Full Width) */}
-      <Card className="border-border/60 shadow-sm bg-white">
-        <CardHeader className="pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div>
-            <CardTitle className="text-base font-bold text-gray-800 flex items-center gap-2">
-              <Video className="w-5 h-5 text-teal-600" /> List of Telemetry CCTV Cameras
-            </CardTitle>
-            <CardDescription className="text-xs text-gray-500">
-              CCTV data is stored in a database and managed directly by the administrator.
-            </CardDescription>
+      <Card className="border-border/60 shadow-sm bg-white overflow-hidden transition-all duration-300">
+        <CardHeader className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-100 bg-slate-50/50">
+          <div className="flex items-center justify-between w-full sm:w-auto gap-4">
+            <div>
+              <CardTitle className="text-base font-bold text-gray-800 flex items-center gap-2">
+                <Video className="w-5 h-5 text-teal-600" /> List of Telemetry CCTV Cameras ({cctvs.length})
+              </CardTitle>
+              <CardDescription className="text-xs text-gray-500">
+                CCTV data is stored in a database and managed directly by the administrator.
+              </CardDescription>
+            </div>
           </div>
 
-          <div className="relative w-full sm:w-64">
-            <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search for CCTV name / code..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-8 pr-3 py-1.5 text-xs border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
-            />
+          <div className="flex items-center gap-2.5 w-full sm:w-auto justify-between sm:justify-end">
+            {isTableOpen && (
+              <div className="relative w-full sm:w-64">
+                <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Search for CCTV name / code..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="w-full pl-8 pr-3 py-1.5 text-xs border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                />
+              </div>
+            )}
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsTableOpen((prev) => !prev)}
+              className="text-xs font-semibold text-gray-600 hover:text-teal-700 flex items-center gap-1.5 shrink-0"
+            >
+              <span>{isTableOpen ? 'Hide Panel' : 'Show Panel'}</span>
+              {isTableOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            </Button>
           </div>
         </CardHeader>
-        <CardContent className="p-0 overflow-x-auto">
-          {loading ? (
-            <div className="p-8 text-center text-gray-500 flex flex-col items-center justify-center gap-2">
-              <Loader2 className="w-6 h-6 animate-spin text-teal-600" />
-              <span className="text-xs">Loading CCTV camera data from the database...</span>
-            </div>
-          ) : filteredCctvs.length === 0 ? (
-            <div className="p-8 text-center text-gray-400 text-xs">
-              No CCTV footage was found.
-            </div>
-          ) : (
-            <table className="w-full text-left border-collapse text-xs">
-              <thead>
-                <tr className="bg-gray-50 border-y border-gray-200 text-gray-600 font-semibold">
-                  <th className="p-3">Camera Code & Name</th>
-                  <th className="p-3">Location / Region</th>
-                  <th className="p-3">Coordinate</th>
-                  <th className="p-3">Status</th>
-                  <th className="p-3 text-center">Management Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100 text-gray-700">
-                {paginatedCctvs.map((item) => (
-                  <tr key={item.id} className="hover:bg-slate-50 transition-colors">
-                    <td className="p-3 font-medium text-gray-900">
-                      <div className="flex items-center gap-2">
-                        <div className="w-7 h-7 rounded-lg bg-teal-50 text-teal-700 flex items-center justify-center flex-shrink-0">
-                          <Camera className="w-3.5 h-3.5" />
-                        </div>
-                        <div>
-                          <div className="font-semibold text-gray-800">{item.name}</div>
-                          <div className="text-[10px] text-teal-700 font-mono">{item.station_code}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="p-3 text-gray-600 max-w-xs truncate">{item.location || '-'}</td>
-                    <td className="p-3 font-mono text-[11px] text-gray-500">
-                      {item.lat}, {item.lng}
-                    </td>
-                    <td className="p-3">
-                      <button
-                        onClick={() => handleToggleActive(item.id)}
-                        className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold border transition ${
-                          item.is_active !== false
-                            ? 'bg-teal-50 text-teal-700 border-teal-200 hover:bg-teal-100'
-                            : 'bg-gray-100 text-gray-500 border-gray-200 hover:bg-gray-200'
-                        }`}
-                        title="Click to change the active status"
-                      >
-                        {item.is_active !== false ? (
-                          <>
-                            <CheckCircle className="w-3 h-3 text-teal-600" /> Aktive
-                          </>
-                        ) : (
-                          <>
-                            <XCircle className="w-3 h-3 text-gray-400" /> Inactive
-                          </>
-                        )}
-                      </button>
-                    </td>
-                    <td className="p-3">
-                      <div className="flex items-center justify-center gap-1.5">
-                        <button
-                          onClick={() => setActiveModalCctv(item)}
-                          className="px-2.5 py-1 text-[11px] bg-teal-600 hover:bg-teal-700 text-white rounded font-medium flex items-center gap-1 shadow-sm transition"
-                          title="Watch Live Stream"
-                        >
-                          <Video className="w-3 h-3" /> Live
-                        </button>
-                        <button
-                          onClick={() => handleStartEdit(item)}
-                          className="p-1.5 text-blue-600 hover:bg-blue-50 rounded transition"
-                          title="Edit CCTV"
-                        >
-                          <Edit2 className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => setConfirmDeleteTarget({ id: item.id, name: item.name })}
-                          className="p-1.5 text-red-600 hover:bg-red-50 rounded transition"
-                          title="Delete CCTV"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </CardContent>
 
-        {/* Pagination Footer */}
-        <Pagination
-          currentPage={currentPage}
-          totalItems={filteredCctvs.length}
-          pageSize={pageSize}
-          onPageChange={setCurrentPage}
-          onPageSizeChange={setPageSize}
-          pageSizeOptions={[5, 10, 20]}
-        />
+        {isTableOpen && (
+          <>
+            <CardContent className="p-0 overflow-x-auto">
+              {loading ? (
+                <div className="p-8 text-center text-gray-500 flex flex-col items-center justify-center gap-2">
+                  <Loader2 className="w-6 h-6 animate-spin text-teal-600" />
+                  <span className="text-xs">Loading CCTV camera data from the database...</span>
+                </div>
+              ) : filteredCctvs.length === 0 ? (
+                <div className="p-8 text-center text-gray-400 text-xs">
+                  No CCTV footage was found.
+                </div>
+              ) : (
+                <table className="w-full text-left border-collapse text-xs">
+                  <thead>
+                    <tr className="bg-gray-50 border-y border-gray-200 text-gray-600 font-semibold">
+                      <th className="p-3">Camera Code & Name</th>
+                      <th className="p-3">Location / Region</th>
+                      <th className="p-3">Coordinate</th>
+                      <th className="p-3">Status</th>
+                      <th className="p-3 text-center">Management Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100 text-gray-700">
+                    {paginatedCctvs.map((item) => (
+                      <tr key={item.id} className="hover:bg-slate-50 transition-colors">
+                        <td className="p-3 font-medium text-gray-900">
+                          <div className="flex items-center gap-2">
+                            <div className="w-7 h-7 rounded-lg bg-teal-50 text-teal-700 flex items-center justify-center flex-shrink-0">
+                              <Camera className="w-3.5 h-3.5" />
+                            </div>
+                            <div>
+                              <div className="font-semibold text-gray-800">{item.name}</div>
+                              <div className="text-[10px] text-teal-700 font-mono">{item.station_code}</div>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="p-3 text-gray-600 max-w-xs truncate">{item.location || '-'}</td>
+                        <td className="p-3 font-mono text-[11px] text-gray-500">
+                          {item.lat}, {item.lng}
+                        </td>
+                        <td className="p-3">
+                          <button
+                            onClick={() => handleToggleActive(item.id)}
+                            className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold border transition ${
+                              item.is_active !== false
+                                ? 'bg-teal-50 text-teal-700 border-teal-200 hover:bg-teal-100'
+                                : 'bg-gray-100 text-gray-500 border-gray-200 hover:bg-gray-200'
+                            }`}
+                            title="Click to change the active status"
+                          >
+                            {item.is_active !== false ? (
+                              <>
+                                <CheckCircle className="w-3 h-3 text-teal-600" /> Aktive
+                              </>
+                            ) : (
+                              <>
+                                <XCircle className="w-3 h-3 text-gray-400" /> Inactive
+                              </>
+                            )}
+                          </button>
+                        </td>
+                        <td className="p-3">
+                          <div className="flex items-center justify-center gap-1.5">
+                            <button
+                              onClick={() => setActiveModalCctv(item)}
+                              className="px-2.5 py-1 text-[11px] bg-teal-600 hover:bg-teal-700 text-white rounded font-medium flex items-center gap-1 shadow-sm transition"
+                              title="Watch Live Stream"
+                            >
+                              <Video className="w-3 h-3" /> Live
+                            </button>
+                            <button
+                              onClick={() => handleStartEdit(item)}
+                              className="p-1.5 text-blue-600 hover:bg-blue-50 rounded transition"
+                              title="Edit CCTV"
+                            >
+                              <Edit2 className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => setConfirmDeleteTarget({ id: item.id, name: item.name })}
+                              className="p-1.5 text-red-600 hover:bg-red-50 rounded transition"
+                              title="Delete CCTV"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </CardContent>
+
+            {/* Pagination Footer */}
+            <Pagination
+              currentPage={currentPage}
+              totalItems={filteredCctvs.length}
+              pageSize={pageSize}
+              onPageChange={setCurrentPage}
+              onPageSizeChange={setPageSize}
+              pageSizeOptions={[5, 10, 20]}
+            />
+          </>
+        )}
       </Card>
 
       {/* Modal Video Stream CCTV */}
