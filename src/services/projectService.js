@@ -93,5 +93,40 @@ export const projectService = {
     const response = await API.delete(`/user/layer-groups/${id}`);
     return response.data;
   },
+
+  // Endpoint: Download layer hasil analisis dengan style GeoServer (GeoTIFF)
+  downloadUserLayer: async (projectId, layer) => {
+    const layerId = layer.id || layer.layer_id || layer.layer_name;
+    const response = await API.get(`/projects/${projectId}/layers/${layerId}/download`, {
+      responseType: 'blob',
+    });
+
+    if (response.data?.type === 'application/json') {
+      const text = await response.data.text();
+      const json = JSON.parse(text);
+      throw new Error(json.message || 'Download failed');
+    }
+
+    const blob = new Blob([response.data], { type: 'image/geotiff' });
+    const downloadUrl = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = downloadUrl;
+
+    let filename = `${(layer.display_name || layer.layer_name || 'analysis_layer').replace(/[^a-zA-Z0-9_-]/g, '_')}.tif`;
+    const disposition = response.headers?.['content-disposition'];
+    if (disposition && disposition.indexOf('filename=') !== -1) {
+      const match = disposition.match(/filename="?([^";]+)"?/);
+      if (match && match[1]) {
+        filename = match[1];
+      }
+    }
+
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(downloadUrl);
+  },
 };
+
 

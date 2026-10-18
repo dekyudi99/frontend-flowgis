@@ -73,6 +73,8 @@ export default function Dashboard() {
   const [visibleGeosocial, setVisibleGeosocial] = useState({});
   const [activeGeosocialWms, setActiveGeosocialWms] = useState({});
   const [activeGeosocialPoints, setActiveGeosocialPoints] = useState({});
+  const [geosocialGroups, setGeosocialGroups] = useState([]);
+  const [activeGeosocialGroups, setActiveGeosocialGroups] = useState({});
 
   // Load Hospitals when layer is toggled on
   useEffect(() => {
@@ -803,12 +805,46 @@ export default function Dashboard() {
     }
   };
 
+  // Layer group geosocial (publik) — satu group = satu layer WMS gabungan
+  const loadGeosocialGroups = async () => {
+    try {
+      const data = await geosocialService.getLayerGroups();
+      if (Array.isArray(data)) setGeosocialGroups(data);
+    } catch (err) {
+      console.error("Failed to load the Geosocial layer groups:", err);
+    }
+  };
+
+  const handleGeosocialGroupToggle = (group, isChecked) => {
+    setActiveGeosocialGroups((prev) => {
+      const next = { ...prev };
+      if (isChecked) {
+        next[group.id] = {
+          id: `geosocial_group_${group.id}`,
+          name: group.title || group.name,
+          wms_url: group.wms_url,
+          wms_layers_param: group.wms_layers_param,
+          opacity: 0.85,
+        };
+      } else {
+        delete next[group.id];
+      }
+      return next;
+    });
+
+    if (isChecked && mapRef.current) {
+      const bounds = normalizeBbox(group.bbox);
+      if (bounds) mapRef.current.fitBounds(bounds, { padding: [40, 40], animate: true });
+    }
+  };
+
   useEffect(() => {
     if (activeProject?.id) {
       loadUserAnalysisLayers(activeProject.id);
       loadUserLayerGroups();
     }
     loadGeosocialLayers();
+    loadGeosocialGroups();
 
     // Dengarkan sinyal auth-change (login / logout / ganti akun)
     const handleAuthChange = () => {
@@ -1152,6 +1188,21 @@ export default function Dashboard() {
     }
   };
 
+  const handleDownloadUserLayer = async (layer) => {
+    if (!activeProject?.id) {
+      addNotification('error', 'Select a project first to download layers.');
+      return;
+    }
+    try {
+      addNotification('info', `Preparing styled GeoTIFF download for ${layer.display_name || layer.layer_name}...`);
+      await projectService.downloadUserLayer(activeProject.id, layer);
+      addNotification('success', `Layer ${layer.display_name || layer.layer_name} downloaded successfully.`);
+    } catch (err) {
+      console.error("Failed to download layer:", err);
+      addNotification('error', `Failed to download layer: ${err.message || 'Error occurred'}`);
+    }
+  };
+
   // Helper untuk mengecek apakah layer cocok dengan AOI yang sedang aktif di peta
   const isLayerMatchesCurrentAoi = (layer) => {
     if (!layer) return false;
@@ -1484,6 +1535,7 @@ export default function Dashboard() {
               ...Object.fromEntries(Object.entries(activeUserLayers).map(([key, layer]) => [`user:${key}`, layer])),
               ...Object.fromEntries(Object.entries(activeUserGroups).map(([key, layer]) => [`group:${key}`, layer])),
               ...Object.fromEntries(Object.entries(activeGeosocialWms).map(([key, layer]) => [`geosocial:${key}`, layer])),
+              ...Object.fromEntries(Object.entries(activeGeosocialGroups).map(([key, layer]) => [`geosocial_group:${key}`, layer])),
             }}
             geosocialPointLayers={activeGeosocialPoints}
             basemap={selectedBasemapId} 
@@ -1772,6 +1824,9 @@ export default function Dashboard() {
         geosocialStatus={visibleGeosocial}
         onGeosocialToggle={handleGeosocialToggle}
         onGeosocialToggleAll={handleGeosocialToggleAll}
+        geosocialGroups={geosocialGroups}
+        geosocialGroupStatus={activeGeosocialGroups}
+        onGeosocialGroupToggle={handleGeosocialGroupToggle}
 
         userAnalysisList={userAnalysisLayers}
         userAnalysisStatus={activeUserLayers}
@@ -1792,6 +1847,7 @@ export default function Dashboard() {
         onUpdateUserGroup={handleUpdateUserGroup}
         onDeleteUserGroup={handleDeleteUserGroup}
         onDeleteLayer={handleDeleteUserLayer}
+        onDownloadUserLayer={handleDownloadUserLayer}
         loadingUserLayers={loadingUserLayers}
       />
 

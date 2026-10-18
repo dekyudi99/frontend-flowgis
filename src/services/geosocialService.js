@@ -1,6 +1,11 @@
 import API from './api';
 
 export const geosocialService = {
+  // Ambil layer group geosocial (publik, tanpa login) untuk peta Dashboard
+  getLayerGroups: async () => {
+    const response = await API.get('/geosocial/layer-groups');
+    return response.data?.data || [];
+  },
   // Ambil katalog layer geosocial aktif (untuk tampilan publik / map viewer)
   getLayers: async () => {
     const response = await API.get('/geosocial/layers');

@@ -3,10 +3,10 @@ import { Checkbox } from '../elements/checkbox';
 import { Label } from '../elements/label';
 import { useTranslation } from 'react-i18next'; 
 
-const GeosocialLayers = ({ layerList, visibleLayers, onToggle, onToggleAll }) => {
+const GeosocialLayers = ({ layerList, visibleLayers, onToggle, onToggleAll, groupList = [], visibleGroups = {}, onToggleGroup }) => {
     const { t } = useTranslation();
 
-    if (!layerList || layerList.length === 0) {
+    if ((!layerList || layerList.length === 0) && groupList.length === 0) {
         return (
             <div className="text-xs text-gray-400 italic px-2 py-1">
                 Loading layers...
@@ -67,6 +67,36 @@ const GeosocialLayers = ({ layerList, visibleLayers, onToggle, onToggleAll }) =>
                     );
                 })}
             </div>
+
+            {groupList.length > 0 && (
+                <div className="mt-4 pt-3 border-t border-gray-200">
+                    <p className="text-xs font-bold text-teal-700 mb-2">{t('geoLayers.layerGroups', 'Layer Groups')}</p>
+                    <div className="ml-2 flex flex-col gap-2">
+                        {groupList.map((group) => (
+                            <div key={group.id} className="flex items-center justify-between hover:bg-gray-50 p-1.5 rounded-lg transition-colors">
+                                <div className="flex items-center min-w-0 flex-1 mr-2">
+                                    <Checkbox
+                                        id={`geo-group-${group.id}`}
+                                        checked={!!visibleGroups[group.id]}
+                                        onCheckedChange={(checked) => onToggleGroup && onToggleGroup(group, checked)}
+                                        className="mr-2.5 shrink-0"
+                                    />
+                                    <Label
+                                        htmlFor={`geo-group-${group.id}`}
+                                        className="text-xs cursor-pointer select-none text-gray-700 truncate font-medium"
+                                        title={group.title || group.name}
+                                    >
+                                        {group.title || group.name}
+                                    </Label>
+                                </div>
+                                <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded shrink-0 uppercase bg-purple-50 text-purple-600 border border-purple-200/60">
+                                    {group.layer_count} layers
+                                </span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
         </section>
     );
 };

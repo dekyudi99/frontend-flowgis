@@ -11,6 +11,7 @@ import { Button } from '@/components/elements/Button';
 import GeosocialTable from '@/components/AdminComponents/GeosocialTable';
 import GeosocialForm from '@/components/AdminComponents/GeosocialForm';
 import GeosocialStyleModal from '@/components/AdminComponents/GeosocialStyleModal';
+import GeosocialLayerGroupManager from '@/components/AdminComponents/GeosocialLayerGroupManager';
 import CctvManagement from '@/components/AdminComponents/CctvManagement';
 import UserManagement from '@/components/AdminComponents/UserManagement';
 import CctvStreamModal from '@/components/AdminComponents/CctvStreamModal';
@@ -348,6 +349,24 @@ export default function AdminDashboard() {
     }
   };
 
+  // Preview layer group geosocial di peta admin (group = satu layer WMS gabungan)
+  const handleViewGroup = (group) => {
+    if (!group) {
+      setActiveWmsLayer((current) => (current?.groupId ? null : current));
+      return;
+    }
+    setActiveWmsLayer({
+      id: `group_${group.id}`,
+      groupId: group.id,
+      url: group.wms_url,
+      wms_layers_param: group.wms_layers_param,
+      display_name: group.title || group.name,
+      bbox: group.bbox,
+      _v: Date.now(),
+    });
+    document.getElementById('admin-leaflet-card')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  };
+
   // Saat admin mengklik "Tampilkan di Peta" pada tabel Geosocial
   const handleSelectLayerToView = (layer) => {
     const rawWmsUrl = layer.url || 'http://localhost:8080/geoserver/wms';
@@ -613,6 +632,11 @@ export default function AdminDashboard() {
                   onOpenStyleModal={(layer) => setStylingLayer(layer)}
                 />
               )}
+              <GeosocialLayerGroupManager
+                geosocialList={geosocialList}
+                viewingGroupId={activeWmsLayer?.groupId ?? null}
+                onViewGroup={handleViewGroup}
+              />
             </div>
           )}
 

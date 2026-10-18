@@ -23,6 +23,9 @@ export default function LayerPopup({
     geosocialStatus,
     onGeosocialToggle,
     onGeosocialToggleAll,
+    geosocialGroups = [],
+    geosocialGroupStatus = {},
+    onGeosocialGroupToggle,
 
     userAnalysisList = [],
     userAnalysisStatus = {},
@@ -38,6 +41,7 @@ export default function LayerPopup({
     onUpdateUserGroup,
     onDeleteUserGroup,
     onDeleteLayer,
+    onDownloadUserLayer,
     loadingUserLayers = false,
 }) {
 
@@ -104,6 +108,9 @@ export default function LayerPopup({
               visibleLayers={geosocialStatus}
               onToggle={onGeosocialToggle}
               onToggleAll={onGeosocialToggleAll}
+              groupList={geosocialGroups}
+              visibleGroups={geosocialGroupStatus}
+              onToggleGroup={onGeosocialGroupToggle}
             />
           )}
         </div>
@@ -173,6 +180,7 @@ export default function LayerPopup({
               onUpdateGroup={onUpdateUserGroup}
               onDeleteGroup={onDeleteUserGroup}
               onDeleteLayer={onDeleteLayer}
+              onDownloadLayer={onDownloadUserLayer}
               loading={loadingUserLayers}
             />
 

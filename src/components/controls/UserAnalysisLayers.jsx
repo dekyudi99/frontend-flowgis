@@ -13,7 +13,8 @@ import {
   X,
   ChevronRight,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Download
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useNotification } from '@/context/NotificationContext';
@@ -34,6 +35,7 @@ export default function UserAnalysisLayers({
   onUpdateGroup,
   onDeleteGroup,
   onDeleteLayer,
+  onDownloadLayer,
   loading = false,
 }) {
   const { t } = useTranslation();
@@ -59,6 +61,20 @@ export default function UserAnalysisLayers({
     title: '',
   });
   const [isDeleting, setIsDeleting] = useState(false);
+  const [downloadingLayerId, setDownloadingLayerId] = useState(null);
+
+  const handleDownloadClick = async (layer, e) => {
+    if (e) e.stopPropagation();
+    if (!onDownloadLayer) return;
+    try {
+      setDownloadingLayerId(layer.id);
+      await onDownloadLayer(layer);
+    } catch (err) {
+      console.error("Failed to download layer:", err);
+    } finally {
+      setDownloadingLayerId(null);
+    }
+  };
 
   const isAllLayersChecked =
     layerList.length > 0 &&
@@ -431,7 +447,7 @@ export default function UserAnalysisLayers({
                         </div>
                       </div>
 
-                      {/* Actions: Zoom & Delete layer */}
+                      {/* Actions: Zoom, Download & Delete layer */}
                       <div className="flex items-center gap-0.5 shrink-0">
                         {layer.bbox && onZoomToLayer && (
                           <button
@@ -440,6 +456,20 @@ export default function UserAnalysisLayers({
                             className="p-1 text-gray-400 hover:text-teal-600 hover:bg-white rounded transition-colors"
                           >
                             <Maximize2 className="w-3 h-3" />
+                          </button>
+                        )}
+                        {onDownloadLayer && (
+                          <button
+                            onClick={(e) => handleDownloadClick(layer, e)}
+                            disabled={downloadingLayerId === layer.id}
+                            title="Download Styled GeoTIFF"
+                            className="p-1 text-gray-400 hover:text-teal-600 hover:bg-white rounded transition-colors disabled:opacity-40"
+                          >
+                            {downloadingLayerId === layer.id ? (
+                              <RefreshCw className="w-3 h-3 animate-spin text-teal-600" />
+                            ) : (
+                              <Download className="w-3 h-3" />
+                            )}
                           </button>
                         )}
                         {onDeleteLayer && (
