@@ -175,7 +175,7 @@ export default function FloodRiskAnalysis({
           <div className="flex items-center justify-between mb-3">
             <label className="block text-sm font-semibold text-teal-700">Component Layers</label>
             <span className="text-[10px] text-gray-500 font-medium">
-              {selectedAoi ? `(${selectedAoi.name || 'AOI Aktif'})` : '(Komponen Analisis)'}
+              {selectedAoi ? `(${selectedAoi.name || 'AOI Aktif'})` : '(Componen Analysis)'}
             </span>
           </div>
           <div className="space-y-2.5">

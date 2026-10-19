@@ -162,7 +162,7 @@ export default function GeosocialLayerGroupManager({ geosocialList = [], viewing
       return;
     }
     if (form.layer_ids.length === 0) {
-      notify.error('Pilih setidaknya 1 layer anggota untuk membuat Layer Group');
+      notify.error('Select at least one member layer to create a Layer Group');
       return;
     }
 
@@ -174,7 +174,7 @@ export default function GeosocialLayerGroupManager({ geosocialList = [], viewing
           abstract_text: form.abstract_text,
           layer_ids: form.layer_ids,
         });
-        notify.success(`Layer group "${title}" berhasil diperbarui!`);
+        notify.success(`Layer group "${title}" successfully updated!`);
       } else {
         await projectService.createUserLayerGroup({
           name: toGroupName(title),
@@ -182,7 +182,7 @@ export default function GeosocialLayerGroupManager({ geosocialList = [], viewing
           abstract_text: form.abstract_text,
           layer_ids: form.layer_ids,
         });
-        notify.success(`Layer group "${title}" berhasil dibuat!`);
+        notify.success(`Layer group "${title}" successfully created!`);
       }
       setIsModalOpen(false);
       await fetchGroups();
@@ -318,7 +318,7 @@ export default function GeosocialLayerGroupManager({ geosocialList = [], viewing
                     {editingGroup ? 'Edit Layer Group & Urutan' : 'Create New Layer Group'}
                   </h3>
                   <p className="text-[11px] text-gray-400 font-normal">
-                    Atur judul, susunan urutan layer anggota, dan tambahkan layer baru
+                    Set the title, arrange the layer order, and add a new layer
                   </p>
                 </div>
               </div>
@@ -337,7 +337,7 @@ export default function GeosocialLayerGroupManager({ geosocialList = [], viewing
                   type="text"
                   value={form.title}
                   onChange={(e) => setForm((prev) => ({ ...prev, title: e.target.value }))}
-                  placeholder="Contoh: Flood Risk Analysis & Contours"
+                  placeholder="Example: Flood Risk Analysis & Contours"
                   className="w-full px-3 py-2 text-xs border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
                 />
                 {!editingGroup && form.title.trim() && (
@@ -354,7 +354,7 @@ export default function GeosocialLayerGroupManager({ geosocialList = [], viewing
                   rows={2}
                   value={form.abstract_text}
                   onChange={(e) => setForm((prev) => ({ ...prev, abstract_text: e.target.value }))}
-                  placeholder="Keterangan singkat mengenai layer group..."
+                  placeholder="A brief description of the layer group..."
                   className="w-full px-3 py-2 text-xs border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
                 />
               </div>
@@ -365,7 +365,7 @@ export default function GeosocialLayerGroupManager({ geosocialList = [], viewing
                   <span className="text-xs font-semibold text-gray-800 flex items-center gap-1.5">
                     <span>Member Layers ({form.layer_ids.length})</span>
                     <span className="text-[10px] text-teal-600 bg-teal-50 px-2 py-0.5 rounded-full font-medium border border-teal-100 flex items-center gap-1">
-                      <ArrowUpDown className="w-3 h-3" /> Urutan Rendering: Bawah → Atas
+                      <ArrowUpDown className="w-3 h-3" /> Rendering Order: Bottom → Top
                     </span>
                   </span>
                 </div>
@@ -373,7 +373,7 @@ export default function GeosocialLayerGroupManager({ geosocialList = [], viewing
                 <div className="border border-slate-200 rounded-xl p-2 bg-slate-50/70 max-h-56 overflow-y-auto space-y-1.5">
                   {form.layer_ids.length === 0 ? (
                     <div className="text-center py-6 text-gray-400 text-xs">
-                      Belum ada layer anggota yang dipilih. Tambahkan layer dari daftar di bawah.
+                      No member layer has been selected yet. Add a layer from the list below.
                     </div>
                   ) : (
                     form.layer_ids.map((layerId, idx) => {
@@ -409,7 +409,7 @@ export default function GeosocialLayerGroupManager({ geosocialList = [], viewing
                               disabled={idx === 0}
                               onClick={() => moveLayer(idx, -1)}
                               className="p-1 rounded text-slate-500 hover:text-teal-600 hover:bg-teal-50 disabled:opacity-20 disabled:hover:bg-transparent cursor-pointer transition-colors"
-                              title="Pindah Naik (Layer dirender lebih bawah)"
+                              title="Move Up (Layer rendered lower down)"
                             >
                               <ChevronUp className="w-4 h-4" />
                             </button>
@@ -419,7 +419,7 @@ export default function GeosocialLayerGroupManager({ geosocialList = [], viewing
                               disabled={idx === form.layer_ids.length - 1}
                               onClick={() => moveLayer(idx, 1)}
                               className="p-1 rounded text-slate-500 hover:text-teal-600 hover:bg-teal-50 disabled:opacity-20 disabled:hover:bg-transparent cursor-pointer transition-colors"
-                              title="Pindah Turun (Layer dirender lebih atas)"
+                              title="Move Down (Layer rendered higher up)"
                             >
                               <ChevronDown className="w-4 h-4" />
                             </button>
@@ -428,7 +428,7 @@ export default function GeosocialLayerGroupManager({ geosocialList = [], viewing
                               type="button"
                               onClick={() => handleRemoveMemberLayer(layerId)}
                               className="p-1 rounded text-slate-400 hover:text-red-600 hover:bg-red-50 cursor-pointer transition-colors ml-1"
-                              title="Hapus dari Layer Group"
+                              title="Remove from Layer Group"
                             >
                               <X className="w-4 h-4" />
                             </button>
@@ -445,7 +445,7 @@ export default function GeosocialLayerGroupManager({ geosocialList = [], viewing
                 <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/80 space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-semibold text-slate-700">
-                      Tambah Layer ke Grup ({availableLayersToAdd.length} tersedia)
+                      Add Layer to Group ({availableLayersToAdd.length} available)
                     </span>
                     {filteredAvailableLayers.length > 1 && (
                       <button
@@ -453,7 +453,7 @@ export default function GeosocialLayerGroupManager({ geosocialList = [], viewing
                         onClick={handleAddAllAvailable}
                         className="text-[11px] text-teal-600 hover:text-teal-700 font-semibold cursor-pointer"
                       >
-                        Tambah Semua ({filteredAvailableLayers.length})
+                        Add all ({filteredAvailableLayers.length})
                       </button>
                     )}
                   </div>
@@ -464,7 +464,7 @@ export default function GeosocialLayerGroupManager({ geosocialList = [], viewing
                       type="text"
                       value={layerSearch}
                       onChange={(e) => setLayerSearch(e.target.value)}
-                      placeholder="Cari layer yang ingin ditambahkan..."
+                      placeholder="Find the layer you want to add..."
                       className="w-full pl-8 pr-3 py-1.5 text-xs bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
                     />
                   </div>
@@ -472,7 +472,7 @@ export default function GeosocialLayerGroupManager({ geosocialList = [], viewing
                   <div className="max-h-36 overflow-y-auto space-y-1 pr-1">
                     {filteredAvailableLayers.length === 0 ? (
                       <p className="text-[11px] text-gray-400 text-center py-2">
-                        Tidak ada layer yang sesuai dengan pencarian.
+                        No layers match the search.
                       </p>
                     ) : (
                       filteredAvailableLayers.map((opt) => (
@@ -489,7 +489,7 @@ export default function GeosocialLayerGroupManager({ geosocialList = [], viewing
                             onClick={() => handleAddMemberLayer(opt.id)}
                             className="inline-flex items-center gap-1 px-2 py-1 text-[11px] font-semibold text-teal-700 bg-teal-50 hover:bg-teal-100 rounded-md border border-teal-200 cursor-pointer shrink-0 transition-colors"
                           >
-                            <Plus className="w-3 h-3" /> Tambah
+                            <Plus className="w-3 h-3" /> Add
                           </button>
                         </div>
                       ))
@@ -498,7 +498,7 @@ export default function GeosocialLayerGroupManager({ geosocialList = [], viewing
                 </div>
               ) : (
                 <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/70 text-center text-xs text-slate-400">
-                  Semua layer yang ada di katalog sudah dimasukkan ke dalam Layer Group ini.
+                  All layers present in the catalog have been added to this Layer Group..
                 </div>
               )}
             </div>

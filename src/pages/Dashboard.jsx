@@ -918,8 +918,8 @@ export default function Dashboard() {
             },
           }));
         } catch (err) {
-          console.error(`Gagal memuat data titik geosocial ${layer.layer_name}:`, err);
-          addNotification('error', `Gagal memuat titik ${layer.display_name}`);
+          console.error(`Failed to load geosocial point data ${layer.layer_name}:`, err);
+          addNotification('error', `Failed to load geosocial point ${layer.display_name}`);
         }
       } else {
         setActiveGeosocialPoints((prev) => {

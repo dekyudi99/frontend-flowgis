@@ -70,7 +70,7 @@ export default function Pagination({
       {/* Informasi Baris & Selector Ukuran Halaman */}
       <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2.5 sm:gap-4 text-gray-500 w-full sm:w-auto">
         <span>
-          Displaying <strong className="text-gray-800 font-semibold">{startIndex}</strong> - <strong className="text-gray-800 font-semibold">{endIndex}</strong> dari <strong className="text-gray-800 font-semibold">{totalItems}</strong> data
+          Displaying <strong className="text-gray-800 font-semibold">{startIndex}</strong> - <strong className="text-gray-800 font-semibold">{endIndex}</strong> from <strong className="text-gray-800 font-semibold">{totalItems}</strong> data
         </span>
 
         {onPageSizeChange && pageSizeOptions && pageSizeOptions.length > 0 && (
