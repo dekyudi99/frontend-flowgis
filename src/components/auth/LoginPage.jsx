@@ -39,25 +39,32 @@ export default function LoginPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    // setErrorMsg("");
 
     try {
       const data = await loginUser(formData);
       setLoading(false);
 
+      // Wajib simpan token & user ke localStorage di sini
+      const token = data.token || data.access_token;
+      const user = data.user;
+
+      if (token) localStorage.setItem("token", token);
+      if (user) localStorage.setItem("user", JSON.stringify(user));
+
       addNotification("success", "Login successful! Redirecting to dashboard...");
       
       setTimeout(() => {
-        const role = data.user.role; 
+        const role = user?.role; 
         const fromPage = location.state?.from;
 
-        if (fromPage) {
+        // Cegah redirect kembali ke /login jika location.state berisi halaman login
+        if (fromPage && fromPage !== '/login' && fromPage?.pathname !== '/login') {
           navigate(fromPage, { replace: true });
         } else {
           if (role === 'admin') {
-            navigate("/admin");
+            navigate("/admin", { replace: true });
           } else {
-            navigate("/map");
+            navigate("/map", { replace: true });
           }
         }
       }, 1000);
@@ -65,25 +72,6 @@ export default function LoginPage() {
     } catch (error) {
       console.error("Login failed:", error);
       setLoading(false);
-
-      let msg = "The email and password are incorrect."; 
-
-      if (error.response) {
-        const status = error.response.status;
-        const serverError = error.response.data?.error || "";
-
-        if (status === 404 || serverError.toLowerCase().includes("user") || serverError.toLowerCase().includes("email")) {
-          msg = "Email not found. Please double-check your email address..";
-        } 
-        else if (status === 401 || serverError.toLowerCase().includes("password")) {
-          msg = "Incorrect password. Please try again.";
-        }
-        else if (serverError) {
-          msg = serverError;
-        }
-      }
-
-      addNotification("error", msg);
     }
   };
 

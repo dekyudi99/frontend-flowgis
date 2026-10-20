@@ -40,6 +40,8 @@ export default function UserManagement() {
   const [confirmDeleteTarget, setConfirmDeleteTarget] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
+  const [confirmRoleTarget, setConfirmRoleTarget] = useState(null);
+  
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
@@ -148,32 +150,38 @@ export default function UserManagement() {
     }
   };
 
-  const handleToggleRole = async (user) => {
+  // Fungsi untuk membuka modal konfirmasi
+  const handleToggleRole = (user) => {
     const nextRole = user.role === 'admin' ? 'analyst' : 'admin';
-    const confirmMsg = user.role === 'admin' 
-      ? `Would you like to change your role? ${user.name} Become a Regular User / Analyst?`
-      : `Would you like to lift ${user.name} Become a FlowGIS Administrator?`;
+    setConfirmRoleTarget({ user, nextRole });
+  };
 
-    if (window.confirm(confirmMsg)) {
-      setActionLoading({
-        message: 'Changing a Users Role...',
-        subtitle: `Updating access rights "${user.name}" to become ${nextRole}...`,
-        stages: [
-          { time: 0, text: 'Updating user access roles in the database...' },
-        ],
-      });
-      try {
-        await userService.toggleRole(user.id, nextRole);
-        setUsers((prev) =>
-          prev.map((u) => (u.id === user.id ? { ...u, role: nextRole } : u))
-        );
-        notify.success(`Role ${user.name} was successfully converted to "${nextRole}"!`);
-      } catch (err) {
-        console.error('Error changing role:', err);
-        notify.error('Failed to change the users role');
-      } finally {
-        setActionLoading(null);
-      }
+  // Fungsi eksekusi yang dipanggil saat tombol konfirmasi di modal diklik
+  const handleConfirmToggleRole = async () => {
+    if (!confirmRoleTarget) return;
+
+    const { user, nextRole } = confirmRoleTarget;
+    setConfirmRoleTarget(null); // Tutup modal
+
+    setActionLoading({
+      message: "Changing a User's Role...",
+      subtitle: `Updating access rights "${user.name}" to become ${nextRole}...`,
+      stages: [
+        { time: 0, text: 'Updating user access roles in the database...' },
+      ],
+    });
+
+    try {
+      await userService.toggleRole(user.id, nextRole);
+      setUsers((prev) =>
+        prev.map((u) => (u.id === user.id ? { ...u, role: nextRole } : u))
+      );
+      notify.success(`Role ${user.name} was successfully converted to "${nextRole}"!`);
+    } catch (err) {
+      console.error('Error changing role:', err);
+      notify.error('Failed to change the users role');
+    } finally {
+      setActionLoading(null);
     }
   };
 
@@ -562,6 +570,22 @@ export default function UserManagement() {
         message={`Are you sure you want to delete user account "${confirmDeleteTarget?.name}"? This action cannot be undone.`}
         confirmText="Yes, Delete User"
         cancelText="Cancel"
+      />
+
+      {/* Modal Konfirmasi Ubah Role */}
+      <ConfirmModal
+        isOpen={!!confirmRoleTarget}
+        onClose={() => setConfirmRoleTarget(null)}
+        onConfirm={handleConfirmToggleRole}
+        title="Change User Role?"
+        message={
+          confirmRoleTarget?.user.role === 'admin'
+            ? `Are you sure you want to change ${confirmRoleTarget?.user.name}'s role to Regular User / Analyst?`
+            : `Are you sure you want to promote ${confirmRoleTarget?.user.name} to FlowGIS Administrator?`
+        }
+        confirmText="Yes, Change Role"
+        cancelText="Cancel"
+        icon={ShieldCheck} // Menggunakan icon kustom agar tidak menggunakan icon hapus default
       />
 
       {/* Loader Operasi CRUD User Management */}

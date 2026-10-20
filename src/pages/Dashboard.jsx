@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useAnalysis } from '../context/AnalysisContext';
 import MapViewer from '../components/Map/MapViewer';
 import L from 'leaflet';
@@ -26,6 +27,9 @@ import shp from 'shpjs';
 import { normalizeBbox } from '@/lib/wmsHelper';
 
 export default function Dashboard() {
+  const location = useLocation();
+  const navigate = useNavigate();
+
   const { activeProject, analysisResult, isNewAnalysis, executeAnalysis, cancelAnalysis, loading, error } = useAnalysis();
   const mapRef = useRef();
   const drawnItemsRef = useRef();
@@ -75,6 +79,18 @@ export default function Dashboard() {
   const [activeGeosocialPoints, setActiveGeosocialPoints] = useState({});
   const [geosocialGroups, setGeosocialGroups] = useState([]);
   const [activeGeosocialGroups, setActiveGeosocialGroups] = useState({});
+
+  const hasNotifiedRef = useRef(false);
+
+  useEffect(() => {
+    if (location.state?.errorMsg && !hasNotifiedRef.current) {
+      hasNotifiedRef.current = true; 
+
+      notify.error(location.state.errorMsg);
+
+      window.history.replaceState({}, document.title);
+    }
+  }, []);
 
   // Load Hospitals when layer is toggled on
   useEffect(() => {
@@ -362,14 +378,14 @@ export default function Dashboard() {
 
   // Reset semua layer dan status ketika project berganti atau kembali ke daftar project
   useEffect(() => {
-    // 1. Matikan semua layer aktif dari project sebelumnya
+    // Matikan semua layer aktif dari project sebelumnya
     setActiveLayers({});
     setActiveUserLayers({});
     setActiveUserGroups({});
     setActiveGeosocialWms({});
     setActiveGeosocialPoints({});
     
-    // 2. Bersihkan visualisasi & status simpan
+    // Bersihkan visualisasi & status simpan
     setIsChartOpen(false);
     setSelectedLayerStats(null);
     setActiveLegend(null);
@@ -378,7 +394,7 @@ export default function Dashboard() {
     setSelectedComponentLayers({});
     setComponentSavePending(false);
     
-    // 3. Bersihkan AOI dan gambar di peta
+    // Bersihkan AOI dan gambar di peta
     setAoiDisplayText('');
     setDrawnGeometryData(null);
     setSelectedAoi(null);
@@ -386,17 +402,17 @@ export default function Dashboard() {
       drawnItemsRef.current.clearLayers();
     }
 
-    // Clear previous project lists; the dedicated loader effect fetches the active project's lists once.
+    // Clear previous project lists; 
     setUserAnalysisLayers([]);
     setUserLayerGroups([]);
     setLoadingUserLayers(false);
   }, [activeProject?.id]); 
   
-  useEffect(() => {
-    if (error) {
-      notify.error(error);
-    }
-  }, [error]);
+  // useEffect(() => {
+  //   if (error) {
+  //     notify.error(error);
+  //   }
+  // }, [error]);
 
   const handleProjectCreated = (project) => {
     // Proyek baru telah dinotifikasi di SidebarLayout
@@ -1368,9 +1384,9 @@ export default function Dashboard() {
     }
     const finalPayload = {
       ...payload,
-      aoi_id: selectedAoi ? selectedAoi.id : (payload.aoi_id || null),
-      aoi_type: drawnGeometryData ? drawnGeometryData.type : (payload.aoi_type || 'polygon'),
-      geometry: drawnGeometryData ? drawnGeometryData.geometry : (payload.geometry || [])
+      aoi_id: selectedAoi ? selectedAoi.id : null,
+      aoi_type: drawnGeometryData ? drawnGeometryData.type : (selectedAoi ? selectedAoi.source_type : 'polygon'),
+      geometry: drawnGeometryData ? drawnGeometryData.geometry : (selectedAoi ? selectedAoi.geometry : [])
     };
 
     setIsAnalysisSaved(false);
@@ -1383,10 +1399,11 @@ export default function Dashboard() {
 
       setIsAnalysisSaved(false);
       if (analysisData?.id) {
-        addNotification('success', 'The analysis is complete. Select the component layer using the checkbox; click Save if you want to save it to GeoServer.');
+        addNotification('success', 'The analysis is complete.');
       }
     } catch (err) {
       console.error("Execute analysis error:", err);
+      // Notifikasi error ditangani di sini saja
       const msg = err.response?.data?.message || err.message || 'Failed to perform spatial analysis.';
       addNotification('error', msg);
     }
