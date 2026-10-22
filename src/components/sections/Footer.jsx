@@ -172,7 +172,7 @@ export default function Footer() {
               <p className="text-xs text-muted-foreground">
                 {t('footer.copyright', { year: currentYear })}
               </p>
-              <p className="text-sm text-muted-foreground/80 mt-1">
+              <p className="text-xs text-muted-foreground/80 mt-1">
                 Part of a Collaboration with{" "}
                 <a 
                   href="https://wefgis.com/" 
@@ -185,7 +185,7 @@ export default function Footer() {
               </p>
             </div>
             
-            <div className="flex gap-6 text-sm">
+            <div className="flex gap-6 text-xs">
               {legalLinks.map((linkKey) => (
                 <a 
                   key={linkKey} 
