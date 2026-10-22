@@ -24,7 +24,14 @@ import WaterStationModal from '@/components/modals/WaterStationModal';
 import { geosocialService } from '@/services/geosocialService';
 import Navbar from '@/components/sections/Navbar';
 import shp from 'shpjs';
-import { normalizeBbox } from '@/lib/wmsHelper';
+import {
+  normalizeBbox,
+  resolveGroupWmsEntry,
+  toggleGroupMember,
+  collectGroupedLayerIds,
+  collectGroupedLayerNames,
+  isLayerInAnyGroup,
+} from '@/lib/wmsHelper';
 
 export default function Dashboard() {
   const location = useLocation();
@@ -81,6 +88,21 @@ export default function Dashboard() {
   const [activeGeosocialGroups, setActiveGeosocialGroups] = useState({});
 
   const hasNotifiedRef = useRef(false);
+
+  // Layers that belong to a layer group are shown through that group only.
+  const groupedUserLayerIds = collectGroupedLayerIds(userLayerGroups);
+  const standaloneGeosocialList = geosocialList.filter(
+    (layer) => !isLayerInAnyGroup(layer, geosocialGroups)
+  );
+
+  useEffect(() => {
+    setActiveUserLayers((prev) => {
+      const stillStandalone = Object.fromEntries(
+        Object.entries(prev).filter(([id]) => !groupedUserLayerIds.has(String(id)))
+      );
+      return Object.keys(stillStandalone).length === Object.keys(prev).length ? prev : stillStandalone;
+    });
+  }, [userLayerGroups]);
 
   useEffect(() => {
     if (location.state?.errorMsg && !hasNotifiedRef.current) {
@@ -831,7 +853,7 @@ export default function Dashboard() {
     }
   };
 
-  const handleGeosocialGroupToggle = (group, isChecked) => {
+  const handleGeosocialGroupToggle = (group, isChecked, hiddenLayerIds = []) => {
     setActiveGeosocialGroups((prev) => {
       const next = { ...prev };
       if (isChecked) {
@@ -840,7 +862,10 @@ export default function Dashboard() {
           name: group.title || group.name,
           wms_url: group.wms_url,
           wms_layers_param: group.wms_layers_param,
+          mode: group.mode,
+          layers: group.layers,
           opacity: 0.85,
+          hidden_layer_ids: Array.isArray(hiddenLayerIds) ? hiddenLayerIds : [],
         };
       } else {
         delete next[group.id];
@@ -852,6 +877,72 @@ export default function Dashboard() {
       const bounds = normalizeBbox(group.bbox);
       if (bounds) mapRef.current.fitBounds(bounds, { padding: [40, 40], animate: true });
     }
+  };
+
+  const handleGeosocialGroupMemberToggle = (group, layerId, isVisible) => {
+    setActiveGeosocialGroups((prev) => {
+      const current = prev[group.id] || {
+        id: `geosocial_group_${group.id}`,
+        name: group.title || group.name,
+        wms_url: group.wms_url,
+        wms_layers_param: group.wms_layers_param,
+        mode: group.mode,
+        layers: group.layers,
+        opacity: 0.85,
+        hidden_layer_ids: [],
+      };
+      const updated = toggleGroupMember(current, layerId, isVisible);
+      const allMembers = group.layers || [];
+      if (allMembers.length > 0) {
+        const hiddenSet = new Set((updated.hidden_layer_ids || []).map(String));
+        const allHidden = allMembers.every((m, idx) => {
+          const mId = String(m.id ?? m.layer_id ?? m.geoserver_name ?? m.layer_name ?? idx);
+          return hiddenSet.has(mId);
+        });
+        if (allHidden) {
+          const next = { ...prev };
+          delete next[group.id];
+          return next;
+        }
+      }
+      return {
+        ...prev,
+        [group.id]: updated,
+      };
+    });
+  };
+
+  const handleUserGroupMemberToggle = (group, layerId, isVisible) => {
+    setActiveUserGroups((prev) => {
+      const current = prev[group.id] || {
+        id: `user_group_${group.id}`,
+        name: group.title || group.name,
+        wms_url: group.wms_url,
+        wms_layers_param: group.wms_layers_param,
+        mode: group.mode,
+        layers: group.layers,
+        opacity: 0.85,
+        hidden_layer_ids: [],
+      };
+      const updated = toggleGroupMember(current, layerId, isVisible);
+      const allMembers = group.layers || [];
+      if (allMembers.length > 0) {
+        const hiddenSet = new Set((updated.hidden_layer_ids || []).map(String));
+        const allHidden = allMembers.every((m, idx) => {
+          const mId = String(m.id ?? m.layer_id ?? m.geoserver_name ?? m.layer_name ?? idx);
+          return hiddenSet.has(mId);
+        });
+        if (allHidden) {
+          const next = { ...prev };
+          delete next[group.id];
+          return next;
+        }
+      }
+      return {
+        ...prev,
+        [group.id]: updated,
+      };
+    });
   };
 
   useEffect(() => {
@@ -947,11 +1038,16 @@ export default function Dashboard() {
     }
   };
 
-  const handleGeosocialToggleAll = async (isChecked) => {
+  const handleGeosocialToggleAll = async (
+    isChecked,
+    standaloneList = geosocialList.filter((l) => !isLayerInAnyGroup(l, geosocialGroups)),
+    groupList = geosocialGroups
+  ) => {
     if (!isChecked) {
       setVisibleGeosocial({});
       setActiveGeosocialWms({});
       setActiveGeosocialPoints({});
+      setActiveGeosocialGroups({});
       return;
     }
 
@@ -959,7 +1055,7 @@ export default function Dashboard() {
     const nextWms = {};
     const vectorLayersToFetch = [];
 
-    geosocialList.forEach((layer) => {
+    standaloneList.forEach((layer) => {
       nextVisible[layer.id] = true;
       if (isGeosocialWmsLayer(layer)) {
         nextWms[layer.id] = {
@@ -976,6 +1072,20 @@ export default function Dashboard() {
 
     setVisibleGeosocial(nextVisible);
     setActiveGeosocialWms(nextWms);
+
+    const nextActiveGroups = {};
+    groupList.forEach((group) => {
+      nextActiveGroups[group.id] = {
+        id: `geosocial_group_${group.id}`,
+        name: group.title || group.name,
+        wms_url: group.wms_url,
+        wms_layers_param: group.wms_layers_param,
+        mode: group.mode,
+        layers: group.layers,
+        opacity: 0.85,
+      };
+    });
+    setActiveGeosocialGroups(nextActiveGroups);
 
     if (vectorLayersToFetch.length > 0) {
       try {
@@ -1043,19 +1153,39 @@ export default function Dashboard() {
     });
   };
 
-  const handleUserLayerToggleAll = (isChecked) => {
+  const handleUserLayerToggleAll = (
+    isChecked,
+    layers = userAnalysisLayers.filter((l) => !isLayerInAnyGroup(l, userLayerGroups)),
+    groups = userLayerGroups
+  ) => {
     if (isChecked) {
       const allActive = {};
-      userAnalysisLayers.forEach((layer) => {
+      layers.forEach((layer) => {
         allActive[layer.id] = layer;
       });
       setActiveUserLayers(allActive);
-      if (userAnalysisLayers.length > 0) {
-        const firstLeg = resolveLayerLegend(userAnalysisLayers[0]);
+
+      const allActiveGroups = {};
+      groups.forEach((group) => {
+        allActiveGroups[group.id] = {
+          id: `user_group_${group.id}`,
+          name: group.title || group.name,
+          wms_url: group.wms_url,
+          wms_layers_param: group.wms_layers_param,
+          mode: group.mode,
+          layers: group.layers,
+          opacity: 0.85,
+        };
+      });
+      setActiveUserGroups(allActiveGroups);
+
+      if (layers.length > 0) {
+        const firstLeg = resolveLayerLegend(layers[0]);
         if (firstLeg) setActiveLegend(firstLeg);
       }
     } else {
       setActiveUserLayers({});
+      setActiveUserGroups({});
       setActiveLegend(null);
       setIsChartOpen(false);
     }
@@ -1074,14 +1204,22 @@ export default function Dashboard() {
   };
 
   // Handlers untuk Layer Group
-  const handleUserGroupToggle = (group, isChecked) => {
+  const handleUserGroupToggle = (group, isChecked, hiddenLayerIds = []) => {
     setActiveUserGroups((prev) => {
       const updated = { ...prev };
       if (isChecked) {
-        updated[group.id] = group;
+        updated[group.id] = {
+          ...group,
+          hidden_layer_ids: Array.isArray(hiddenLayerIds) ? hiddenLayerIds : [],
+        };
 
-        // Ambil legenda dan statistik dari layer teratas group
-        const firstMemberId = group.layers?.[0]?.id;
+        // Ambil legenda dan statistik dari layer teratas group yang tidak disembunyikan
+        const hiddenSet = new Set((Array.isArray(hiddenLayerIds) ? hiddenLayerIds : []).map(String));
+        const firstActiveMember = (group.layers || []).find((m, idx) => {
+          const mId = String(m.id ?? m.layer_id ?? m.geoserver_name ?? m.layer_name ?? idx);
+          return !hiddenSet.has(mId);
+        });
+        const firstMemberId = firstActiveMember?.id ?? group.layers?.[0]?.id;
         const memberLayer = userAnalysisLayers.find(l => l.id === firstMemberId);
         if (memberLayer) {
           const leg = resolveLayerLegend(memberLayer);
@@ -1159,6 +1297,7 @@ export default function Dashboard() {
             ...prev,
             [groupId]: {
               ...(freshGroup || prev[groupId]),
+              hidden_layer_ids: prev[groupId].hidden_layer_ids,
               _t: Date.now(),
             },
           };
@@ -1550,9 +1689,15 @@ export default function Dashboard() {
             maps={activeLayers} 
             wmsLayers={{
               ...Object.fromEntries(Object.entries(activeUserLayers).map(([key, layer]) => [`user:${key}`, layer])),
-              ...Object.fromEntries(Object.entries(activeUserGroups).map(([key, layer]) => [`group:${key}`, layer])),
+              ...Object.fromEntries(Object.entries(activeUserGroups).flatMap(([key, group]) => {
+                const entry = resolveGroupWmsEntry(group);
+                return entry ? [[`group:${key}`, entry]] : [];
+              })),
               ...Object.fromEntries(Object.entries(activeGeosocialWms).map(([key, layer]) => [`geosocial:${key}`, layer])),
-              ...Object.fromEntries(Object.entries(activeGeosocialGroups).map(([key, layer]) => [`geosocial_group:${key}`, layer])),
+              ...Object.fromEntries(Object.entries(activeGeosocialGroups).flatMap(([key, group]) => {
+                const entry = resolveGroupWmsEntry(group);
+                return entry ? [[`geosocial_group:${key}`, entry]] : [];
+              })),
             }}
             geosocialPointLayers={activeGeosocialPoints}
             basemap={selectedBasemapId} 
@@ -1844,6 +1989,7 @@ export default function Dashboard() {
         geosocialGroups={geosocialGroups}
         geosocialGroupStatus={activeGeosocialGroups}
         onGeosocialGroupToggle={handleGeosocialGroupToggle}
+        onGeosocialGroupMemberToggle={handleGeosocialGroupMemberToggle}
 
         userAnalysisList={userAnalysisLayers}
         userAnalysisStatus={activeUserLayers}
@@ -1852,6 +1998,7 @@ export default function Dashboard() {
         onUserAnalysisToggle={handleUserLayerToggle}
         onUserAnalysisToggleAll={handleUserLayerToggleAll}
         onUserGroupToggle={handleUserGroupToggle}
+        onUserGroupMemberToggle={handleUserGroupMemberToggle}
         onZoomToUserLayer={handleZoomToUserLayer}
         onZoomToUserGroup={handleZoomToUserGroup}
         onRefreshUserLayers={() => {

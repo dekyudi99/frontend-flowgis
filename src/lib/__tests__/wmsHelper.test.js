@@ -5,6 +5,12 @@ import {
   resolveWmsStyleParam,
   normalizeBbox,
   buildWmsLayerConfig,
+  isNamedGroup,
+  resolveGroupWmsEntry,
+  collectGroupedLayerIds,
+  collectGroupedLayerNames,
+  isLayerInAnyGroup,
+  resolveMemberDisplayName,
 } from '../wmsHelper.js';
 import { clearWmsLayers, syncWmsLayers } from '../wmsLayerManager.js';
 
@@ -175,4 +181,81 @@ console.log('🎉 ALL wmsHelper regression tests passed successfully!');
   clearWmsLayers(map, managedLayers);
   assert.strictEqual(mapLayers.size, 0, 'Unmount cleanup removes all managed WMS instances');
   console.log('✓ WMS Analysis Results on/off regression test passed');
+}
+
+// Test: layer group member visibility and detection
+{
+  const members = [
+    { id: 'a', workspace_name: 'ws', geoserver_name: 'layer_a', layer_name: 'layer_a' },
+    { id: 'b', workspace_name: 'ws', geoserver_name: 'layer_b', layer_name: 'layer_b' },
+  ];
+  const group = { id: 'g1', mode: 'named', wms_layers_param: 'ws:grp', layers: members };
+
+  assert.strictEqual(isNamedGroup(group), true, 'Group with members supports member visibility');
+  assert.strictEqual(isNamedGroup({ id: 'g2', layers: [] }), false, 'Group without members returns false');
+  assert.strictEqual(resolveGroupWmsEntry(group), group, 'Without hidden members the group WMS entry is untouched');
+
+  assert.strictEqual(
+    resolveGroupWmsEntry({ ...group, hidden_layer_ids: ['a'] }).wms_layers_param,
+    'ws:layer_b',
+    'Hidden member is dropped from the WMS request'
+  );
+  assert.strictEqual(
+    resolveGroupWmsEntry({ ...group, hidden_layer_ids: ['a', 'b'] }),
+    null,
+    'Group with every member hidden draws nothing'
+  );
+
+  assert.deepStrictEqual([...collectGroupedLayerIds([group])], ['a', 'b'], 'Grouped layer ids are collected');
+  assert.deepStrictEqual(
+    [...collectGroupedLayerNames([group])],
+    ['ws:layer_a', 'layer_a', 'ws:layer_b', 'layer_b'],
+    'Grouped layer names are collected lower-cased'
+  );
+  console.log('✓ Named layer group member visibility test passed');
+}
+
+// Test: isLayerInAnyGroup and resolveMemberDisplayName
+{
+  const groups = [
+    {
+      id: 10,
+      name: 'kei',
+      title: 'kei',
+      layers: [
+        { id: 101, geoserver_name: 'bridge_point', workspace_name: 'ws_flow' },
+        { id: 102, geoserver_name: 'agriculture_area_poly', workspace_name: 'ws_flow' },
+      ],
+    },
+  ];
+
+  const catalog = [
+    { id: 101, layer_name: 'geosocial:bridge_point', display_name: 'Bridge point' },
+    { id: 102, layer_name: 'geosocial:agriculture_area_poly', display_name: 'Agriculture area poly' },
+    { id: 103, layer_name: 'geosocial:school_point', display_name: 'School point' },
+  ];
+
+  // Matching by normalized layer name
+  assert.strictEqual(isLayerInAnyGroup(catalog[0], groups), true, 'Bridge point matches member in group');
+  assert.strictEqual(isLayerInAnyGroup(catalog[1], groups), true, 'Agriculture area poly matches member in group');
+  assert.strictEqual(isLayerInAnyGroup(catalog[2], groups), false, 'School point is not in group');
+
+  // Display name resolution
+  assert.strictEqual(
+    resolveMemberDisplayName({ geoserver_name: 'bridge_point' }, catalog),
+    'Bridge point',
+    'Resolves display name from catalog by normalized name'
+  );
+  assert.strictEqual(
+    resolveMemberDisplayName('agriculture_area_poly', catalog),
+    'Agriculture area poly',
+    'Resolves display name from catalog from string member'
+  );
+  assert.strictEqual(
+    resolveMemberDisplayName({ geoserver_name: 'unknown_sample_layer' }, []),
+    'Unknown Sample Layer',
+    'Formats title case when not in catalog'
+  );
+
+  console.log('✓ isLayerInAnyGroup and resolveMemberDisplayName tests passed');
 }

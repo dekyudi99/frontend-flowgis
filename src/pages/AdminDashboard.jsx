@@ -393,7 +393,7 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="flex min-h-screen bg-slate-100 font-sans">
+    <div className="flex min-h-screen lg:h-screen lg:overflow-hidden bg-slate-100 font-sans">
       <AdminSidebar 
         activeMenu={activeMenu} 
         setActiveMenu={setActiveMenu} 
@@ -401,11 +401,11 @@ export default function AdminDashboard() {
         onCloseMobile={() => setIsMobileSidebarOpen(false)}
       />
 
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 lg:h-full lg:overflow-y-auto">
         <AdminHeader onToggleSidebar={() => setIsMobileSidebarOpen((prev) => !prev)} />
 
         <ErrorBoundary>
-          <main className="p-3 sm:p-4 md:p-6 flex-1 space-y-4 sm:space-y-6 overflow-y-auto">
+          <main className="p-3 sm:p-4 md:p-6 flex-1 space-y-4 sm:space-y-6">
           
           {/* Summary Cards untuk Fasilitas jika di menu facilities */}
           {activeMenu === 'facilities' && (

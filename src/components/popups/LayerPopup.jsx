@@ -26,6 +26,7 @@ export default function LayerPopup({
     geosocialGroups = [],
     geosocialGroupStatus = {},
     onGeosocialGroupToggle,
+    onGeosocialGroupMemberToggle,
 
     userAnalysisList = [],
     userAnalysisStatus = {},
@@ -34,6 +35,7 @@ export default function LayerPopup({
     onUserAnalysisToggle,
     onUserAnalysisToggleAll,
     onUserGroupToggle,
+    onUserGroupMemberToggle,
     onZoomToUserLayer,
     onZoomToUserGroup,
     onRefreshUserLayers,
@@ -111,6 +113,7 @@ export default function LayerPopup({
               groupList={geosocialGroups}
               visibleGroups={geosocialGroupStatus}
               onToggleGroup={onGeosocialGroupToggle}
+              onToggleGroupMember={onGeosocialGroupMemberToggle}
             />
           )}
         </div>
@@ -173,6 +176,7 @@ export default function LayerPopup({
               onToggleLayer={onUserAnalysisToggle}
               onToggleAllLayers={onUserAnalysisToggleAll}
               onToggleGroup={onUserGroupToggle}
+              onToggleGroupMember={onUserGroupMemberToggle}
               onZoomToLayer={onZoomToUserLayer}
               onZoomToGroup={onZoomToUserGroup}
               onRefresh={onRefreshUserLayers}

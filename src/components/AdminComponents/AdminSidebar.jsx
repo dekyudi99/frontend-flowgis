@@ -32,11 +32,11 @@ export default function AdminSidebar({
         />
       )}
 
-      {/* Sidebar Container: Drawer on mobile, static on desktop */}
+      {/* Sidebar Container: Drawer on mobile, sticky on desktop */}
       <aside 
         className={`
           fixed top-0 bottom-0 left-0 z-[9999] w-72 max-w-[85vw] bg-[#1e293b] text-slate-300 flex flex-col border-r border-slate-800 text-sm shadow-2xl transition-transform duration-300 ease-in-out
-          lg:static lg:w-64 lg:min-h-screen lg:shadow-none lg:translate-x-0 lg:flex-shrink-0
+          lg:sticky lg:top-0 lg:h-screen lg:w-64 lg:shadow-none lg:translate-x-0 lg:flex-shrink-0
           ${isMobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
         `}
       >

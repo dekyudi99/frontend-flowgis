@@ -18,6 +18,17 @@ function cleanDuplicateWorkspace(param) {
 }
 
 /**
+ * Normalizes a layer key or technical name by stripping workspace prefix,
+ * trimming, lowercasing, and removing non-alphanumeric/underscore chars.
+ */
+export function normalizeLayerKey(key) {
+  if (!key || typeof key !== 'string') return '';
+  const trimmed = key.trim();
+  const withoutWs = trimmed.includes(':') ? trimmed.split(':').pop() : trimmed;
+  return withoutWs.toLowerCase().replace(/[^a-z0-9_]/g, '');
+}
+
+/**
  * Resolves the WMS layers parameter cleanly from diverse layer schemas:
  * - layer.wms_layers_param (legacy explicit param)
  * - workspace_name:store_name (raster coverage stores)
@@ -46,6 +57,161 @@ export function resolveWmsLayersParam(layer) {
   if (layer.name) return cleanDuplicateWorkspace(layer.name);
 
   return '';
+}
+
+/**
+ * Checks if a layer group has member layers to display.
+ */
+export function hasGroupMembers(group) {
+  return (Array.isArray(group?.layers) && group.layers.length > 0)
+    || (Array.isArray(group?.layer_ids) && group.layer_ids.length > 0);
+}
+
+/**
+ * Alias for backward compatibility. Any group with members supports member visibility.
+ */
+export function isNamedGroup(group) {
+  return hasGroupMembers(group);
+}
+
+/** Returns a copy of an active group entry with one member shown or hidden. */
+export function toggleGroupMember(entry, layerId, visible) {
+  const hidden = new Set((entry?.hidden_layer_ids || []).map(String));
+  const idStr = String(layerId);
+  if (visible) hidden.delete(idStr);
+  else hidden.add(idStr);
+  return { ...entry, hidden_layer_ids: [...hidden] };
+}
+
+/**
+ * Resolves the WMS entry to draw for an active layer group, honouring
+ * `hidden_layer_ids` (member layers the user switched off).
+ * Returns null when every member is hidden so nothing is drawn.
+ */
+export function resolveGroupWmsEntry(group) {
+  if (!group) return null;
+  const members = group.layers || [];
+  if (!members.length) return group;
+
+  const hidden = new Set((group.hidden_layer_ids || []).map(String));
+  if (hidden.size === 0) return group;
+
+  const visibleMembers = members.filter((member, idx) => {
+    const memberId = String(member.id ?? member.layer_id ?? member.geoserver_name ?? member.layer_name ?? idx);
+    return !hidden.has(memberId);
+  });
+
+  if (visibleMembers.length === 0) return null;
+
+  const visibleNames = visibleMembers
+    .map(resolveWmsLayersParam)
+    .filter(Boolean);
+
+  if (visibleNames.length === 0) return null;
+  return { ...group, wms_layers_param: visibleNames.join(',') };
+}
+
+/**
+ * Checks whether a layer (from geosocialList or userAnalysisLayers) belongs
+ * to any group in the provided group list. Matches by ID, technical name, or display name.
+ */
+export function isLayerInAnyGroup(layer, groups = []) {
+  if (!layer || !Array.isArray(groups)) return false;
+
+  const layerIdStr = String(layer.id ?? '');
+  const layerNameNorm = normalizeLayerKey(layer.layer_name || layer.layer_key || layer.name || '');
+  const displayNameNorm = normalizeLayerKey(layer.display_name || layer.title || '');
+
+  return groups.some((group) => {
+    // 1. Check in group.layer_ids
+    const layerIds = (group?.layer_ids || []).map(String);
+    if (layerIdStr && layerIds.includes(layerIdStr)) return true;
+    if (layerNameNorm && layerIds.some((id) => normalizeLayerKey(id) === layerNameNorm)) return true;
+    if (displayNameNorm && layerIds.some((id) => normalizeLayerKey(id) === displayNameNorm)) return true;
+
+    // 2. Check in group.layers
+    const members = group?.layers || [];
+    return members.some((member) => {
+      if (typeof member === 'string') {
+        const norm = normalizeLayerKey(member);
+        if (layerNameNorm && layerNameNorm === norm) return true;
+        if (displayNameNorm && displayNameNorm === norm) return true;
+        if (layerIdStr && member === layerIdStr) return true;
+        return false;
+      }
+
+      const memberIdStr = String(member?.id ?? member?.layer_id ?? '');
+      if (layerIdStr && memberIdStr && layerIdStr === memberIdStr) return true;
+
+      const memGeoserverNorm = normalizeLayerKey(member?.geoserver_name || '');
+      const memLayerNorm = normalizeLayerKey(member?.layer_name || member?.name || '');
+
+      if (layerNameNorm && (layerNameNorm === memGeoserverNorm || layerNameNorm === memLayerNorm)) return true;
+      if (displayNameNorm && (displayNameNorm === memGeoserverNorm || displayNameNorm === memLayerNorm)) return true;
+
+      return false;
+    });
+  });
+}
+
+/**
+ * Resolves a human-friendly display label for a group member using the layer catalog.
+ */
+export function resolveMemberDisplayName(member, catalog = []) {
+  if (!member) return '';
+  const memberObj = typeof member === 'string' ? { layer_name: member } : member;
+  const memberIdStr = String(memberObj.id ?? memberObj.layer_id ?? '');
+  const memGeoserverNorm = normalizeLayerKey(memberObj.geoserver_name || '');
+  const memLayerNorm = normalizeLayerKey(memberObj.layer_name || memberObj.name || '');
+
+  if (Array.isArray(catalog)) {
+    const found = catalog.find((item) => {
+      if (memberIdStr && String(item.id) === memberIdStr) return true;
+      const itemNameNorm = normalizeLayerKey(item.layer_name || item.layer_key || item.name || '');
+      if (itemNameNorm && (itemNameNorm === memGeoserverNorm || itemNameNorm === memLayerNorm)) return true;
+      const itemDisplayNorm = normalizeLayerKey(item.display_name || item.title || '');
+      if (itemDisplayNorm && (itemDisplayNorm === memGeoserverNorm || itemDisplayNorm === memLayerNorm)) return true;
+      return false;
+    });
+    if (found) {
+      return found.display_name || found.name || found.layer_name || memberObj.layer_name || memberObj.geoserver_name;
+    }
+  }
+
+  const raw = memberObj.layer_name || memberObj.geoserver_name || memberObj.name || String(memberObj.id || '');
+  if (raw && raw.includes('_')) {
+    return raw.split(':').pop().replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+  }
+  return raw;
+}
+
+/** Ids of every layer that already belongs to at least one layer group. */
+export function collectGroupedLayerIds(groups = []) {
+  const ids = new Set();
+  groups.forEach((group) => {
+    (group?.layer_ids || []).forEach((id) => {
+      if (id !== undefined && id !== null) ids.add(String(id));
+    });
+    (group?.layers || []).forEach((member) => {
+      if (member?.id !== undefined && member?.id !== null) ids.add(String(member.id));
+      if (member?.layer_id !== undefined && member?.layer_id !== null) ids.add(String(member.layer_id));
+    });
+  });
+  return ids;
+}
+
+/** Lower-cased `workspace:name` of every layer that belongs to at least one layer group. */
+export function collectGroupedLayerNames(groups = []) {
+  const names = new Set();
+  groups.forEach((group) => {
+    (group?.layers || []).forEach((member) => {
+      const name = resolveWmsLayersParam(member);
+      if (name) names.add(name.toLowerCase());
+      if (member?.geoserver_name) names.add(member.geoserver_name.toLowerCase());
+      if (member?.layer_name) names.add(member.layer_name.toLowerCase());
+    });
+  });
+  return names;
 }
 
 /**
@@ -94,9 +260,6 @@ export function normalizeBbox(rawBbox) {
   const isLikelyProjected = Math.abs(minx) > 180 || Math.abs(maxx) > 180 || Math.abs(miny) > 90 || Math.abs(maxy) > 90;
 
   if (isLikelyProjected) {
-    // If coordinates are projected meters (e.g. UTM Thailand 32647),
-    // Leaflet cannot directly fitBounds with meter values without Proj4.
-    // Return null or approximate safe center bounds instead of breaking Leaflet map.
     return null;
   }
 
