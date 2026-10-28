@@ -1,7 +1,7 @@
 import CommonSearchBar from '@/components/elements/CommonSearchbar';
-import DocumentList from '@/components/informations/DocumentList';
-import MapPreview from '@/components/informations/MapPreview';
-import PdfViewer from '@/components/informations/PdfViewer';
+// import DocumentList from '@/components/informations/DocumentList';
+// import MapPreview from '@/components/informations/MapPreview';
+// import PdfViewer from '@/components/informations/PdfViewer';
 import Footer from '@/components/sections/Footer';
 import Navbar from '@/components/sections/Navbar';
 import React, { useEffect, useState } from 'react'
@@ -47,12 +47,12 @@ export const InfoPage = () => {
           </div>
         )}
 
-        {!selectedDoc && !isLoading && !error && (
+        {/* {!selectedDoc && !isLoading && !error && (
            <MapPreview />
-        )}
+        )} */}
 
         {/* Conditional Rendering: Loading -> Error -> List -> Viewer */}
-        {isLoading ? (
+        {/* {isLoading ? (
           <div className="flex justify-center items-center py-20 text-teal-600 font-medium">
              {t('infoPage.loading', 'Loading document...')}
           </div>
@@ -70,7 +70,7 @@ export const InfoPage = () => {
             document={selectedDoc} 
             onClose={() => setSelectedDoc(null)} 
           />
-        )}
+        )} */}
       </main>
       <Footer />
     </div>

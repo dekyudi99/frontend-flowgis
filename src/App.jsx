@@ -19,15 +19,15 @@ export default function App() {
         <AnalysisProvider>
           <Routes>
             <Route path="/" element={<LandingPage />} />
-            {/* <Route path="/map" element={<Dashboard />} /> */}
+            <Route path="/map" element={<Dashboard />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />
             <Route path="/information" element={<InfoPage />}></Route>
             <Route path="/forgot-password" element={<ResetPassword1 />}></Route>
 
-            <Route element={<ProtectedRoute allowedRoles={['admin', 'analyst', 'user']} />}>
+            {/* <Route element={<ProtectedRoute allowedRoles={['admin', 'analyst', 'user']} />}>
               <Route path="/map" element={<Dashboard />} />
-            </Route>
+            </Route> */}
             {/* <Route path="/admin" element={<AdminDashboard />} /> */}
             {/* Protected Routes: Khusus Admin */}
             <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
