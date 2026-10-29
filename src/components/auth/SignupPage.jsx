@@ -143,7 +143,28 @@ export default function SignupPage() {
           <h2 className=" text-xl font-bold text-gray-900">{t('signup.title')}</h2>
         </div>
 
-        {/* Form Pendaftaran */}
+        {import.meta.env.VITE_AUTH_LOCAL_ENABLED !== 'true' ? (
+          <div className="space-y-6 text-center">
+            <p className="text-sm text-gray-600">
+              Pendaftaran akun lokal telah dinonaktifkan. Seluruh akun dan akses dikelola terpusat melalui Keycloak SSO.
+            </p>
+            <Link
+              to="/sso/start"
+              className="w-full inline-flex items-center justify-center py-3 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl shadow-sm transition-all"
+            >
+              Masuk dengan SSO Keycloak
+            </Link>
+            <div className="pt-2">
+              <a
+                href={import.meta.env.VITE_PORTAL_URL || "http://localhost:5170"}
+                className="text-xs text-teal-600 hover:underline"
+              >
+                Kembali ke Portal SSO WefGIS
+              </a>
+            </div>
+          </div>
+        ) : (
+        /* Form Pendaftaran */
         <form className="mt-8 space-y-6" onSubmit={handleSubmit} noValidate>
           <div className="space-y-4">
             
@@ -288,6 +309,7 @@ export default function SignupPage() {
             </Link>
           </p>
         </form>
+        )}
       </div>
     </div>
   )

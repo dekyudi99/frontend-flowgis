@@ -1,7 +1,34 @@
 import API from './api';
+import { getOidcAccessToken } from './oidcTokenService';
 
 export const isLoggedIn = () => {
-  return !!localStorage.getItem('auth_token');
+  if (typeof window === 'undefined') return false;
+
+  // 1. Cek token OIDC in-memory
+  if (getOidcAccessToken()) return true;
+
+  // 2. Cek token di localStorage (auth_token atau token)
+  if (localStorage.getItem('auth_token') || localStorage.getItem('token')) return true;
+
+  // 3. Cek sessionStorage OIDC user
+  try {
+    if (window.sessionStorage) {
+      for (let i = 0; i < window.sessionStorage.length; i++) {
+        const key = window.sessionStorage.key(i);
+        if (key && key.startsWith('oidc.user:')) {
+          const raw = window.sessionStorage.getItem(key);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (parsed?.access_token) return true;
+          }
+        }
+      }
+    }
+  } catch {
+    // Abaikan parse error
+  }
+
+  return false;
 };
 
 export const loginUser = async (credentials) => {
@@ -43,5 +70,10 @@ export const logoutUser = async () => {
 
 export const registerUser = async (userData) => {
   const response = await API.post('/auth/register', userData); 
+  return response.data;
+};
+
+export const getMe = async () => {
+  const response = await API.get('/me');
   return response.data;
 };

@@ -2,17 +2,19 @@ import { loginUser } from "@/services/authService"
 import { Button } from "@/components/elements/Button"
 import { Input } from "@/components/elements/input"
 import { Label } from "@/components/elements/label"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Trans, useTranslation } from "react-i18next"
 import { Link, useLocation, useNavigate } from "react-router-dom"
 import Loader from "../commons/Loader"
 import NotificationContainer from "../commons/NotificationContainer"
-import { Eye, EyeOff } from "lucide-react"
+import { Eye, EyeOff, ShieldCheck } from "lucide-react"
+import useAuth from "@/hooks/useAuth"
 
 export default function LoginPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
+  const { signinRedirect } = useAuth();
 
   const [formData, setFormData] = useState({
     email: "", 
@@ -21,6 +23,17 @@ export default function LoginPage() {
 
   const [loading, setLoading] = useState(false);
   const [notifications, setNotifications] = useState([]);
+  const [sessionMsg, setSessionMsg] = useState("");
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.sessionStorage) {
+      const msg = sessionStorage.getItem("SESSION_TERMINATED_MSG");
+      if (msg) {
+        setSessionMsg(msg);
+        sessionStorage.removeItem("SESSION_TERMINATED_MSG");
+      }
+    }
+  }, []);
 
   const addNotification = (type, message) => {
     const id = Date.now();
@@ -30,7 +43,13 @@ export default function LoginPage() {
   const removeNotification = (id) => {
     setNotifications((prev) => prev.filter((n) => n.id !== id));
   };
-  // const [errorMsg, setErrorMsg] = useState("");
+
+  const handleSsoLogin = () => {
+    const targetPath = location.state?.from || "/map";
+    signinRedirect({ state: { returnTo: targetPath } }).catch((err) => {
+      addNotification("error", err.message || "Gagal memulai SSO");
+    });
+  };
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
@@ -98,121 +117,110 @@ export default function LoginPage() {
             <img src="/flowgis-logo.png" alt={t('login.logoAlt')} className="w-16 h-16" />
           </div>
           <h2 className="text-xl font-bold text-gray-900">{t('login.title')}</h2>
-          {/* <p className="mt-2 text-gray-600">Log in to your account</p> */}
         </div>
 
-        {/* Form Login */}
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-
-          {/* {errorMsg && (
-            <div className="p-3 text-sm text-red-500 bg-red-50 rounded border border-red-200">
-              {errorMsg}
-            </div>
-          )} */}
-
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="email" className="text-gray-700">
-                {t('login.form.emailLabel')}
-              </Label>
-              <Input
-                id="email"
-                name="email"
-                type="text"
-                required
-                className="mt-1 border-gray-300 focus:border-teal-500 focus:ring-teal-500"
-                placeholder={t('login.form.emailPlaceholder')}
-                value={formData.email} // Bind value
-                onChange={handleChange}   // Bind change
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="password" className="text-gray-700">
-                {t('login.form.passwordLabel')}
-              </Label>
-              <div className="relative w-full">
-                <Input
-                  id="password"
-                  name="password"
-                  type={showPassword ? "text" : "password"}
-                  required
-                  className="mt-1 border-gray-300 focus:border-teal-500 focus:ring-teal-500"
-                  placeholder={t('login.form.passwordPlaceholder')}
-                  value={formData.password} // Bind value
-                  onChange={handleChange}   // Bind change
-                />
-                <button
-                  type="button" 
-                  onClick={togglePasswordVisibility}
-                  className="absolute inset-y-0 right-0 flex items-center pr-3 mt-1 text-gray-500 hover:text-teal-600 focus:outline-none"
-                >
-                  {showPassword ? (
-                    <EyeOff size={20} /> 
-                  ) : (
-                    <Eye size={20} />    
-                  )}
-                </button>
-              </div>
-            </div>
+        {sessionMsg && (
+          <div className="p-3 text-sm text-amber-800 bg-amber-50 rounded-lg border border-amber-200 text-center">
+            {sessionMsg}
           </div>
+        )}
 
-          {/* <div className="flex items-center justify-end">
-            <Link to="/forgot-password" className="text-sm text-teal-600 hover:text-teal-700 hover:underline">
-              {t('login.form.forgotPassword')}
-            </Link>
-          </div> */}
-
-          <Button type="submit" className="w-full bg-teal-600 hover:bg-teal-700 text-white font-semibold py-3">
-            {t('login.form.submitButton')}
+        {/* Tombol Login SSO Terpusat Keycloak */}
+        <div className="space-y-4">
+          <Button
+            type="button"
+            onClick={handleSsoLogin}
+            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 flex items-center justify-center space-x-2 shadow-sm rounded-xl"
+          >
+            <ShieldCheck className="w-5 h-5 mr-1" />
+            <span>Masuk dengan SSO Keycloak</span>
           </Button>
 
-          {/* <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300"></div>
+          {!authLocalEnabled && (
+            <div className="pt-2 text-center">
+              <a
+                href={portalUrl}
+                className="text-xs text-teal-600 hover:text-teal-700 hover:underline font-medium"
+              >
+                Kembali ke Portal SSO WefGIS
+              </a>
             </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-4 bg-white text-gray-500">{t('login.form.orSeparator')}</span>
+          )}
+
+          {authLocalEnabled && (
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-200"></div>
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="px-3 bg-white text-gray-400 font-medium">atau masuk dengan akun lokal</span>
+              </div>
             </div>
-          </div> */}
+          )}
+        </div>
 
-          {/* <Button
-            type="button"
-            variant="outline"
-            className="w-full border-gray-300 hover:bg-teal-50 font-semibold py-3 bg-transparent"
-          >
-            <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
-              <path
-                fill="currentColor"
-                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-              />
-              <path
-                fill="currentColor"
-                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-              />
-              <path
-                fill="currentColor"
-                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-              />
-              <path
-                fill="currentColor"
-                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-              />
-            </svg>
-            {t('login.form.googleButton')}
-          </Button> */}
+        {/* Form Login (Hanya ditampilkan jika AUTH_LOCAL_ENABLED = true) */}
+        {authLocalEnabled && (
+          <form className="mt-6 space-y-6" onSubmit={handleSubmit}>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="email" className="text-gray-700">
+                  {t('login.form.emailLabel')}
+                </Label>
+                <Input
+                  id="email"
+                  name="email"
+                  type="text"
+                  required
+                  className="mt-1 border-gray-300 focus:border-teal-500 focus:ring-teal-500"
+                  placeholder={t('login.form.emailPlaceholder')}
+                  value={formData.email}
+                  onChange={handleChange}
+                />
+              </div>
 
-          <p className="text-center text-sm text-gray-600">
-            {/* <Trans i18nKey="login.form.registerPrompt"> */}
-            {t('login.desc')}
-              {/* Don't have an account yet?{" "} */}
-              <Link to="/signup" className="font-semibold text-teal-600 hover:text-teal-700 hover:underline">
+              <div>
+                <Label htmlFor="password" className="text-gray-700">
+                  {t('login.form.passwordLabel')}
+                </Label>
+                <div className="relative w-full">
+                  <Input
+                    id="password"
+                    name="password"
+                    type={showPassword ? "text" : "password"}
+                    required
+                    className="mt-1 border-gray-300 focus:border-teal-500 focus:ring-teal-500"
+                    placeholder={t('login.form.passwordPlaceholder')}
+                    value={formData.password}
+                    onChange={handleChange}
+                  />
+                  <button
+                    type="button" 
+                    onClick={togglePasswordVisibility}
+                    className="absolute inset-y-0 right-0 flex items-center pr-3 mt-1 text-gray-500 hover:text-teal-600 focus:outline-none"
+                  >
+                    {showPassword ? (
+                      <EyeOff size={20} /> 
+                    ) : (
+                      <Eye size={20} />    
+                    )}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <Button type="submit" className="w-full bg-teal-600 hover:bg-teal-700 text-white font-semibold py-3">
+              {t('login.form.submitButton')}
+            </Button>
+
+            <p className="text-center text-sm text-gray-600">
+              {t('login.desc')}
+              <Link to="/signup" className="font-semibold text-teal-600 hover:text-teal-700 hover:underline ml-1">
                 {t('login.toRegister')}
-                {/* Register now */}
               </Link>
-            {/* </Trans> */}
-          </p>
-        </form>
+            </p>
+          </form>
+        )}
       </div>
     </div>
   )
