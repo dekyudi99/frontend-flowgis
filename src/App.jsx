@@ -26,17 +26,13 @@ export default function App() {
             <AnalysisProvider>
               <Routes>
                 <Route path="/" element={<LandingPage />} />
+                <Route path="/map" element={<Dashboard />} />
                 <Route path="/sso/start" element={<SsoStartPage />} />
                 <Route path="/auth/callback" element={<AuthCallbackPage />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/signup" element={<SignupPage />} />
                 <Route path="/information" element={<InfoPage />} />
                 <Route path="/forgot-password" element={<ResetPassword1 />} />
-
-                {/* Protected Routes: Pengguna Aplikasi FlowGIS */}
-                <Route element={<ProtectedRoute allowedRoles={['admin', 'analyst', 'user']} />}>
-                  <Route path="/map" element={<Dashboard />} />
-                </Route>
 
                 {/* Protected Routes: Khusus Admin */}
                 <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
