@@ -691,17 +691,26 @@ export default function Dashboard() {
     setActiveLayers(prev => {
         const newLayers = { ...prev };
         
+        const isFacility = ['hospital', 'water_station'].includes(layerName);
         const tileUrl = availableMaps[layerName] || getStaticLayerUrl(layerName) || (typeof isChecked === 'string' ? isChecked : null);
 
-        if (isChecked && typeof tileUrl === 'string' && tileUrl.startsWith('http')) {
-            newLayers[layerName] = tileUrl;
+        if (isChecked) {
+            if (isFacility) {
+                newLayers[layerName] = true;
+            } else if (typeof tileUrl === 'string' && tileUrl.startsWith('http')) {
+                newLayers[layerName] = tileUrl;
+            } else {
+                delete newLayers[layerName];
+            }
         } else {
             delete newLayers[layerName];
         }
 
-        const activeLayerNames = Object.keys(newLayers);
-        if (activeLayerNames.length > 0) {
-            const topLayerName = activeLayerNames[activeLayerNames.length - 1];
+        const activeTileLayerNames = Object.keys(newLayers).filter(
+            name => !['hospital', 'water_station'].includes(name)
+        );
+        if (activeTileLayerNames.length > 0) {
+            const topLayerName = activeTileLayerNames[activeTileLayerNames.length - 1];
             
             if (availableLegends[topLayerName]) {
                 setActiveLegend(availableLegends[topLayerName]);
@@ -1932,7 +1941,7 @@ export default function Dashboard() {
         onSaveAnalysis={handleSaveAnalysis}
         isSavingAnalysis={isSavingAnalysis}
         isAnalysisSaved={isAnalysisSaved}
-        hasAnalysisToSave={Boolean(analysisResult?.data || analysisResult || Object.keys(activeUserLayers).length > 0 || Object.keys(activeLayers).length > 0 || componentSavePending)}
+        hasAnalysisToSave={Boolean(analysisResult?.data || analysisResult || Object.keys(activeUserLayers).length > 0 || Object.keys(activeLayers).filter((k) => !['hospital', 'water_station'].includes(k)).length > 0 || componentSavePending)}
         onParametersChange={handleAnalysisParamsChange}
         onDownloadProject={handleDownloadProject}
         onSaveProject={handleSaveProject}
