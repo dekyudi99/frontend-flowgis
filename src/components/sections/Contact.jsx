@@ -66,7 +66,7 @@ export default function ContactSection() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Contact Info */}
           <div className="space-y-6">
-            <Card className="border-border/50 hover:border-primary/50 transition-all duration-300 hover:shadow-lg">
+            {/* <Card className="border-border/50 hover:border-primary/50 transition-all duration-300 hover:shadow-lg">
               <CardContent className="p-6">
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
@@ -82,9 +82,9 @@ export default function ContactSection() {
                   </div>
                 </div>
               </CardContent>
-            </Card>
+            </Card> */}
 
-            <Card className="border-border/50 hover:border-secondary/50 transition-all duration-300 hover:shadow-lg">
+            {/* <Card className="border-border/50 hover:border-secondary/50 transition-all duration-300 hover:shadow-lg">
               <CardContent className="p-6">
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 rounded-lg bg-secondary/10 flex items-center justify-center flex-shrink-0">
@@ -99,7 +99,7 @@ export default function ContactSection() {
                   </div>
                 </div>
               </CardContent>
-            </Card>
+            </Card> */}
 
             <Card className="border-border/50 hover:border-accent/50 transition-all duration-300 hover:shadow-lg">
               <CardContent className="p-6">
