@@ -5,15 +5,15 @@ import { Loader2, Trash2, Bot, Sparkles, CloudRain, ShieldCheck, Calendar, Clock
 
 const PROVINCE_CONFIG = {
   sukhothai: {
-    name: "Sukhothai (Yom Basin - Random Forest EWS)",
+    name: "Sukhothai (Yom Basin - Multi-Horizon RF EWS 28 Features)",
     sourceNote: "Source: GISTDA Open API v2.0 (/features/flood/1d..30d) + GEE Sentinel-1 SAR (365d).",
   },
   suphanburi: {
-    name: "Suphan Buri (Tha Chin - LightGBM EWS)",
+    name: "Suphan Buri (Tha Chin - Multi-Horizon LightGBM EWS 28 Features)",
     sourceNote: "Source: GISTDA Open API v2.0 (/features/flood/1d..30d) + GEE Sentinel-1 SAR (365d).",
   },
   nakhon_pathom: {
-    name: "Nakhon Pathom (Delta - CatBoost EWS)",
+    name: "Nakhon Pathom (Lower Delta - Multi-Horizon EWS 38 Features)",
     sourceNote: "Source: GISTDA Open API v2.0 + HII OpenData Stations (tiservice.hii.or.th) + GEE SAR.",
   },
 };
@@ -99,13 +99,13 @@ export default function EWSFloodMLAnalysis({
           className="w-full p-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-teal-500 bg-white font-medium text-gray-700"
         >
           <option value="sukhothai">
-            Sukhothai (Yom Basin - RF EWS 20 Features)
+            Sukhothai (Yom Basin - RF Multi-Horizon EWS)
           </option>
           <option value="suphanburi">
-            Suphan Buri (Tha Chin - LightGBM EWS 15 Features)
+            Suphan Buri (Tha Chin - LightGBM Multi-Horizon EWS)
           </option>
           <option value="nakhon_pathom">
-            Nakhon Pathom (Delta - CatBoost EWS 16 Features)
+            Nakhon Pathom (Lower Delta - Multi-Horizon EWS + Stations)
           </option>
         </select>
         <span className="text-[10.5px] text-gray-500 mt-1.5 block leading-snug">
