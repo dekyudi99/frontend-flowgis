@@ -84,8 +84,42 @@ export function toggleGroupMember(entry, layerId, visible) {
 }
 
 /**
+ * Cartographic weight for ordering WMS layers from bottom to top (OGC WMS standard):
+ * 0: Raster / Coverage (bottom)
+ * 1: Polygon / Area
+ * 2: Line / Road / River
+ * 3: Point / Marker / Station (top)
+ */
+export function getCartographicWeight(member) {
+  if (!member) return 2;
+  const geomType = String(member.geom_type || member.geometry_type || member.layer_type || member.type || '').toLowerCase();
+  const rawName = String(member.layer_name || member.geoserver_name || member.name || member.display_name || '').toLowerCase();
+
+  // 1. Rasters (bottom-most)
+  if (geomType.includes('raster') || geomType.includes('coverage') || rawName.includes('ras_') || rawName.includes('dem') || rawName.includes('elevation')) {
+    return 0;
+  }
+  // 2. Polygons / Areas
+  if (geomType.includes('poly') || geomType.includes('surface') || rawName.includes('poly') || rawName.includes('area') || rawName.includes('boundary') || rawName.includes('zone')) {
+    return 1;
+  }
+  // 3. Lines
+  if (geomType.includes('line') || geomType.includes('string') || rawName.includes('line') || rawName.includes('road') || rawName.includes('river') || rawName.includes('stream')) {
+    return 2;
+  }
+  // 4. Points (top-most)
+  if (geomType.includes('point') || rawName.includes('point') || rawName.includes('pt_') || rawName.includes('station') || rawName.includes('node') || rawName.includes('spot')) {
+    return 3;
+  }
+
+  return 2;
+}
+
+/**
  * Resolves the WMS entry to draw for an active layer group, honouring
  * `hidden_layer_ids` (member layers the user switched off).
+ * Applies cartographic sorting (Polygon -> Line -> Point) so layers render
+ * consistently without occlusion.
  * Returns null when every member is hidden so nothing is drawn.
  */
 export function resolveGroupWmsEntry(group) {
@@ -94,7 +128,6 @@ export function resolveGroupWmsEntry(group) {
   if (!members.length) return group;
 
   const hidden = new Set((group.hidden_layer_ids || []).map(String));
-  if (hidden.size === 0) return group;
 
   const visibleMembers = members.filter((member, idx) => {
     const memberId = String(member.id ?? member.layer_id ?? member.geoserver_name ?? member.layer_name ?? idx);
@@ -103,7 +136,12 @@ export function resolveGroupWmsEntry(group) {
 
   if (visibleMembers.length === 0) return null;
 
-  const visibleNames = visibleMembers
+  // Cartographic ordering: Polygon (bottom) -> Line -> Point (top)
+  const sortedMembers = [...visibleMembers].sort((a, b) => {
+    return getCartographicWeight(a) - getCartographicWeight(b);
+  });
+
+  const visibleNames = sortedMembers
     .map(resolveWmsLayersParam)
     .filter(Boolean);
 
