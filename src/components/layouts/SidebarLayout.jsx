@@ -45,7 +45,9 @@ export default function SidebarLayout({
   hasAnalysisToSave = false,
   onSelectSavedAoi,
   selectedAoi = null,
-  onParametersChange = null
+  onParametersChange = null,
+  onEWSResult = null,
+  onEWSSaved = null
 }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -506,7 +508,6 @@ export default function SidebarLayout({
                 <div className="pb-4">
                   <p className="text-sm font-bold text-gray-700 mb-2">2. Select & Run Analysis</p>
                   <div className="border border-gray-200 rounded-lg overflow-hidden shadow-sm flex flex-col space-y-1">
-                    
                     <div>
                         <button onClick={() => toggleSection("floodRisk")} className="w-full flex items-center justify-between py-3 px-4 hover:bg-gray-50 bg-gray-50/50 transition-colors border-b border-gray-100">
                         <h3 className="text-sm font-semibold text-teal-700">{t('sidebar.sections.floodRisk', 'Flood Risk Analysis')}</h3>

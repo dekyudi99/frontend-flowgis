@@ -40,5 +40,157 @@
   animation: indeterminate-short 2.1s cubic-bezier(0.165, 0.84, 0.44, 1) 1.15s infinite;
 }
 
+/* EWS Flood Risk Pulsing Danger Markers (Higher Risk = Larger & Faster Pulse) */
+.ews-marker-icon {
+  background: transparent !important;
+  border: none !important;
+}
 
+.ews-dot-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
 
+.ews-dot-core {
+  position: relative;
+  z-index: 2;
+  border-radius: 9999px;
+  border: 1.5px solid #ffffff;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.35);
+}
+
+.ews-dot-pulse,
+.ews-dot-pulse-secondary {
+  position: absolute;
+  border-radius: 9999px;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Tier 5: Very High / Critical Danger - Largest & Fastest Double Radar Pulse */
+@keyframes ewsPulseTier5 {
+  0% {
+    transform: scale(0.9);
+    opacity: 0.9;
+  }
+  70% {
+    transform: scale(3.6);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(3.6);
+    opacity: 0;
+  }
+}
+
+/* Tier 4: High Danger - Large Fast Pulse */
+@keyframes ewsPulseTier4 {
+  0% {
+    transform: scale(0.95);
+    opacity: 0.8;
+  }
+  75% {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+}
+
+/* Tier 3: Moderate Risk - Medium Pulse */
+@keyframes ewsPulseTier3 {
+  0% {
+    transform: scale(0.95);
+    opacity: 0.65;
+  }
+  80% {
+    transform: scale(1.85);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1.85);
+    opacity: 0;
+  }
+}
+
+/* Tier 2: Low Risk - Subtle Gentle Blink */
+@keyframes ewsPulseTier2 {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.35;
+  }
+  50% {
+    transform: scale(1.3);
+    opacity: 0.1;
+  }
+}
+
+.ews-tier-5 .ews-dot-core {
+  width: 13px;
+  height: 13px;
+  background-color: #dc2626;
+  box-shadow: 0 0 10px rgba(220, 38, 38, 0.9);
+}
+.ews-tier-5 .ews-dot-pulse {
+  width: 13px;
+  height: 13px;
+  background-color: rgba(239, 68, 68, 0.75);
+  animation: ewsPulseTier5 1.15s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+.ews-tier-5 .ews-dot-pulse-secondary {
+  width: 13px;
+  height: 13px;
+  background-color: rgba(220, 38, 38, 0.55);
+  animation: ewsPulseTier5 1.15s cubic-bezier(0, 0, 0.2, 1) 0.55s infinite;
+}
+
+.ews-tier-4 .ews-dot-core {
+  width: 11px;
+  height: 11px;
+  background-color: #ea580c;
+  box-shadow: 0 0 8px rgba(234, 88, 12, 0.8);
+}
+.ews-tier-4 .ews-dot-pulse {
+  width: 11px;
+  height: 11px;
+  background-color: rgba(249, 115, 22, 0.7);
+  animation: ewsPulseTier4 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+.ews-tier-3 .ews-dot-core {
+  width: 9px;
+  height: 9px;
+  background-color: #eab308;
+  box-shadow: 0 0 5px rgba(234, 179, 8, 0.65);
+}
+.ews-tier-3 .ews-dot-pulse {
+  width: 9px;
+  height: 9px;
+  background-color: rgba(250, 204, 21, 0.6);
+  animation: ewsPulseTier3 2.1s ease-out infinite;
+}
+
+.ews-tier-2 .ews-dot-core {
+  width: 7px;
+  height: 7px;
+  background-color: #2ecc71;
+}
+.ews-tier-2 .ews-dot-pulse {
+  width: 7px;
+  height: 7px;
+  background-color: rgba(46, 204, 113, 0.45);
+  animation: ewsPulseTier2 2.8s ease-in-out infinite;
+}
+
+.ews-tier-1 .ews-dot-core {
+  width: 6px;
+  height: 6px;
+  background-color: #27ae60;
+  opacity: 0.85;
+}

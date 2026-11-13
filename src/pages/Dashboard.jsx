@@ -13,7 +13,7 @@ import { isLoggedIn } from '@/services/authService';
 import { HomeButton } from '@/components/elements/HomeButton';
 import { BasemapButton } from '@/components/elements/BasemapButton';
 import { aoiService } from '@/services/aoiService';
-import Legend from '@/components/commons/Legend'; 
+import Legend from '@/components/commons/Legend';
 import PrecipitationChart from '@/components/Charts/PrecipitationCharts';
 import StatsDashboard from '@/components/Charts/StatsDashboard';
 import { InfoButton } from '@/components/elements/InfoButton';
@@ -21,6 +21,8 @@ import Loader from '@/components/commons/Loader';
 import { projectService } from '@/services/projectService';
 import { facilityService } from '@/services/facilityService';
 import WaterStationModal from '@/components/modals/WaterStationModal';
+import EWSFloodMLAnalysis from '@/components/controls/EWSFloodMLAnalysis';
+import { Bot, X } from 'lucide-react';
 import { geosocialService } from '@/services/geosocialService';
 import Navbar from '@/components/sections/Navbar';
 import shp from 'shpjs';
@@ -40,6 +42,9 @@ export default function Dashboard() {
   const { activeProject, analysisResult, isNewAnalysis, executeAnalysis, cancelAnalysis, loading, error } = useAnalysis();
   const mapRef = useRef();
   const drawnItemsRef = useRef();
+  const ewsGeoJsonLayerRef = useRef(null);
+  const [isEwsModalOpen, setIsEwsModalOpen] = useState(false);
+  const [hasEwsLayer, setHasEwsLayer] = useState(false);
   const [isLayerOpen, setIsLayerOpen] = useState(false);
   const [isBasemapOpen, setIsBasemapOpen] = useState(false);
   const [isFileUploadOpen, setIsFileUploadOpen] = useState(false);
@@ -106,7 +111,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (location.state?.errorMsg && !hasNotifiedRef.current) {
-      hasNotifiedRef.current = true; 
+      hasNotifiedRef.current = true;
 
       notify.error(location.state.errorMsg);
 
@@ -204,7 +209,7 @@ export default function Dashboard() {
     window.addEventListener('mouseup', handleMouseUp);
   };
 
-  
+
   const resultData = analysisResult?.data || analysisResult;
   const availableMaps = resultData?.maps || {};
   const availableLegends = resultData?.legends || {};
@@ -248,46 +253,46 @@ export default function Dashboard() {
 
   useEffect(() => {
     const data = analysisResult?.data || analysisResult;
-    if (!data) return; 
+    if (!data) return;
 
     const loadedMaps = data.maps || {};
     const loadedLegends = data.legends || {};
     const loadedAoi = data.aoi || null;
 
     if (loadedAoi && drawnItemsRef.current) {
-        drawnItemsRef.current.clearLayers();
-        
-        try {
-            const geoJsonLayer = L.geoJSON(loadedAoi, {
-                style: { color: '#0d9488', weight: 2, fillOpacity: 0.2 }
-            });
-            geoJsonLayer.eachLayer((layer) => {
-                drawnItemsRef.current.addLayer(layer);
-            });
+      drawnItemsRef.current.clearLayers();
 
-            if (mapRef.current) {
-                mapRef.current.fitBounds(geoJsonLayer.getBounds());
-            }
+      try {
+        const geoJsonLayer = L.geoJSON(loadedAoi, {
+          style: { color: '#0d9488', weight: 2, fillOpacity: 0.2 }
+        });
+        geoJsonLayer.eachLayer((layer) => {
+          drawnItemsRef.current.addLayer(layer);
+        });
 
-            let rawCoordinates = [];
-            if (loadedAoi.type === 'Polygon') {
-                rawCoordinates = loadedAoi.coordinates;
-            } else if (loadedAoi.type === 'MultiPolygon') {
-                rawCoordinates = loadedAoi.coordinates[0];
-            }
-
-            setDrawnGeometryData({
-                type: 'polygon', 
-                geometry: rawCoordinates 
-            });
-
-            if (rawCoordinates && rawCoordinates[0]) {
-                const coordStrings = rawCoordinates[0].slice(0, 3).map(p => `[${p[1].toFixed(5)}, ${p[0].toFixed(5)}]`);
-                setAoiDisplayText(`Type: Polygon (History)\nPoints:\n${coordStrings.join('\n')}\n... (+ other points)`);
-            }
-        } catch (error) {
-            console.error("Failed to redraw AOI from history:", error);
+        if (mapRef.current) {
+          mapRef.current.fitBounds(geoJsonLayer.getBounds());
         }
+
+        let rawCoordinates = [];
+        if (loadedAoi.type === 'Polygon') {
+          rawCoordinates = loadedAoi.coordinates;
+        } else if (loadedAoi.type === 'MultiPolygon') {
+          rawCoordinates = loadedAoi.coordinates[0];
+        }
+
+        setDrawnGeometryData({
+          type: 'polygon',
+          geometry: rawCoordinates
+        });
+
+        if (rawCoordinates && rawCoordinates[0]) {
+          const coordStrings = rawCoordinates[0].slice(0, 3).map(p => `[${p[1].toFixed(5)}, ${p[0].toFixed(5)}]`);
+          setAoiDisplayText(`Type: Polygon (History)\nPoints:\n${coordStrings.join('\n')}\n... (+ other points)`);
+        }
+      } catch (error) {
+        console.error("Failed to redraw AOI from history:", error);
+      }
     }
 
     // Kasus 1: WMS Layer dari AstraGIS (Layer yang sudah tersimpan di GeoServer)
@@ -406,7 +411,7 @@ export default function Dashboard() {
     setActiveUserGroups({});
     setActiveGeosocialWms({});
     setActiveGeosocialPoints({});
-    
+
     // Bersihkan visualisasi & status simpan
     setIsChartOpen(false);
     setSelectedLayerStats(null);
@@ -415,7 +420,7 @@ export default function Dashboard() {
     setIsAnalysisSaved(false);
     setSelectedComponentLayers({});
     setComponentSavePending(false);
-    
+
     // Bersihkan AOI dan gambar di peta
     setAoiDisplayText('');
     setDrawnGeometryData(null);
@@ -428,8 +433,8 @@ export default function Dashboard() {
     setUserAnalysisLayers([]);
     setUserLayerGroups([]);
     setLoadingUserLayers(false);
-  }, [activeProject?.id]); 
-  
+  }, [activeProject?.id]);
+
   // useEffect(() => {
   //   if (error) {
   //     notify.error(error);
@@ -457,13 +462,13 @@ export default function Dashboard() {
     setIsFileUploadOpen(false);
     setIsUploading(true);
     setUploadProgress(15);
-    
+
     try {
       const formData = new FormData();
       formData.append('file', file);
-      formData.append('project_id', activeProject.id); 
-      formData.append('name', file.name.split('.')[0]); 
-      
+      formData.append('project_id', activeProject.id);
+      formData.append('name', file.name.split('.')[0]);
+
       const ext = file.name.split('.').pop().toLowerCase();
       if (ext === 'zip') formData.append('source_type', 'upload_shp');
       else if (ext === 'kml' || ext === 'xml') formData.append('source_type', 'upload_kml');
@@ -534,46 +539,46 @@ export default function Dashboard() {
       const savedAoi = response.data?.data || response.data;
 
       if (savedAoi && savedAoi.geometry) {
-          if (drawnItemsRef.current) drawnItemsRef.current.clearLayers();
-          setActiveLayers({});
-          setActiveLegend(null);
-          setIsChartOpen(false);
+        if (drawnItemsRef.current) drawnItemsRef.current.clearLayers();
+        setActiveLayers({});
+        setActiveLegend(null);
+        setIsChartOpen(false);
 
-          const geoJsonLayer = L.geoJSON(savedAoi.geometry, {
-              style: { color: '#0d9488', weight: 2, fillOpacity: 0.2 }
-          });
-          geoJsonLayer.eachLayer((layer) => {
-              drawnItemsRef.current.addLayer(layer);
-          });
-          if (mapRef.current) {
-              mapRef.current.fitBounds(geoJsonLayer.getBounds());
-          }
+        const geoJsonLayer = L.geoJSON(savedAoi.geometry, {
+          style: { color: '#0d9488', weight: 2, fillOpacity: 0.2 }
+        });
+        geoJsonLayer.eachLayer((layer) => {
+          drawnItemsRef.current.addLayer(layer);
+        });
+        if (mapRef.current) {
+          mapRef.current.fitBounds(geoJsonLayer.getBounds());
+        }
 
-          let rawCoordinates = [];
-          if (savedAoi.geometry.type === 'Polygon') {
-              rawCoordinates = savedAoi.geometry.coordinates;
-          } else if (savedAoi.geometry.type === 'MultiPolygon') {
-              rawCoordinates = savedAoi.geometry.coordinates[0]; 
-          } else {
-              rawCoordinates = savedAoi.geometry.coordinates;
-          }
+        let rawCoordinates = [];
+        if (savedAoi.geometry.type === 'Polygon') {
+          rawCoordinates = savedAoi.geometry.coordinates;
+        } else if (savedAoi.geometry.type === 'MultiPolygon') {
+          rawCoordinates = savedAoi.geometry.coordinates[0];
+        } else {
+          rawCoordinates = savedAoi.geometry.coordinates;
+        }
 
-          setDrawnGeometryData({
-              type: 'polygon', 
-              geometry: rawCoordinates 
-          });
+        setDrawnGeometryData({
+          type: 'polygon',
+          geometry: rawCoordinates
+        });
       }
-      
+
       setAoiDisplayText(`Type: Uploaded File\nFile Name: ${file.name}\nExtension: ${ext.toUpperCase()}`);
       addNotification('success', `File ${file.name} uploaded successfully!`);
       setIsFileUploadOpen(false);
-      
+
     } catch (error) {
       console.error("Upload error:", error);
       const errMsg = error.response?.data?.message || 'Failed to upload file.';
       addNotification('error', errMsg);
     } finally {
-      setIsUploading(false); 
+      setIsUploading(false);
     }
   };
 
@@ -588,10 +593,10 @@ export default function Dashboard() {
 
     let geom = aoi.geometry;
     if (typeof geom === 'string') {
-      try { 
-        geom = JSON.parse(geom); 
-      } catch (e) { 
-        console.error("Failed to parse geometry:", e); 
+      try {
+        geom = JSON.parse(geom);
+      } catch (e) {
+        console.error("Failed to parse geometry:", e);
       }
     }
 
@@ -600,7 +605,7 @@ export default function Dashboard() {
       let rawType = (geom.type || 'polygon').toLowerCase();
 
       if (rawType === 'multipolygon' && Array.isArray(rawCoordinates)) {
-        rawCoordinates = rawCoordinates[0]; 
+        rawCoordinates = rawCoordinates[0];
         rawType = 'polygon';
       }
 
@@ -619,13 +624,13 @@ export default function Dashboard() {
       drawnItemsRef.current.clearLayers();
       drawnItemsRef.current.addLayer(layer);
     }
-    
+
     setDrawnGeometryData(data);
-    setActiveTool(null); 
+    setActiveTool(null);
 
     let text = '';
     if (data.type === 'polygon' || data.type === 'rectangle') {
-      const coords = data.geometry[0]; 
+      const coords = data.geometry[0];
       if (coords) {
         const coordStrings = coords.map(p => `[${p[1].toFixed(5)}, ${p[0].toFixed(5)}]`);
         text = `Type: Polygon\nPoints:\n${coordStrings.join('\n')}`;
@@ -635,7 +640,7 @@ export default function Dashboard() {
     } else if (data.type === 'circle') {
       text = `Type: Circle\nCenter Point: [${data.geometry.coordinates[1].toFixed(5)}, ${data.geometry.coordinates[0].toFixed(5)}]\nRadius: ${data.geometry.radius.toFixed(2)} meters`;
     }
-    setAoiDisplayText(text); 
+    setAoiDisplayText(text);
     addNotification('info', `Area of Interest (${data.type}) created successfully!`);
   };
 
@@ -647,7 +652,7 @@ export default function Dashboard() {
     setDrawnGeometryData(null);
     setActiveTool(null);
     setAoiDisplayText('');
-    
+
     setActiveLayers({});
     setActiveLegend(null);
     setIsChartOpen(false);
@@ -689,49 +694,49 @@ export default function Dashboard() {
 
   const handleLayerToggle = (layerName, isChecked) => {
     setActiveLayers(prev => {
-        const newLayers = { ...prev };
-        
-        const isFacility = ['hospital', 'water_station'].includes(layerName);
-        const tileUrl = availableMaps[layerName] || getStaticLayerUrl(layerName) || (typeof isChecked === 'string' ? isChecked : null);
+      const newLayers = { ...prev };
 
-        if (isChecked) {
-            if (isFacility) {
-                newLayers[layerName] = true;
-            } else if (typeof tileUrl === 'string' && tileUrl.startsWith('http')) {
-                newLayers[layerName] = tileUrl;
-            } else {
-                delete newLayers[layerName];
-            }
+      const isFacility = ['hospital', 'water_station'].includes(layerName);
+      const tileUrl = availableMaps[layerName] || getStaticLayerUrl(layerName) || (typeof isChecked === 'string' ? isChecked : null);
+
+      if (isChecked) {
+        if (isFacility) {
+          newLayers[layerName] = true;
+        } else if (typeof tileUrl === 'string' && tileUrl.startsWith('http')) {
+          newLayers[layerName] = tileUrl;
         } else {
-            delete newLayers[layerName];
+          delete newLayers[layerName];
         }
+      } else {
+        delete newLayers[layerName];
+      }
 
-        const activeTileLayerNames = Object.keys(newLayers).filter(
-            name => !['hospital', 'water_station'].includes(name)
-        );
-        if (activeTileLayerNames.length > 0) {
-            const topLayerName = activeTileLayerNames[activeTileLayerNames.length - 1];
-            
-            if (availableLegends[topLayerName]) {
-                setActiveLegend(availableLegends[topLayerName]);
-            } else if (availableLegends.FloodEvent) {
-                setActiveLegend(availableLegends.FloodEvent);
-            } else {
-                if (!availableLegends[topLayerName] && topLayerName === 'province' || topLayerName === 'district') {
-                    setActiveLegend(null); 
-                }
-            }
+      const activeTileLayerNames = Object.keys(newLayers).filter(
+        name => !['hospital', 'water_station'].includes(name)
+      );
+      if (activeTileLayerNames.length > 0) {
+        const topLayerName = activeTileLayerNames[activeTileLayerNames.length - 1];
+
+        if (availableLegends[topLayerName]) {
+          setActiveLegend(availableLegends[topLayerName]);
+        } else if (availableLegends.FloodEvent) {
+          setActiveLegend(availableLegends.FloodEvent);
         } else {
+          if (!availableLegends[topLayerName] && topLayerName === 'province' || topLayerName === 'district') {
             setActiveLegend(null);
+          }
         }
+      } else {
+        setActiveLegend(null);
+      }
 
-        return newLayers;
+      return newLayers;
     });
   };
 
   const getStaticLayerUrl = (layerName) => {
     const staticMap = {
-      'province': null, 
+      'province': null,
       'district': null,
       'hospital': null,
       'water_station': null,
@@ -1395,7 +1400,7 @@ export default function Dashboard() {
         if (JSON.stringify(drawnGeometryData.geometry) === JSON.stringify(metaGeom)) {
           return true;
         }
-      } catch (e) {}
+      } catch (e) { }
       if (layerAoiId && !selectedAoi) {
         return false;
       }
@@ -1432,9 +1437,9 @@ export default function Dashboard() {
       } else {
         // Komponen spesifik: rainfall, elevation, distance, tpi, ndvi, ndwi
         matchesType = metaComp === searchKey ||
-                      metaType === `component_${searchKey}` ||
-                      metaType === searchKey ||
-                      title.includes(searchKey);
+          metaType === `component_${searchKey}` ||
+          metaType === searchKey ||
+          title.includes(searchKey);
       }
 
       if (!matchesType) return false;
@@ -1642,6 +1647,81 @@ export default function Dashboard() {
     }
   };
 
+  const handleEWSResult = (data) => {
+    if (!mapRef.current || !data?.geojson) return;
+    if (ewsGeoJsonLayerRef.current) {
+      mapRef.current.removeLayer(ewsGeoJsonLayerRef.current);
+      ewsGeoJsonLayerRef.current = null;
+    }
+
+    try {
+      const geoLayer = L.geoJSON(data.geojson, {
+        pointToLayer: (feature, latlng) => {
+          const p = feature.properties || {};
+          const tier = Number(p.risk_tier) || 1;
+          const sizeMap = { 5: 28, 4: 22, 3: 18, 2: 12, 1: 8 };
+          const zMap = { 5: 1000, 4: 800, 3: 500, 2: 200, 1: 0 };
+          const boxSize = sizeMap[tier] || 10;
+
+          const pulseRings =
+            tier === 5
+              ? '<span class="ews-dot-pulse"></span><span class="ews-dot-pulse-secondary"></span>'
+              : tier >= 2
+                ? '<span class="ews-dot-pulse"></span>'
+                : '';
+
+          const icon = L.divIcon({
+            className: `ews-marker-icon ews-tier-${tier}`,
+            html: `<div class="ews-dot-wrapper">${pulseRings}<span class="ews-dot-core"></span></div>`,
+            iconSize: [boxSize, boxSize],
+            iconAnchor: [boxSize / 2, boxSize / 2],
+            popupAnchor: [0, -(boxSize / 2)],
+          });
+
+          return L.marker(latlng, {
+            icon,
+            zIndexOffset: zMap[tier] || 0,
+          });
+        },
+        onEachFeature: (feature, layer) => {
+          const p = feature.properties || {};
+          layer.bindPopup(`
+            <div style="font-size:12px; font-family:sans-serif; min-width:195px; line-height:1.45;">
+              <div style="font-weight:bold; font-size:13px; color:#0f766e; margin-bottom:4px; border-bottom:1px solid #e5e7eb; padding-bottom:3px;">
+                ${p.province || 'Monitoring Point'} #${p.point_id}
+              </div>
+              <div><b>Risk Level:</b> <span style="color:${p.color}; font-weight:bold;">${p.risk_label} (Tier ${p.risk_tier})</span></div>
+              <div><b>Flood Probability:</b> ${(p.probability * 100).toFixed(1)}%</div>
+              ${p.elevation_m !== undefined && p.elevation_m !== null ? `<div><b>Elevation:</b> ${p.elevation_m} m MSL</div>` : ''}
+              ${p.dist_to_river_m !== undefined && p.dist_to_river_m !== null ? `<div><b>Distance to River:</b> ${p.dist_to_river_m} m</div>` : ''}
+              ${p.flood_days_365d !== undefined ? `<div><b>GEE S1 365d Flood Obs:</b> ${p.flood_days_365d} obs</div>` : ''}
+              ${p.nearest_station ? `<div><b>HII Station:</b> ${p.nearest_station}</div>` : ''}
+              <div style="margin-top:4px; font-size:10px; color:#6b7280;">Observation Date: ${p.target_date || '-'}</div>
+              <div style="font-size:10px; color:#0f766e;">Forecast Valid For (T+1): ${p.valid_for_date || '-'}</div>
+            </div>
+          `);
+        }
+      });
+
+      geoLayer.addTo(mapRef.current);
+      if (geoLayer.getLayers().length > 0) {
+        mapRef.current.fitBounds(geoLayer.getBounds(), { padding: [30, 30] });
+      }
+      ewsGeoJsonLayerRef.current = geoLayer;
+      setHasEwsLayer(true);
+    } catch (err) {
+      console.error("Render EWS GeoJSON error:", err);
+    }
+  };
+
+  const handleClearEWS = () => {
+    if (ewsGeoJsonLayerRef.current && mapRef.current) {
+      mapRef.current.removeLayer(ewsGeoJsonLayerRef.current);
+      ewsGeoJsonLayerRef.current = null;
+    }
+    setHasEwsLayer(false);
+  };
+
   const handleAnalysisParamsChange = ({ startDate, endDate, weights }) => {
     const matched = findMatchingSavedLayer('flood_risk', selectedAoi, startDate, endDate, weights);
     setIsAnalysisSaved(Boolean(matched));
@@ -1652,7 +1732,7 @@ export default function Dashboard() {
   //     addNotification('error', 'Please select a project first before downloading.');
   //     return;
   //   }
-    
+
   //   const apiBase = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8001/api';
   //   const downloadUrl = `${apiBase}/projects/${projectId}/download`;
   //   window.open(downloadUrl, '_blank');
@@ -1664,7 +1744,7 @@ export default function Dashboard() {
       addNotification('error', 'Please select a project first before downloading.');
       return;
     }
-    
+
     try {
       addNotification('info', 'Generating download URL...');
 
@@ -1691,11 +1771,11 @@ export default function Dashboard() {
 
   return (
     <div className="flex flex-col h-screen w-screen overflow-hidden">
-      <Navbar className="shrink-0 z-[1000]"/>
+      <Navbar className="shrink-0 z-[1000]" />
       <div className="relative flex-1 w-full overflow-hidden">
         <div className="absolute inset-0 z-0">
-          <MapViewer 
-            maps={activeLayers} 
+          <MapViewer
+            maps={activeLayers}
             wmsLayers={{
               ...Object.fromEntries(Object.entries(activeUserLayers).map(([key, layer]) => [`user:${key}`, layer])),
               ...Object.fromEntries(Object.entries(activeUserGroups).flatMap(([key, group]) => {
@@ -1709,7 +1789,7 @@ export default function Dashboard() {
               })),
             }}
             geosocialPointLayers={activeGeosocialPoints}
-            basemap={selectedBasemapId} 
+            basemap={selectedBasemapId}
             mapRef={mapRef}
             drawnItemsRef={drawnItemsRef}
             onGeometryComplete={handleGeometryComplete}
@@ -1729,21 +1809,21 @@ export default function Dashboard() {
 
         </div>
       </div>
-      
+
 
 
       {/* Floating Draggable Data Analysis Visualization */}
       {selectedLayerStats && isChartOpen && (() => {
         const stats = selectedLayerStats;
         return (
-          <div 
+          <div
             style={{
               transform: `translate(calc(-50% + ${chartPos.x}px), ${chartPos.y}px)`,
             }}
             className="fixed bottom-8 left-1/2 z-[600] pointer-events-auto bg-white rounded-2xl shadow-2xl w-[330px] max-w-[92vw] border border-teal-200 select-none flex flex-col transition-shadow duration-200"
           >
             {/* Draggable Header */}
-            <div 
+            <div
               onMouseDown={handleChartMouseDown}
               className="flex justify-between items-center px-4 py-2.5 bg-gradient-to-r from-teal-50 via-emerald-50 to-teal-50 rounded-t-2xl border-b border-teal-100 cursor-grab active:cursor-grabbing shrink-0"
               title="Click and drag to move this window"
@@ -1767,8 +1847,8 @@ export default function Dashboard() {
                     Reset
                   </button>
                 )}
-                <button 
-                  onClick={() => setIsChartOpen(false)} 
+                <button
+                  onClick={() => setIsChartOpen(false)}
                   className="text-gray-400 hover:text-red-500 hover:bg-red-50 p-1 rounded-lg transition-colors"
                   title="Close visualization"
                 >
@@ -1790,7 +1870,7 @@ export default function Dashboard() {
                   <div className="bg-red-50 border border-red-100 p-5 rounded-xl flex flex-col items-center justify-center text-center shadow-sm">
                     <span className="text-red-800 font-medium text-sm mb-2">Total Estimated New Flooded Area:</span>
                     <span className="font-bold text-red-600 text-4xl">
-                      {stats.new_flooded_area_km2 !== undefined ? stats.new_flooded_area_km2 : '0'} 
+                      {stats.new_flooded_area_km2 !== undefined ? stats.new_flooded_area_km2 : '0'}
                       <span className="text-xl ml-1">km²</span>
                     </span>
                     <p className="text-xs text-red-500 mt-3 bg-red-100 px-3 py-1 rounded-full">
@@ -1919,13 +1999,13 @@ export default function Dashboard() {
       })()}
 
       <SidebarLayout
-        className="relative z-20" 
+        className="relative z-20"
         aoiDisplayText={aoiDisplayText}
         onSelectSavedAoi={handleSelectSavedAoi}
         onFloodRiskAnalysis={handleRunAnalysis}
         onFloodEventAnalysis={handleRunAnalysis}
         onRainfallAnalysis={handleRunAnalysis}
-        
+
         onLayerToggle={handleLayerToggle}
         activeLayers={activeLayers}
         selectedComponentLayers={selectedComponentLayers}
@@ -1946,12 +2026,12 @@ export default function Dashboard() {
         onDownloadProject={handleDownloadProject}
         onSaveProject={handleSaveProject}
         drawnGeometryData={drawnGeometryData}
-        
+
         activeTool={activeTool}
         setActiveTool={setActiveTool}
         onZoomIn={handleZoomIn}
         onZoomOut={handleZoomOut}
-        
+
         onDrawPolygon={handleDrawPolygon}
         onDrawCircle={handleDrawCircle}
         onInsertPoint={handleInsertPoint}
@@ -1959,31 +2039,82 @@ export default function Dashboard() {
       />
 
       <div className="z-50">
-        <HomeButton /> 
-        <LayerButton 
-          isOpen={isLayerOpen} 
-          onClick={() => setIsLayerOpen(!isLayerOpen)} 
-        /> 
-        <BasemapButton 
-          onClick={() => setIsBasemapOpen(true)} 
-        /> 
+        <HomeButton />
+        <LayerButton
+          isOpen={isLayerOpen}
+          onClick={() => setIsLayerOpen(!isLayerOpen)}
+        />
+        <BasemapButton
+          onClick={() => setIsBasemapOpen(true)}
+        />
         <InfoButton />
+
+        {/* Tombol Robot AI EWS di Pojok Kanan Bawah */}
+        <div className="fixed bottom-8 right-4 z-50 flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setIsEwsModalOpen((prev) => !prev)}
+            title="AI Flood Early Warning System (Machine Learning)"
+            className={`relative p-3.5 rounded-full shadow-xl border transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 ${isEwsModalOpen || hasEwsLayer
+                ? 'bg-teal-600 text-white border-teal-600 hover:bg-teal-700'
+                : 'bg-white text-teal-600 border-gray-200 hover:bg-teal-50'
+              }`}
+          >
+            <Bot className="h-6 w-6" />
+            <span className="absolute -top-1 -right-1 flex h-3 w-3">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+            </span>
+          </button>
+        </div>
+
+        {/* Modal Analisis Flood EWS (Machine Learning) */}
+        {isEwsModalOpen && (
+          <div className="fixed bottom-24 right-4 z-[650] w-[360px] max-w-[calc(100vw-2rem)] bg-white rounded-2xl shadow-2xl border border-teal-100 overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-200">
+            <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-teal-600 to-emerald-600 text-white">
+              <div className="flex items-center gap-2.5">
+                <div className="p-1.5 bg-white/20 rounded-lg">
+                  <Bot className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-sm leading-tight">AI Flood Susceptibility &amp; EWS</h3>
+                  <span className="text-[10px] text-teal-100 block">Multi-Horizon (T+1, T+3, T+7) Early Warning System</span>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsEwsModalOpen(false)}
+                className="p-1 rounded-lg text-white/80 hover:text-white hover:bg-white/15 transition-colors cursor-pointer"
+                title="Close Modal"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="p-4 max-h-[75vh] overflow-y-auto">
+              <EWSFloodMLAnalysis
+                onEWSResult={handleEWSResult}
+                onClearEWS={handleClearEWS}
+                hasActiveLayer={hasEwsLayer}
+              />
+            </div>
+          </div>
+        )}
       </div>
 
-      <BasemapLayout 
-        isOpen={isBasemapOpen} 
+      <BasemapLayout
+        isOpen={isBasemapOpen}
         onClose={() => setIsBasemapOpen(false)}
         selectedBasemapId={selectedBasemapId}
         onSelectBasemap={(basemap) => setSelectedBasemapId(basemap.id)}
       />
 
-      <LayerPopup 
-        isOpen={isLayerOpen} 
-        onClose={() => setIsLayerOpen(false)} 
-        
+      <LayerPopup
+        isOpen={isLayerOpen}
+        onClose={() => setIsLayerOpen(false)}
+
         onAdminLayerToggle={handleLayerToggle}
         adminStatus={activeLayers['province'] ? 'province' : (activeLayers['district'] ? 'district' : null)}
-        
+
         onThematicLayerToggle={handleLayerToggle}
         thematicStatus={activeLayers}
 
@@ -2024,8 +2155,8 @@ export default function Dashboard() {
         loadingUserLayers={loadingUserLayers}
       />
 
-      <FileUploadPopup 
-        isOpen={isFileUploadOpen} 
+      <FileUploadPopup
+        isOpen={isFileUploadOpen}
         onClose={() => setIsFileUploadOpen(false)}
         onFileSubmit={handleFileUploadSubmit}
       />
@@ -2045,7 +2176,7 @@ export default function Dashboard() {
       )}
 
       {loading && (
-        <Loader 
+        <Loader
           message="Processing Google Earth Engine Analysis"
           onCancel={cancelAnalysis}
           stages={[
@@ -2059,7 +2190,7 @@ export default function Dashboard() {
       )}
 
       {isUploading && (
-        <Loader 
+        <Loader
           mode="determinate"
           progress={uploadProgress}
           message={uploadProgress >= 100 ? "Validating AOI Geometry..." : "Uploading Spatial Files..."}
