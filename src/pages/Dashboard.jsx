@@ -215,22 +215,31 @@ export default function Dashboard() {
       const dx = moveEvent.clientX - startX;
       const dy = moveEvent.clientY - startY;
 
-      if (dir === 'right') {
-        const newWidth = Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, initWidth + dx));
-        setChartSize((prev) => ({ ...prev, width: newWidth }));
-        setChartPos((prev) => ({ ...prev, x: initX + (newWidth - initWidth) / 2 }));
-      } else if (dir === 'left') {
-        const newWidth = Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, initWidth - dx));
-        setChartSize((prev) => ({ ...prev, width: newWidth }));
-        setChartPos((prev) => ({ ...prev, x: initX - (newWidth - initWidth) / 2 }));
-      } else if (dir === 'bottom') {
-        const newHeight = Math.min(MAX_HEIGHT, Math.max(MIN_HEIGHT, initHeight + dy));
-        setChartSize((prev) => ({ ...prev, height: newHeight }));
-        setChartPos((prev) => ({ ...prev, y: initY + (newHeight - initHeight) }));
-      } else if (dir === 'top') {
-        const newHeight = Math.min(MAX_HEIGHT, Math.max(MIN_HEIGHT, initHeight - dy));
-        setChartSize((prev) => ({ ...prev, height: newHeight }));
+      let nextWidth = initWidth;
+      let nextHeight = initHeight;
+      let nextX = initX;
+      let nextY = initY;
+
+      if (dir.includes('right')) {
+        nextWidth = Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, initWidth + dx));
+        nextX = initX + (nextWidth - initWidth) / 2;
+      } else if (dir.includes('left')) {
+        nextWidth = Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, initWidth - dx));
+        nextX = initX - (nextWidth - initWidth) / 2;
       }
+
+      if (dir.includes('bottom')) {
+        nextHeight = Math.min(MAX_HEIGHT, Math.max(MIN_HEIGHT, initHeight + dy));
+        nextY = initY + (nextHeight - initHeight);
+      } else if (dir.includes('top')) {
+        nextHeight = Math.min(MAX_HEIGHT, Math.max(MIN_HEIGHT, initHeight - dy));
+      }
+
+      setChartSize((prev) => ({
+        width: dir.includes('left') || dir.includes('right') ? nextWidth : prev.width,
+        height: dir.includes('top') || dir.includes('bottom') ? nextHeight : prev.height,
+      }));
+      setChartPos({ x: nextX, y: nextY });
     };
 
     const handleMouseUp = () => {
@@ -1894,23 +1903,51 @@ export default function Dashboard() {
             }}
             className="fixed bottom-8 left-1/2 z-[600] pointer-events-auto bg-white rounded-2xl shadow-2xl w-[330px] max-w-[92vw] border border-teal-200 select-none flex flex-col transition-shadow duration-200"
           >
-            {/* Resize Handles (Atas, Bawah, Kiri, Kanan) */}
+            {/* Resize Handles (Sisi & Sudut) */}
             <div
               onMouseDown={(e) => handleChartResizeMouseDown(e, 'top')}
-              className="absolute top-0 left-2 right-2 h-1.5 cursor-ns-resize z-10"
+              title="Drag to resize height"
+              className="absolute -top-1 left-3 right-3 h-2.5 cursor-ns-resize z-10 rounded-t-full hover:bg-teal-400/30 transition-colors"
             />
             <div
               onMouseDown={(e) => handleChartResizeMouseDown(e, 'bottom')}
-              className="absolute bottom-0 left-2 right-2 h-1.5 cursor-ns-resize z-10"
+              title="Drag to resize height"
+              className="absolute -bottom-1 left-3 right-3 h-2.5 cursor-ns-resize z-10 rounded-b-full hover:bg-teal-400/30 transition-colors"
             />
             <div
               onMouseDown={(e) => handleChartResizeMouseDown(e, 'left')}
-              className="absolute top-2 bottom-2 left-0 w-1.5 cursor-ew-resize z-10"
+              title="Drag to widen/narrow"
+              className="absolute top-3 bottom-3 -left-1 w-2.5 cursor-ew-resize z-10 rounded-l-full hover:bg-teal-400/30 transition-colors"
             />
             <div
               onMouseDown={(e) => handleChartResizeMouseDown(e, 'right')}
-              className="absolute top-2 bottom-2 right-0 w-1.5 cursor-ew-resize z-10"
+              title="Drag to widen/narrow"
+              className="absolute top-3 bottom-3 -right-1 w-2.5 cursor-ew-resize z-10 rounded-r-full hover:bg-teal-400/30 transition-colors"
             />
+            <div
+              onMouseDown={(e) => handleChartResizeMouseDown(e, 'top-left')}
+              title="Drag corner to resize"
+              className="absolute -top-1 -left-1 w-3.5 h-3.5 cursor-nwse-resize z-20"
+            />
+            <div
+              onMouseDown={(e) => handleChartResizeMouseDown(e, 'top-right')}
+              title="Drag corner to resize"
+              className="absolute -top-1 -right-1 w-3.5 h-3.5 cursor-nesw-resize z-20"
+            />
+            <div
+              onMouseDown={(e) => handleChartResizeMouseDown(e, 'bottom-left')}
+              title="Drag corner to resize"
+              className="absolute -bottom-1 -left-1 w-3.5 h-3.5 cursor-nesw-resize z-20"
+            />
+            <div
+              onMouseDown={(e) => handleChartResizeMouseDown(e, 'bottom-right')}
+              title="Drag corner to resize"
+              className="absolute -bottom-1 -right-1 w-4 h-4 cursor-nwse-resize z-20 flex items-end justify-end p-1 text-teal-500/70 hover:text-teal-700"
+            >
+              <svg className="w-2.5 h-2.5" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+                <path d="M9 1L1 9M9 5L5 9" />
+              </svg>
+            </div>
             
             {/* Draggable Header */}
             <div
@@ -1924,14 +1961,17 @@ export default function Dashboard() {
                 </span>
                 <div>
                   <h3 className="font-bold text-teal-900 text-xs leading-tight">Data Analysis Visualization</h3>
-                  <span className="text-[9px] text-gray-400 block font-normal leading-none mt-0.5">Draggable window</span>
+                  <span className="text-[9px] text-gray-400 block font-normal leading-none mt-0.5">Draggable &amp; resizable window</span>
                 </div>
               </div>
               <div className="flex items-center gap-1">
-                {(chartPos.x !== 0 || chartPos.y !== 0) && (
+                {isModified && (
                   <button
-                    onClick={() => setChartPos({ x: 0, y: 0 })}
-                    title="Reset to center-bottom position"
+                    onClick={() => {
+                      setChartPos({ x: 0, y: 0 });
+                      setChartSize({ width: 330, height: null });
+                    }}
+                    title="Reset size and position"
                     className="text-[10px] px-1.5 py-0.5 text-teal-700 hover:bg-teal-100 rounded transition-colors font-medium border border-teal-200"
                   >
                     Reset
@@ -1948,7 +1988,11 @@ export default function Dashboard() {
             </div>
 
             {/* Scrollable Content Body */}
-            <div className="p-4 overflow-y-auto max-h-[50vh] space-y-3 custom-scrollbar">
+            <div
+              className={`p-4 overflow-y-auto space-y-3 custom-scrollbar flex-1 min-h-0 ${
+                chartSize.height ? '' : 'max-h-[50vh]'
+              }`}
+            >
               {/* 1. Full Flood Risk Analysis */}
               {(activeLayers['FloodRisk'] || stats.risk_distribution || (stats.avg_elevation_m !== undefined && stats.avg_rainfall_mm !== undefined && stats.avg_ndvi !== undefined)) && (
                 <StatsDashboard statistics={stats} />
@@ -1987,7 +2031,33 @@ export default function Dashboard() {
                     )}
                   </div>
                   {stats.time_series_data && (
-                    <div className="h-48 w-full bg-white p-2 border border-gray-100 rounded-lg shadow-inner">
+                    <div
+                      style={{
+                        height: chartSize.height
+                          ? `${Math.max(192, chartSize.height - 250)}px`
+                          : undefined,
+                      }}
+                      className="relative h-48 min-h-[12rem] w-full bg-white p-2 border border-gray-100 rounded-lg shadow-inner"
+                    >
+                      <div
+                        onMouseDown={(e) => handleChartResizeMouseDown(e, 'right')}
+                        title="Drag to widen graph"
+                        className="absolute top-0 bottom-3 -right-1.5 w-2.5 cursor-ew-resize z-10"
+                      />
+                      <div
+                        onMouseDown={(e) => handleChartResizeMouseDown(e, 'left')}
+                        title="Drag to widen graph"
+                        className="absolute top-0 bottom-3 -left-1.5 w-2.5 cursor-ew-resize z-10"
+                      />
+                      <div
+                        onMouseDown={(e) => handleChartResizeMouseDown(e, 'bottom-right')}
+                        title="Drag to resize graph"
+                        className="absolute -bottom-1 -right-1 w-4 h-4 cursor-nwse-resize z-10 flex items-end justify-end p-0.5 text-gray-300 hover:text-teal-600"
+                      >
+                        <svg className="w-2.5 h-2.5" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+                          <path d="M9 1L1 9M9 5L5 9" />
+                        </svg>
+                      </div>
                       <PrecipitationChart chartData={stats.time_series_data} />
                     </div>
                   )}

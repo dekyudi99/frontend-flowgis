@@ -140,7 +140,7 @@ function PrecipitationChart({ chartData }) {
         </button>
       </div>
       
-      <div className="flex-grow">
+      <div className="relative flex-1 w-full h-full min-w-0 min-h-0 overflow-hidden">
         <Line data={data} options={options} />
       </div>
     </div>
