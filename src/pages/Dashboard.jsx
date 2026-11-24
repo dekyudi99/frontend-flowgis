@@ -175,6 +175,74 @@ export default function Dashboard() {
     window.addEventListener('mouseup', handleMouseUp);
   };
 
+  const chartRef = useRef(null);
+  const [chartSize, setChartSize] = useState({ width: 330, height: null });
+  const isResizingChartRef = useRef(false);
+  const chartResizeStartRef = useRef({
+    direction: null,
+    startX: 0,
+    startY: 0,
+    initWidth: 330,
+    initHeight: 0,
+    initX: 0,
+    initY: 0,
+  });
+
+  const handleChartResizeMouseDown = (e, direction) => {
+    e.stopPropagation();
+    e.preventDefault();
+    isResizingChartRef.current = true;
+
+    const currentHeight = chartSize.height || chartRef.current?.offsetHeight || 300;
+    chartResizeStartRef.current = {
+      direction,
+      startX: e.clientX,
+      startY: e.clientY,
+      initWidth: chartSize.width,
+      initHeight: currentHeight,
+      initX: chartPos.x,
+      initY: chartPos.y,
+    };
+
+    const MIN_WIDTH = 260;
+    const MAX_WIDTH = Math.floor(window.innerWidth * 0.92);
+    const MIN_HEIGHT = 160;
+    const MAX_HEIGHT = window.innerHeight - 64;
+
+    const handleMouseMove = (moveEvent) => {
+      if (!isResizingChartRef.current) return;
+      const { direction: dir, startX, startY, initWidth, initHeight, initX, initY } = chartResizeStartRef.current;
+      const dx = moveEvent.clientX - startX;
+      const dy = moveEvent.clientY - startY;
+
+      if (dir === 'right') {
+        const newWidth = Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, initWidth + dx));
+        setChartSize((prev) => ({ ...prev, width: newWidth }));
+        setChartPos((prev) => ({ ...prev, x: initX + (newWidth - initWidth) / 2 }));
+      } else if (dir === 'left') {
+        const newWidth = Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, initWidth - dx));
+        setChartSize((prev) => ({ ...prev, width: newWidth }));
+        setChartPos((prev) => ({ ...prev, x: initX - (newWidth - initWidth) / 2 }));
+      } else if (dir === 'bottom') {
+        const newHeight = Math.min(MAX_HEIGHT, Math.max(MIN_HEIGHT, initHeight + dy));
+        setChartSize((prev) => ({ ...prev, height: newHeight }));
+        setChartPos((prev) => ({ ...prev, y: initY + (newHeight - initHeight) }));
+      } else if (dir === 'top') {
+        const newHeight = Math.min(MAX_HEIGHT, Math.max(MIN_HEIGHT, initHeight - dy));
+        setChartSize((prev) => ({ ...prev, height: newHeight }));
+      }
+    };
+
+    const handleMouseUp = () => {
+      isResizingChartRef.current = false;
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+  };
+
   const [legendPos, setLegendPos] = useState({ x: 0, y: 0 });
   const isDraggingLegendRef = useRef(false);
   const legendDragStartRef = useRef({ startX: 0, startY: 0, initX: 0, initY: 0 });
@@ -1815,13 +1883,35 @@ export default function Dashboard() {
       {/* Floating Draggable Data Analysis Visualization */}
       {selectedLayerStats && isChartOpen && (() => {
         const stats = selectedLayerStats;
+        const isModified = chartPos.x !== 0 || chartPos.y !== 0 || chartSize.width !== 330 || chartSize.height !== null;
         return (
           <div
+            ref={chartRef}
             style={{
               transform: `translate(calc(-50% + ${chartPos.x}px), ${chartPos.y}px)`,
+              width: `${chartSize.width}px`,
+              ...(chartSize.height ? { height: `${chartSize.height}px` } : {}),
             }}
             className="fixed bottom-8 left-1/2 z-[600] pointer-events-auto bg-white rounded-2xl shadow-2xl w-[330px] max-w-[92vw] border border-teal-200 select-none flex flex-col transition-shadow duration-200"
           >
+            {/* Resize Handles (Atas, Bawah, Kiri, Kanan) */}
+            <div
+              onMouseDown={(e) => handleChartResizeMouseDown(e, 'top')}
+              className="absolute top-0 left-2 right-2 h-1.5 cursor-ns-resize z-10"
+            />
+            <div
+              onMouseDown={(e) => handleChartResizeMouseDown(e, 'bottom')}
+              className="absolute bottom-0 left-2 right-2 h-1.5 cursor-ns-resize z-10"
+            />
+            <div
+              onMouseDown={(e) => handleChartResizeMouseDown(e, 'left')}
+              className="absolute top-2 bottom-2 left-0 w-1.5 cursor-ew-resize z-10"
+            />
+            <div
+              onMouseDown={(e) => handleChartResizeMouseDown(e, 'right')}
+              className="absolute top-2 bottom-2 right-0 w-1.5 cursor-ew-resize z-10"
+            />
+            
             {/* Draggable Header */}
             <div
               onMouseDown={handleChartMouseDown}
